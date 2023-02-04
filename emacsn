@@ -1,0 +1,220 @@
+#!/usr/bin/env zsh
+
+runemacs=`which emacs`
+
+eval_prefix=" --eval '("
+eval_suffix=")'"
+runfunc=""
+sleep=""
+background=" &"
+title=""
+terminal=""
+daemon=""
+emacsclient="no"
+email_elisp='mu4e'
+edit_elisp='main-window'
+browser_eval_prefix=' eaf-open-url "'
+browser_eval_suffix='"'
+profile=''
+
+help(){
+    print 'emacsn - helper for running emacs'
+    print ' '
+    print 'emacsn [options] [files]'
+    print ' '
+    print 'Run emacs as emacsclient or emacs non-client'
+    print 'with a title, in a terminal or not,'
+    print 'and with a lisp evaluation function on startup'
+    print ' '
+    print 'If starting servers on xinit, it is advisable to add some Sleep time'
+    print 'before startup and to also run it in the background.'
+    print 'Otherwise the server may fail to startup as emacs finishes'
+    print 'before X windows is fully started.'
+    print ' '
+    print 'For email, mu4e must be installed. My main-window and eaf-open-url '
+    print 'functions can be found here. '
+    print 'http://github.com/EricGebhart/emacs-setup/elisp/config/functions.el'
+    print ' '
+    print ' Chemacs profile'
+    print ' -p profile      Use another emacs config. (stable, dev, doom, space)'
+    print ' '
+    print ' Client/server'
+    print ' -c              Use emacsclient'
+    print ' -s server name  Connect to, or Start, a named daemon'
+    print ' -d              Start an unnamed server daemon'
+    print ' -S count        Sleep count seconds before running.'
+    print ' '
+    print ' Run a lisp function on startup. -e, -m, -b, -f'
+    print ' -e              Title it Email and eval mu4e.'
+    print ' -m name         Title it name and eval (main-window)'
+    print ' -b url          Open eaf-browser with url'
+    print ' -f lisp-func    Evaluate lisp-func on startup.'
+    print ' '
+    print ' -h              This help text.'
+    print ' -T title        Give emacs that title.'
+    print ' -t              'emacs -nw' - run in a terminal.'
+    print ' -w              New window/frame --create-frame. opposite of -t'
+    print ' '
+    print 'Note: There are functionalities that must be present in emacs in order'
+    print '      for some things to work. Namely: mu4e, eaf-browser, and the'
+    print '      main-window and the eaf-open-url elisp functions.'
+    print ' '
+    print 'Run emacs alone, as a server daemon or emacsclient.'
+    print ' '
+    print 'Examples: '
+    print ' '
+    print '   Stand alone Emacs'
+    print '   * Start a default emacs session'
+    print '     emacsn'
+    print '   * Start terminal session. '
+    print '     emacsn -t'
+    print '   * Start an mu4e email session (mu4e) as a standalone emacs'
+    print '     emacsn -e'
+    print '   * Start a split frame session (main-window) as a standalone emacs'
+    print '     emacsn -m MySessionTitle'
+    print '   * Start a browser session (eaf-open-url) as a standalone emacs'
+    print '     emacsn -b duckduckgo.com'
+    print ' '
+    print '   Using an emacs server daemon:'
+    print '   * Start an unnamed server daemon: '
+    print '     emacsn -d'
+    print '   * Start a client in new window/frame:'
+    print '     emacsn -cw'
+    print '   * Start a client in terminal:'
+    print '     emacsn -ct'
+    print ' '
+    print '   Using a named emacs server daemon:'
+    print ' '
+    print '     Emacs server'
+    print '     * Start a server daemon with a name of "common":'
+    print '       emacsn -s common'
+    print '     * Start a server daemon running mu4e with a name of "mail" :'
+    print '       emacsn -es mail'
+    print '     * Start a server daemon with a sleep delay of 20 seconds:'
+    print '       emacsn -es mail -S 20'
+    print ' '
+    print '     Emacs client'
+    print '     * Start a client in new window/frame using a named server:'
+    print '       emacsn -cws common '
+    print '     * Start a client in an existing window/frame using a named server:'
+    print '       emacsn -cs common '
+    print '     * Start a client running mu4e in a new window/frame using a named server:'
+    print '       emacsn -ces email '
+    print '     * Open an eaf browser on url in an new client window/frame:'
+    print '       emacsn -cws common -b duckduckgo.com'
+    print '     * Open an eaf browser on url in an existing window/frame:'
+    print '       emacsn -cs common -b duckduckgo.com'
+    print '     * Start a split frame session (main-window) in new frame:'
+    print '       emacsn -cws common -m MySessionTitle '
+    print '     * Start an mu4e email session.'
+    print '       emacsn -cews email'
+    print '     * Start terminal session. '
+    print '       emacsn -cts common'
+    print ' '
+    print 'Related Elisp code:'
+    print ' '
+    print '(defun main-window ()
+             "Split it up into some windows"
+             (interactive)
+             (balance-windows)
+             (split-window-horizontally)
+             (split-window-horizontally)
+             (split-window-horizontally)
+             (split-window-horizontally))'
+    print ' '
+    print '(defun eaf-open-url (url)
+             "Non interactive way to open a browser url in eaf-browser.
+             Wraps urls with https:// as needed."
+             (eaf-open (eaf-wrap-url url) "browser"))'
+
+    print ' '
+    print 'See Also: '
+    print 'http://github.com/EricGebhart/xmonad-setup'
+    print 'More emacs stuff is available here:'
+    print 'http://github.com/EricGebhart/emacs-setup'
+    print ' '
+    exit
+}
+
+
+# $opt will hold the current option
+local opt
+while getopts cetdhwm:f:T:b:s:S:p: opt; do
+    # loop continues till options finished
+    # see which pattern $opt matches...
+    case $opt in
+        (d)
+            #eval "emacs --daemon"
+            if [ -z "$daemon" ]; then
+                daemon="--daemon"
+            fi
+            ;;
+        (p)
+            profile="--with-profile "$OPTARG
+            ;;
+        (s)
+            daemon="--daemon="$OPTARG
+            socket="--socket-name="$OPTARG
+            ;;
+        (S)
+            sleep=$OPTARG
+            ;;
+        (c)
+            runemacs=`which emacsclient`
+            emacsclient="yes"
+            ;;
+        (e)
+            runfunc=$eval_prefix$email_elisp$eval_suffix
+            title="-T Email"
+            ;;
+        (m)
+            runfunc=$eval_prefix$edit_elisp$eval_suffix
+            title=' -T '$OPTARG
+            ;;
+        (b)
+            runfunc=$eval_prefix$browser_eval_prefix$OPTARG$browser_eval_suffix$eval_suffix
+            ;;
+        (f)
+            runfunc=$eval_prefix$OPTARG$eval_suffix
+            ;;
+        (T)
+            title=' -T '$OPTARG
+            ;;
+        (t)
+            terminal=' -nw ' $terminal
+            background=''
+            ;;
+        (w)
+            terminal=' -c ' $terminal
+            ;;
+        (h)
+            help
+            ;;
+	# matches a question mark
+	# (and nothing else, see text)
+        (\?)
+            print "Bad option:" $*
+            print " "
+            help
+            return 1
+            ;;
+    esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+#print Remaining arguments are: $*
+
+# switch the arg if we are running emacs client.
+if [[ ${emacsclient} == "yes" ]]; then
+    daemon=$socket
+fi
+
+mycommand=$runemacs' '${daemon}' '${profile}' '${terminal}' '${title}' '${*}' '$runfunc' '${background}
+
+print "Emacs With Command:" $mycommand
+
+if [ -n "$sleep"  ]; then
+    # print "Sleeping:" $sleep
+    sleep $sleep
+fi
+
+eval $mycommand

@@ -1,0 +1,212 @@
+# THEN WE SPECIFY THE LOCAL AND REMOTE STORAGE
+# - THE REMOTE STORAGE IS WHERE WE GET THE MAIL FROM (E.G., THE
+#   SPECIFICATION OF AN IMAP ACCOUNT)
+# - THE LOCAL STORAGE IS WHERE WE STORE THE EMAIL ON OUR COMPUTER
+
+# CONNECTIONS SPECIFY LINKS BETWEEN REMOTE AND LOCAL FOLDERS
+#
+# CONNECTIONS ARE SPECIFIED USING PATTERNS, WHICH MATCH REMOTE MAIl
+# FOLDERS. SOME COMMONLY USED PATTERS INCLUDE:
+#
+# 1 "*" TO MATCH EVERYTHING
+# 2 "!DIR" TO EXCLUDE "DIR"
+# 3 "DIR" TO MATCH DIR
+#
+# FOR INSTANCE IN THE SPECIFICATION BELOW:
+#
+# gmail-inbox gets the folder INBOX, ARCHIVE, and everything under "ARCHIVE*"
+# gmail-trash gets only the "[Gmail]/Trash" folder and stores it to the local "trash" folder
+
+
+#====================================================================================================================================
+
+# The "Channel" is used when invoking mbsync to tell it which Channel to "watch"
+# Far tells it which IMAPStore to look at, (in this case look for the one called "just.a.label"
+# Near is where to put it, (this _can_ be a remote IMAP server! Cool for migrations)
+# the last three are more example settings. Check the man for more.
+
+# A Channel can pull from multiple accounts or server at the same time!
+
+#================================================================================
+
+# What we set SSLVersions to depends on the output of
+
+# openssl s_client -connect imap.gmail.com:993 -showcerts | grep Protocol
+
+# C-c out of that command once it says * OK Gimap ready for requests from <your IP address>. You must have also noticed that we store passwords in encrypted files. Very easy to do: write the password for account acc1-gmail in a plain-text file .mbsyncpass-acc1 and on the terminal do
+
+# gpg2 -c .mbsyncpass-acc1
+
+# You will be asked for a password, enter it, memorize it, and delete the plain-text file containing your password. You can also do this in Emacs when visiting the file, using M-x epa-encrypt-file and simply selecting the option [OK]. Emacs will also automatically decrypt any encrypted files when opening them, you might of course be asked for your password.
+
+
+SyncState *
+Create Both
+#Expunge Both
+# PassCmd "security find-generic-password -s mbsync-gmail-password -w"
+# UseIMAPS yes
+#SSLType IMAPS
+#SSLVersions SSLv3
+
+IMAPAccount erica
+    Host       imap.gmail.com
+    User       ericalinagebhart@gmail.com
+    #Pass      not-very-secure-password.
+;    PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mail/.mbsyncpass-erica.gpg"
+    PassCmd "cat ~/.mail/.mbsyncpass-erica"
+    SSLType IMAPS
+    #SSLVersions SSLv3
+    AuthMechs LOGIN
+#CertificateFile ~/.mail/certs.pem
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+# REMOTE STORAGE (USE THE IMAP ACCOUNT SPECIFIED ABOVE)
+IMAPStore erica-remote
+    Account erica
+
+MaildirStore erica-local
+    Path  ~/.mail/erica/
+    Inbox ~/.mail/erica/INBOX
+
+Channel erica-inbox
+    Far :erica-remote:"INBOX"
+    Near  :erica-local:inbox
+
+Channel erica-sent
+    Far :erica-remote:"[Gmail]/Sent Mail"
+    Near  :erica-local:sent
+
+Channel erica-trash
+    Far :erica-remote:"[Gmail]/Trash"
+    Near  :erica-local:trash
+
+Group erica
+    Channel erica-inbox
+    Channel erica-sent
+
+#----------------------------------------
+
+# IMAPAccount eric
+#     Host       imap.gmail.com
+#     User       e.a.gebhart@gmail.com
+#     #Pass      not-very-secure-password.
+#     SSLType IMAPS
+#     #SSLVersions SSLv3
+#     AuthMechs LOGIN
+#     PassCmd "cat ~/.mail/junk"
+# #CertificateFile ~/.mail/certs.pem
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+# # REMOTE STORAGE (USE THE IMAP ACCOUNT SPECIFIED ABOVE)
+# IMAPStore eric-remote
+#     Account eric
+
+# MaildirStore eric-local
+#     Path  ~/.mail/eric/
+#     Inbox ~/.mail/eric/INBOX
+
+# Channel eric-inbox
+#     Far :eric-remote:"INBOX"
+#     Near  :eric-local:inbox
+
+# Channel eric-sent
+#     Far :eric-remote:"[Gmail]/Sent Mail"
+#     Near  :eric-local:sent
+
+# Channel eric-trash
+#     Far :eric-remote:"[Gmail]/Trash"
+#     Near  :eric-local:trash
+
+# Group eric
+#     Channel eric-inbox
+#     Channel eric-sent
+
+#----------------------------------------
+
+# IMAPAccount tangobreath-account
+#     Host       imap.gmail.com
+#     User       tangobreath@gmail.com
+#     SSLType IMAPS
+#     #SSLVersions SSLv3
+#     AuthMechs LOGIN
+#     PassCmd "cat ~/.mail/junk"
+# #CertificateFile ~/.mail/certs.pem
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+# IMAPStore tangobreath-remote
+#     Account tangobreath-account
+
+# MaildirStore tangobreath-local
+#     Path  ~/.mail/tangobreath/
+#     Inbox ~/.mail/tangobreath/INBOX
+
+# Channel tangobreath-inbox
+#     Far :tangobreath-remote:"INBOX"
+#     Near  :tangobreath-local:inbox
+
+# Channel tangobreath-sent
+#     Far :tangobreath-remote:"[Gmail]/Sent Mail"
+#     Near  :tangobreath-local:sent
+
+# Channel tangobreath-trash
+#     Far :tangobreath-remote:"[Gmail]/Trash"
+#     Near  :tangobreath-local:trash
+
+# Group tangobreath
+#     Channel tangobreath-inbox
+#     Channel tangobreath-sent
+
+#----------------------------------------
+
+# IMAPAccount ericYeti-account
+#     Host       imap.gmail.com
+#     User       eric@yetidata.com
+#     SSLType IMAPS
+#     #SSLVersions SSLv3
+#     AuthMechs LOGIN
+#     PassCmd "cat ~/.mail/junk"
+# #CertificateFile ~/.mail/certs.pem
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+# IMAPStore ericYeti-remote
+#     Account ericYeti-account
+
+# MaildirStore ericYeti-local
+#     Path  ~/.mail/ericYeti/
+#     Inbox ~/.mail/ericYeti/INBOX
+
+# Channel ericYeti-inbox
+#     Far :ericYeti-remote:"INBOX"
+#     Near  :ericYeti-local:inbox
+
+# Channel ericYeti-sent
+#     Far :ericYeti-remote:"[Gmail]/Sent Mail"
+#     Near  :ericYeti-local:sent
+
+# Channel ericYeti-trash
+#     Far :ericYeti-remote:"[Gmail]/Trash"
+#     Near  :ericYeti-local:trash
+
+# Group ericYeti
+#     Channel ericYeti-inbox
+#     Channel ericYeti-sent
+
+
+# GROUPS PUT TOGETHER CHANNELS, SO THAT WE CAN INVOKE
+# MBSYNC ON A GROUP TO SYNC ALL CHANNELS
+#
+# FOR INSTANCE: "mbsync allmail" GETS MAIL FROM
+# "gmail-inbox", "gmail-sent", and "gmail-trash"
+#
+
+Group allmail
+    Channel eric-inbox
+    Channel eric-sent
+    Channel eric-trash
+
+    # Channel tangobreath-inbox
+    # Channel tangobreath-sent
+    # Channel tangobreath-trash
+    # Channel ericYeti-inbox
+    # Channel ericYeti-sent
+    # Channel ericYeti-trash
