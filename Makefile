@@ -25,14 +25,13 @@ emacsn-home := ~/bin
 config-custom := ~/.config/emacs-custom.el
 
 # this repo actually.
-emacs-setup := ericalinag/emacs-setup.git
+emacsn := ericalinag/emacsn.git
 
 # emacs installation repos
 default-emacs-repo := ericalinag/ericas-emacs.git
 dev-repo := $(default-emacs-repo)
 stable-repo := $(default-emacs-repo)
 test-repo := $(default-emacs-repo)
-
 
 # we can use the plain vanilla emacs to load our packages.
 # We just have to be where we want them.
@@ -142,7 +141,7 @@ touch-custom:
 
 mk-emacs-home: touch-custom
 	printf "Creating Emacs Home: $(emacs-home)\n"
-	git clone $(emacs-setup) $(emacs-home)
+	git clone $(emacsn) $(emacs-home)
 	mkdir -p $(emacs-home)
 
 # These move .emacs and .emacs.d to .bak.<epoch seconds>
