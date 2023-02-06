@@ -129,6 +129,14 @@ print-%  : ; @echo $* = $($*)
 
 # profile targets,
 # add/uncomment them into .emacs-profiles.el.
+#
+# profile entries in emacs-profiles-orig.el start with ;;<profile>
+# ie. ;;stable
+# so that we can easily enable them if a profile is installed.
+# It starts earlier when install-chemacs installs emacs-profiles-orig.el
+# to ~/. Each time we come through here we get it, uncomment the target
+# entries and put it back. We leave a copy here just in case.
+#
 # clone them to their target directory.
 # do what we can to get them to do their initial load.
 $(profiles):

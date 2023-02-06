@@ -3,7 +3,7 @@
 ;;; Code:
 
 (
- ;;stable ("default" . ((user-emacs-directory . "~/Emacs/stable/elisp")))
+ ;;stable ("default" . ((user-emacs-directory . "~/Emacs/stable")))
  ("gnu"      . ((user-emacs-directory . "~/Emacs/gnu")))
  ("test"      . ((user-emacs-directory . "~/Emacs/test")))
 
