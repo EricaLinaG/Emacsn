@@ -86,21 +86,21 @@ so that any problems can be managed.
 
 ## Emacs-home
 
-In the __Makefile__ _emacs-home_ is set to __~/Emacs__ this is where 
+In the __Makefile__ _emacs-home_ is set to __~/Emacsn__ this is where 
 an _emacsn_ repo like this one will live, and under it will be all of the 
 emacs configurations.
 
-The default install will place an __emacsn__ repo in _~/Emacs_ anyway, go 
+The default install will place an __emacsn__ repo in _~/Emacsn_ anyway, go 
 with the flow or edit the Makefile and make your own.
 
 ## Installation
 
 ### Get the makefile or this repo.
 
-    git clone https://github.com/ericalinag/emacsn.git ~/Emacs
-    cd ~/Emacs
+    git clone https://github.com/ericalinag/Emacsn.git ~/Emacsn
+    cd ~/Emacsn
 
-or really you just need the Makefile, it will create ~/Emacs for you.
+or really you just need the Makefile, it will create ~/Emacsn for you.
 
     curl https://github.com/ericalinag/emacsn/master/blob/Makefile > Makefile
 
@@ -123,11 +123,11 @@ __make install__ Does the following:
   - Move _.emacs_ and _.emacs.d_ out of the way if they exist.
   - Install Chemacs2 into ~/.emacs.d
   - Create _.emacs-profiles.el 
-    - __gnu__ empty at _~/Emacs/gnu_.
-    - __test__ empty at ~/Emacs/test
-    - __dev__ ericas at ~/Emacs/dev
+    - __gnu__ empty at _~/Emacsn/gnu_.
+    - __test__ empty at ~/Emacsn/test
+    - __dev__ ericas at ~/Emacsn/dev
         - load packages at __dev__
-    - __stable__ ericas at ~/Emacs/stable
+    - __stable__ ericas at ~/Emacsn/stable
         - load packages at __stable__
   - Copy _.emacs-profiles.el_, to _~/_ with each additional profile.
   

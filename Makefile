@@ -20,7 +20,7 @@
 .SILENT:
 
 # Where Emacs installations and this Emacsn will live.
-emacs-home := ~/Emacs
+emacs-home := ~/Emacsn
 
 # Where to put Emacsn helper script
 emacsn-home := ~/bin
@@ -155,7 +155,8 @@ $(profiles):
 	printf "-----------------------------------------------------\n\n"
 
 
-$(profiles)-update:
+update-profiles := stable-update dev-update test-update doom-update
+$(update-profiles):
 	printf "\n\nRunning update for profile: $@\n\n"
 	$($@-update-cmd)
 
@@ -164,7 +165,7 @@ $(profiles)-update:
 .PHONY: mu4e
 mu4e: mbsync
 	printf "On Arch linux, mu4e should be loaded from site packages automatically"
-        printf "if mu has been installed. sudo pacman -S mu\n"
+	printf "if mu has been installed. sudo pacman -S mu\n"
 #       the hacky way I used to do it.
 #	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
 
