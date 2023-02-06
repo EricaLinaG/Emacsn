@@ -127,18 +127,18 @@ testit:
 # make print-VARIABLE ie. make print-profiles, make print-emacs-home
 print-%  : ; @echo $* = $($*)
 
-# profile targets,
-# add/uncomment them into .emacs-profiles.el.
+# Profile targets,
+# Clone them to their target directory.
+# Add/uncomment them into ~/.emacs-profiles.el.
+# Run them how they like to install themselves.
 #
 # profile entries in emacs-profiles-orig.el start with ;;<profile>
 # ie. ;;stable
-# so that we can easily enable them if a profile is installed.
+# so that we can easily enable them when a profile is installed.
 # It starts earlier when install-chemacs installs emacs-profiles-orig.el
-# to ~/. Each time we come through here we get it, uncomment the target
+# to ~/. Each time we come through here we get it from ~/, uncomment the target
 # entries and put it back. We leave a copy here just in case.
 #
-# clone them to their target directory.
-# do what we can to get them to do their initial load.
 $(profiles):
 	printf "\n\n-----------------------------------------------------\n"
 	printf "Adding profile for $@ to ~/.emacs-profiles.el\n"
@@ -160,12 +160,17 @@ $(profiles)-update:
 	$($@-update-cmd)
 
 # is there a better way? I hope so.
+# link mbsyncrc and hope mu4e is installed properly already.
 .PHONY: mu4e
 mu4e: mbsync
-	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
+	printf "On Arch linux, mu4e should be loaded from site packages automatically"
+        printf "if mu has been installed. sudo pacman -S mu\n"
+#       the hacky way I used to do it.
+#	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
 
 .PHONY: mbsync
 mbsync:
+	print "linking mbysyncrc to ~/.mbsyncrc\n\n"
 	ln -s $(PWD)/mbsyncrc $(HOME)/.mbsyncrc
 
 clean-links:
