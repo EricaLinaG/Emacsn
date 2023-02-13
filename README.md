@@ -4,49 +4,52 @@
 
 This is literally just a script and a __Makefile__ to create an easy system of 
 installing and managing multiple emacs installations from github. 
+The emacs installs just need to work in _.emacs.d_ under normal cirmumstances,
+with an _init.el_.
 
-The shell script Emacs wrapper, __emacsn__ is just to make life a little easier.
+If you ever wanted an easy way to compare Doom to spacemacs, to Prelude, Emacs from
+Scratch, Emacs-Live, or any other, Here is an easy path. 
+
+If you have ever ruined your emacs setup and had to go back, or fix it in less than
+ideal circumstances, then this could also be your solution to accidental 
+emacs startup breakage.
+
+There is shell script Emacs wrapper, __emacsn__ is just to make life a little easier.
 Because I'm lazy and I forget. It has accumulated features over the years, but
 remains a nice wrapper for the emacs and emacsclient command lines.
 
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
-But that can be yours or something else.
+But that can be yours or something else. It is very easy to change at the top of
+the _Makefile_.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
-and can use yours as the default by visiting this in the makefile.
+and can use yours as the default by visiting and editing this in the makefile.
 
     default-emacs-repo := ericalinag/ericas-emacs.git
 
 The default configuration gets 3 installs, __stable__, __dev__ and __test__.
+test is empty, and therefore vanilla gnu to start with.
 
 There is a `make test-install` target to make sure what is pushed installs and 
 runs cleanly before updating the stable installation with `make stable-update`.
 
 For the Ericas-Emacs and Doom-Emacs installations there are make targets
-to update those installations. 
-    `make <stable|dev|test>-update`
+to update those installations. Erica's update includes a  `git pull` to update
+the code base as well as the packages.
+    `make <stable|dev|test|doom>-update`
+    ie.
     `make doom-update`
+    
+The rest of the configurations simply use _list-packages_ for updates and 
+install all packages on the first run as you would expect. The install and 
+update commands, are to just invoke emacs with that profile.
 
-Current available installations can be printed with `make print-profiles`:
-
-  - default - Ericas-Emacs -- default/stable, dev, test.
-  - gnu     - plain vanilla.
-  optional:
-  - ericas  - ericas-emacs
-  - doom    - doom-emacs
-  - space   - spacemacs
-  - prelude
-
-There are multiple profiles and servers for the default configuration
-as well as servers for doom and spacemacs.
-
-There is a __test__ profile which is used to test the pushed version of 
-the default configuration.
 
 ## Read the Makefile
 
 Its not too hard, and you'll know everything, mostly.
-Oh, and take a look at _emacs-profiles-orig.el_.
+Oh, and take a look at _emacs-profiles-orig.el_. It does have a majority of
+the examples from the Chemacs2 readme.
 
 ## Chemacs
 
@@ -55,21 +58,38 @@ as an _Emacs bootloader_ to allow multiple emacs configurations to exist at once
 Most of the examples from the chemacs doc are incorporated here.
 
 This repo can install the following:
-    - Chemacs2  - Our bootloader.
-    - __stable__ and __development__ installs of the default configuration.
-    - __doom__ For [_doom-emacs](https://github.com/doomemacs), 
-    - __space__ For [spacemacs](https://github.com/syl20bnr/spacemacs).
-    - __prelude__ For [prelude emacs](https://github.com/bbatsov/prelude).
-    - __ericas__ For [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
-    gnu and test are a special case and are always added.
-    - __gnu__ A blank emacs.d - vanilla gnu emacs. 
-    - __test__ Like __gnu__ when clear, but is used to test fresh installs of default.
+    - __Chemacs2__  - Our bootloader.
+
+    - Flavors of Emacs
+    Current available installations can be printed with `make print-profiles`:
+      - __default__ is the same as __stable__
+      - __stable__ and __dev__ and __test__ are 
+      [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
+      as the default configuration.
+      - __doom__ is [_doom-emacs](https://github.com/doomemacs), 
+      - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
+      - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
+      - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
+      - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
+      - __efs__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
+      - __hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
+      - __ude__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
+
+    - gnu and test are a special case and are always added.
+      - __gnu__ A blank emacs.d - vanilla gnu emacs. 
+      - __test__ Like __gnu__ when clear, but is used to test fresh installs of default.
 
 To see the profile targets that the Makefile knows. 
      `make print-profiles`
 
 On install, the target, `chemacs-profiles` will copy the
 current _~/.emacs-profiles.el_. The default profile will be __stable__
+
+There are multiple Chemacs profiles and servers for the default configuration
+as well as servers for doom and gnu.
+
+There is a __test__ profile which is used to test the pushed version of 
+the default configuration.
 
 When I modify my emacs configuration, I use the _dev_ installation. 
 Once _dev_ is pushed to github and I'm happy with it,
@@ -82,7 +102,7 @@ with an install from github, it finishes with
 
     `emacs -with-profile test --debug-init`.
 
-so that any problems can be managed.
+so that any first run problems can be managed.
 
 ## Emacs-home
 

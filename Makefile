@@ -51,7 +51,15 @@ seconds-now := $(shell date +%s)
 #####  OR adapt the insert.el and update.el from Ericas-Emacs to your own.
 #############################################################################
 
-# emacs installation repos
+# Change these if you want a different flavor of emacs as
+# your default/stable/dev/test repo.
+#
+# Only Ericas and Doom provide a command line way of installing or updating
+# the packages and code base. The rest use list-packages. Which also works
+# with Ericas, and probably doom.
+# But I dont know doom. Kind of why I made this.
+#
+# Emacs installation repos
 default-emacs-repo := ericalinag/ericas-emacs.git
 dev-repo := $(default-emacs-repo)
 stable-repo := $(default-emacs-repo)
@@ -64,7 +72,13 @@ test-repo := $(default-emacs-repo)
 default-install-cmd-pre := emacs --script install.el --chdir $(emacs-home)
 default-update-cmd-pre  := emacs --script update.el --chdir $(emacs-home)
 
-# install and update commands for each of the default target profiles.
+# An easier rule for those installs that dont have an api for this.
+# dev-install-cmd := emacs --with-profile dev
+# dev-update-cmd := emacs --with-profile dev
+
+# Install and update commands for each of the default target profiles.
+# These could just be the above, emacs will usually try to install and update
+# when it is started the first time. It might just take a while.
 dev-install-cmd := $(default-install-cmd-pre)/dev
 dev-update-cmd := $(default-update-cmd-pre)/dev
 
@@ -75,9 +89,19 @@ stable-install-cmd := $(default-install-cmd-pre)/stable
 stable-update-cmd := $(default-update-cmd-pre)/stable
 
 #############################################################################
-#####  emacs configuration definitions.
+#####  Additional Emacs configuration definitions.
 #####  define a <profile-name>-repo, -install-cmd, and -update-cmd
-#####  add the profile name to the profiles variable above.
+#####  add the profile name to the profiles variable below.
+#####
+#####  Except for Doom and Ericas theres really not much point to the
+#####  the install and update commmands.
+#####  Emacs will install packages when you start it the first time.
+#####
+#####  Doom has commands - they say to use them.
+#####
+#####  Ericas has a hack, which works well, but so does list-packages.
+#####  Its nice to not wait the first time it fires up and also to
+#####  have a single update for code and packages.
 #############################################################################
 
 # Make it easy to keep ericas-emacs if the default changes.
@@ -103,6 +127,31 @@ doom-repo := hlissner/doom-emacs.git
 doom-install-cmd := $(emacs-home)/doom/bin/doom install
 doom-update-cmd := $(emacs-home)/doom/bin/doom update
 
+# Emacs Live doesn't provide a way to install or update besides (list-packages)
+# so we just run it.
+live-repo := overtone/emacs-live.git
+live-install-cmd := emacs --with-profile live
+live-update-cmd := emacs --with-profile live
+
+# Emacs from Hell doesn't provide a way to install or update besides (list-packages)
+# so we just run it.
+hell-repo := daviwil/emacs-from-hell.git
+hell-install-cmd := emacs --with-profile hell
+hell-update-cmd := emacs --with-profile hell
+
+# Emacs from scratch doesn't provide a way to install or update besides (list-packages)
+# so we just run it.
+efs-repo := daviwil/emacs-from-scratch.git
+efs-install-cmd := emacs --with-profile efs
+efs-update-cmd := emacs --with-profile efs
+
+# Uncle Daves Emacs doesn't provide a way to install or update besides (list-packages)
+# so we just run it.
+ude-repo := daedreth/UncleDavesEmacs.git
+ude-install-cmd := emacs --with-profile ude
+ude-update-cmd := emacs --with-profile ude
+
+
 #############################################################################
 # Profiles that can be installed, and updated.
 #    We dont actually install gnu because there isnt anything to do.
@@ -113,7 +162,7 @@ doom-update-cmd := $(emacs-home)/doom/bin/doom update
 #    If new configurations are added, they should also be added to
 #    emacs-profiles-orig.el so they can be automatically uncommented.
 #############################################################################
-profiles := gnu stable dev test doom space prelude ericas
+profiles := gnu stable dev test doom space prelude ericas live efs hell ude
 
 ############################################################
 #  Target Rules
@@ -143,17 +192,16 @@ $(profiles):
 	printf "\n\n-----------------------------------------------------\n"
 	printf "Adding profile for $@ to ~/.emacs-profiles.el\n"
 	sed 's/;;$@//' ~/.emacs-profiles.el > .emacs-profiles.el
-	cp .emacs-profiles ~/
+	cp .emacs-profiles.el ~/
 	printf "\nCloning repo for $@\n\n"
 	git clone https://github.com/$($@-repo) $(emacs-home)/$@
 	printf "\n\n-------------------------------------------\n"
 	printf "Running install for: $@\n"
 	printf "Exit Emacs with C-x C-c as needed when done\n"
-	printf "-------------------------------------------\n\n"
+	printf "\-------------------------------------------\n"
 	$($@-install-cmd)
 	printf "\n\nInstall finished for: $@\n"
-	printf "-----------------------------------------------------\n\n"
-
+	printf "\---------------------------------------------\n"
 
 update-profiles := stable-update dev-update test-update doom-update
 $(update-profiles):
@@ -177,16 +225,24 @@ mbsync:
 clean-links:
 	rm $(HOME)/.mbsyncrc
 
+retrieve-profiles.el:
+	printf "\n\nRetrieving .emacs-profiles.el from ~/.\n\n"
+	cp ~/.emacs-profiles.el .
+
+.emacs-profiles.el:
+	printf "\n\nCreating a fresh .emacs-profiles.el from original template.\n\n"
+	cp emacs-profiles-orig.el .emacs-profiles.el
+
 # copy .emacs-profiles.el to ~/
 .PHONY: chemacs-profiles
-chemacs-profiles:
+chemacs-profiles: .emacs-profiles.el
 	printf "\n\nCopying .emacs-profiles.el to ~/.\n\n"
 	cat .emacs-profiles.el
 	printf "\n\n\n"
 	cp .emacs-profiles.el ~/
 
 install-emacsn:
-	mkdir -p $(emacsn-home)
+	printf "\n\nCopying emacsn to $(emacsn-home)\n"
 	cp emacsn $(emacsn-home)
 
 touch-custom:
