@@ -15,7 +15,7 @@ ideal circumstances, then this could also be your solution to accidental
 emacs startup breakage.
 
 ## emacsn
-There is shell script Emacs wrapper, __emacsn__ is just to make life a little easier.
+This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
 Because I'm lazy and I forget. It has accumulated features over the years, but
 remains a nice wrapper for the emacs and emacsclient command lines.
 
@@ -26,7 +26,7 @@ But that can be yours or something else. It is very easy to change at the top of
 the _Makefile_.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
-and can use yours as the default by visiting and editing this region in the makefile.
+and can use yours as the default by visiting and editing this region in the _Makefile_.
 
     default-emacs-repo := ericalinag/ericas-emacs.git
 
@@ -35,12 +35,13 @@ and can use yours as the default by visiting and editing this region in the make
 The default configuration gets 3 installs, __stable__, __dev__ and __test__.
 test is empty, and therefore vanilla gnu to start with.
 
-There is a `make test-install` target to make sure what is pushed installs and 
+There is `make test-install` which will make a test install in the test profile.
+This is to make sure what is pushed installs and 
 runs cleanly before updating the stable installation with `make stable-update`.
 
 ## Easy updates to configurations.
 
-There are make targets to update those installations. They do a `git pull` and
+There are make targets to update the installations. They do a `git pull` and
 then update packages in each configuration's preferred way.
 
 For example:
@@ -62,48 +63,44 @@ This is really pretty simple.
 
 ### Emacs-home
 
-In the __Makefile__ _emacs-home_ is set to wherever you pulled __/Emacsn__ 
-to. This is where there will be all of the emacs configurations.
+In the __Makefile__ _emacs-home_ is set to wherever you clone __Emacsn__ 
+to. This is where all of the emacs configurations will be.
+
 I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
 
   - Step 0: Optional: Fork this repo. 
       You'll probably want to make this your own.
 
   - Step 1: Get this repo from here or from your fork and `cd` into it.
-    I usually just put in my Home directory.
+    I usually just clone it into my Home directory.
 
-```sh
+```shell
     cd
     git clone https://github.com/EricaLinaG/Emacsn.git 
-    
-    ## or to use SSH with your fork from the beginning;
-
-    git clone git@github.com:<your github>/Emacsn.git
-
     cd Emacsn
 ```
 
-
-  - Step 2:  install Chemacs2 as well as the default and gnu profiles.
+  - Step 2:  Install Chemacs2 as well as the default and gnu profiles.
     ONLY do the install once. The optional configurations can be installed later.
 
 ```sh
     make install
 ```
 
-    Or to install Doom emacs and Spacemacs in addition;
+Or to install Doom emacs and Spacemacs in addition;
 
 ```shell
     make install doom space
 ```
 
-    Or to install Everything. _This might take a while_;
+Or to install Everything. _This might take a while, and requires baby sitting._;
 
 ```shell
     make install-all 
 ```
 
   - Step 3: install optional emacs configurations. 
+  `make print-` can tell you what your choices are.
   This can be done at anytime as you go.
 
 ```sh
@@ -112,24 +109,24 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
     make doom space uncle-daves from-scratch prelude live hell
 ```
 
-  - Step 4: Use update to `git pull` and update emacs configurations. 
+At this point you are ready to go. Running emacs will give you your
+default __stable__ configuration. you can also specify them specifically
+with these variants
 
-```sh
-    make print-update-profiles
-
-    make stable-update
-    make doom-update
-    make space-update
-
-    # note the tilde
-    make print-update-generic-profiles
+    emacs --with-profile dev
     
-    make uncle-daves~update
-    make from-scratch~update
-```
+Or
+    
+    emacsn -p dev
 
-  - Step 5: Optional, Change the git remote for __dev__ to SSH.
+
+## What to do next.
+
+Play. learn, explore. :-)
+
+  - Step 4: Optional, Change the git remote for __dev__ to SSH.
       I only do this for _dev_, as its the only one I ever push.
+      __dev__ is where I maintain Ericas-Emacs.
 
 ```sh
     cd dev
@@ -138,18 +135,19 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
     git remote -v      # just to make sure.
 ```
 
-  - Step 6: Optional, After pushing changes from __dev__, test your configuration 
+  - Step 5: Optional, After pushing changes from __dev__, test your configuration 
   with an install from git.
 
 ```sh
     make test-install 
 ```
 
-  - Step 7: Optional, pull your changes into __stable__ and update the packages.
+  - Step 6: Optional, pull your changes into __stable__ and update the packages.
 ```sh
     make stable-update
 ```
 
+Rinse - Repeat.
 
 ## Read the Makefile
 
@@ -166,14 +164,20 @@ in many places, so we circumvent that by constructing the url.
 It should also specify an install and optionally an update command 
 and repo-flags as desired for the git clone. 
 
-They can all be seen with
+They can all be seen with `make print-...
 
 ```shell
     make print-optional-profiles
+    make print-profiles
+    make print-default-profiles
+
+    # for the update targets.
+    make print-update-profiles
+    make print-update-generic-profiles
 ```
 
 The extra profiles can be installed like so. You may install them
-as you go.  Emacsn modifies .emacs-profiles.el
+as you go.  Emacsn modifies your __~/.emacs-profiles.el__
 as you add new profile installs. 
 
 ```shell
@@ -232,7 +236,7 @@ their packages. So the install command amounts to one of these.
 For configurations with no update function. (Most of them)
 
 Only Doom, Ericas and Spacemacs provide an update mechanism.
-The rest use this generic update rule.
+The rest can use this generic update rule.
 
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
@@ -243,8 +247,10 @@ and then exits.
 These configurations usually do not have an install function 
 either so on install we just run them like so. 
 They download and install all their packages. 
-We can check for errors, then `C-x C-c` so the `make` can continue.
+We can check for errors, then `C-x C-c` so that 
+the `make` can continue.
 
+Their install command is usually this.
 ```make
     emacs --with-profile <profile-name>
 ```
@@ -293,7 +299,7 @@ and add an install command. Define an update command or put it in the
 The install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
 
-The update is frequently not needed if it fits the generic case.
+The update is not absolutely needed. It is a convenience.
 But if it has special accommodations like Doom or Ericas, or less so 
 like Spacemacs those needs can be met.
 
@@ -309,7 +315,7 @@ Most of the examples from the chemacs doc are incorporated here.
 This repo can install the following:
     - __Chemacs2__  - Our bootloader.
 
-    - Flavors of Emacs
+  - Flavors of Emacs
     Current available installations can be printed with `make print-profiles`:
       - __default__ is the same as __stable__
       - __stable__ and __dev__ and __test__ are 
@@ -328,12 +334,21 @@ This repo can install the following:
       - __gnu__ A blank emacs.d - vanilla gnu emacs. 
       - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
 
-To see the profile targets that the Makefile knows. 
-     `make print-profiles`
-     `make print-optional-profiles`
+In addition to the actual installed profiles there are server
+profiles which use them. See __~/.emacs-profiles.el__ for full details
 
-There are multiple Chemacs profiles and servers for the default configuration
-as well as servers for doom and gnu. See __~/.emacs-profiles.el__
+Server profiles are:
+  - Stable
+    - exwm
+    - mail
+    - common
+  - Doom
+    - doom-server
+  - Vanilla gnu
+    - gnu-server
+
+(provide '.emacs-profiles.el)
+;;; emacs-profiles-orig.el ends here
 
 There is a __test__ profile which is used to test the pushed version of 
 the default configuration.
