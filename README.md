@@ -53,6 +53,21 @@ Its not too hard, and you'll know everything, mostly.
 Oh, and take a look at _emacs-profiles-orig.el_. It does have a majority of
 the examples from the Chemacs2 readme.
 
+### Installation targets
+
+So far they are all from github.  Each one needs to specify its piece of
+the github url, the part that follows github.com/.
+It should also specify an install and an update command 
+and optionally repo flags for the git clone. 
+
+The install command is frequently to run emacs with that profile.
+The update is frequently not needed if it fits the generic case.
+But if it has special accommodations like Doom or Ericas, or less so 
+like Spacemacs those needs can be met.
+
+The repo flags allow for creating profiles based on different branches in 
+the same repo.
+
 ## Chemacs
 
 This system uses [Chemacs2](https://github.com/plexus/chemacs2) 

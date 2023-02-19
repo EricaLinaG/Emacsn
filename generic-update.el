@@ -30,8 +30,14 @@
 
 ;; Trick emacs to be here, instead of .emacs.d
 ;; Requires being here or using emacs --chdir <here> to work.
+;; This allows us to run vanilla emacs to update our emacs.
+;; just make sure its running here directly or with --chdir on
+;; on the emacs command line.
 (setq user-emacs-directory default-directory)
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+(princ "# updated:")
+(princ package-user-dir)
 
 (require 'package)
 

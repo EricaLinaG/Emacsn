@@ -50,11 +50,15 @@ generic-update := $(emacs-home)/generic-update.el
 #####
 #####  This is where you would put your emacs repo in order to use your own.
 #####
+#####  <profile-name>-repo-flags can be set to a branch
+#####                            or what you need to give clone.
+#####
 #####  Everyone has a different way of managing packages. mostly the generic-update
 #####  generic-update.el provided seems to do the trick where there is no
 #####  clear update mechanism other than list packages.
 #####
 #####  Both uncle-daves and Prelude seem to work this way. Follow their examples.
+#####  spacemacs update is an interesting example.
 #############################################################################
 
 # Change these if you want a different flavor of emacs as
@@ -67,6 +71,7 @@ generic-update := $(emacs-home)/generic-update.el
 #
 # default profiles source repos
 default-emacs-repo := ericalinag/ericas-emacs.git
+# default-repo-flags := -b somebranch
 dev-repo := $(default-emacs-repo)
 stable-repo := $(default-emacs-repo)
 test-repo := $(default-emacs-repo)
@@ -113,6 +118,7 @@ stable-update-cmd := $(default-update-cmd-pre)/stable
 # Make it easy to keep ericas-emacs if the default changes.
 # It has simple install and update scripts that can be called with vanilla emacs.
 ericas-repo := ericalinag/ericas-emacs.git
+#  ericas-repo-flags := -b with-helm
 ericas-install-cmd := emacs --script install.el --chdir $(emacs-home)/ericas
 ericas-update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
 
@@ -123,14 +129,15 @@ space-install-cmd := emacs --with-profile space
 # then call the update function, and then exit.
 #
 # this is very similar to generic-update.el
-space-update-el := '(lambda ()\
+# this almost works. the git pull happens in the wrong place
+# the extra parens are necessary.
+space-update-el := '((lambda ()\
 			(shell-command "git pull origin HEAD")\
 			(configuration-layer/update-packages)\
-			(save-buffers-kill-terminal t))'
+			(save-buffers-kill-terminal t)))'
 
-# we use emacsn cause its easier. Heres our space-macs update command
-# -t so it comes up in the terminal.
-space-update-cmd := emacsn -tp space -f $(space-update-el)
+space-update-cmd := emacs -nw --with-profile space \
+		--eval $(space-update-el) --chdir $(emacs-home)/space
 
 # doom has hybrid shell/elisp scripts to run.
 doom-repo := hlissner/doom-emacs.git
@@ -145,12 +152,17 @@ doom-update-cmd := $(emacs-home)/doom/bin/doom update
 # update-generic-profiles. This just uses list-packages as its updater.
 # The name should be of the form <profile name>~update.
 #
-# The generic rule essentially runs vanilla emacs,
+# The generic rule essentially runs default emacs, --with-profile doesnt
+# work with the --script or --batch options.
 # changes directorys to the target profile,
 # git pull origin HEAD,
 # list packages,
 # install selected packages.
 # exit
+
+# this is used in the generic update rule below.
+generic-update-cmd := emacs -nw --script $(generic-update)     \
+				--chdir $(emacs-home)/
 
 # using the generic update seems to work.
 prelude-repo := bbatsov/prelude.git
@@ -231,7 +243,7 @@ $(profiles):
 	sed 's/;;$@//' ~/.emacs-profiles.el > .emacs-profiles.el
 	cp .emacs-profiles.el ~/
 	printf "\nCloning repo for $@\n\n"
-	git clone https://github.com/$($@-repo) $(emacs-home)/$@
+	git clone $($@-repo-flags) https://github.com/$($@-repo) $(emacs-home)/$@
 	printf "\n\n-------------------------------------------\n"
 	printf "Running install for: $@\n"
 	printf "Exit Emacs with C-x C-c as needed when done\n"
@@ -247,9 +259,12 @@ $(update-profiles):
 	$($@-cmd)
 
 # generic rule, for generic update method. works for some.
+# the double $$ is for keeping it from being interpreted and
+# one of them makes to the shell for execution. the g is necessary.
+# for make to be happy.
 $(update-generic-profiles):
 	$(eval target-path=$(shell echo $@ | sed 's/~.*$$//g' ))
-	emacs --script $(generic-update) --chdir $(emacs-home)/$(target-path)
+	$(shell $(generic-update-cmd)/$(target-path))
 
 foo-bar:
 	$(eval target-path=$(shell echo $@ | sed 's/\-.*$$//g' ))
@@ -335,8 +350,7 @@ remove-dot-emacs:
 	rm -f ~/.emacs
 
 # Chemacs goes in emacs.d, make initial chemacs profiles.
-install-chemacs:
-	cp emacs-profiles-orig.el .emacs-profiles.el
+install-chemacs: .emacs-profiles.el
 	cp .emacs-profiles.el ~/
 	printf "\n\nCloning chemacs into ~/.emacs.d\n\n"
 	git clone https://github.com/plexus/chemacs2.git ~/.emacs.d
