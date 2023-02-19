@@ -20,7 +20,8 @@
 .SILENT:
 
 # Where Emacs installations and this Emacsn will live.
-emacs-home := ~/Emacsn
+# ~/Emacsn ?
+emacs-home := $(PWD)
 
 # Where to put Emacsn helper script
 emacsn-home := ~/bin
@@ -38,6 +39,9 @@ move-dot-emacs.d := $(or $(and $(wildcard $(HOME)/.emacs.d),1),0)
 # so we can have uniquely named backups. being lazy.
 seconds-now := $(shell date +%s)
 
+# a generic update script to run git pull and package update.
+# for configurations which dont provide a an update other than list-packages U.
+generic-update := $(emacs-home)/generic-update.el
 
 #############################################################################
 #####  Define the default repo for dev, stable and test.
@@ -110,46 +114,59 @@ ericas-repo := ericalinag/ericas-emacs.git
 ericas-install-cmd := emacs --script install.el --chdir $(emacs-home)/ericas
 ericas-update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
 
-# spacemacs doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
 space-repo := syl20bnr/spacemacs.git
 space-install-cmd := emacs --with-profile space
-space-update-cmd := emacs --with-profile space
+# spacemacs has a function to do its updates so we use that.
+# we do a git pull
+# then call the update function, and then exit.
+# after we repull itself.
+space-update-el := '(lambda ()\
+			(shell-command "git pull origin HEAD")\
+			(configuration-layer/update-packages)\
+			(save-buffers-kill-terminal t))'
 
-# prelude doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
+# we use emacsn cause its easier. Heres our space-macs update command
+# -t so it comes up in the terminal.
+space-update-cmd := emacsn -tp space -f $(space-update-el)
+
+# needs testing. Should work.
+# The question is if everyones git is origin main or master.
+# A possible way to update configs which rely on list-packages completely.
+
+# using the generic update seems to work.
 prelude-repo := bbatsov/prelude.git
 prelude-install-cmd := emacs --with-profile prelude
-prelude-update-cmd := emacs --with-profile prelude
+prelude-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/prelude
 
 # doom has hybrid shell/elisp scripts to run.
 doom-repo := hlissner/doom-emacs.git
 doom-install-cmd := $(emacs-home)/doom/bin/doom install
 doom-update-cmd := $(emacs-home)/doom/bin/doom update
 
-# Emacs Live doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
+# using the generic update seems to work.
 live-repo := overtone/emacs-live.git
 live-install-cmd := emacs --with-profile live
-live-update-cmd := emacs --with-profile live
+live-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/live
 
-# Emacs from Hell doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
+# I'm assuming this works the same as emacs from scratch.
+# so use the generic update function
 hell-repo := daviwil/emacs-from-hell.git
 hell-install-cmd := emacs --with-profile hell
-hell-update-cmd := emacs --with-profile hell
+hell-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/hell
 
-# Emacs from scratch doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
-efs-repo := daviwil/emacs-from-scratch.git
-efs-install-cmd := emacs --with-profile efs
-efs-update-cmd := emacs --with-profile efs
+# emacs from scratch has auto updating so we dont need to do that.
+# our generic update still works, it pulls a new version and then
+# runs a package update, which there arent any.
+from-scratch-repo := daviwil/emacs-from-scratch.git
+from-scratch-install-cmd := emacs --with-profile from-scratch
+from-scratch-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/from-scratch
 
 # Uncle Daves Emacs doesn't provide a way to install or update besides (list-packages)
 # so we just run it.
-ude-repo := daedreth/UncleDavesEmacs.git
-ude-install-cmd := emacs --with-profile ude
-ude-update-cmd := emacs --with-profile ude
+uncle-daves-repo := daedreth/UncleDavesEmacs.git
+uncle-daves-install-cmd := emacs --with-profile uncle-daves
+# trying out the generic update... -- totally works. -- maybe make a rule to simplify
+uncle-daves-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/uncle-daves
 
 
 #############################################################################
@@ -162,7 +179,13 @@ ude-update-cmd := emacs --with-profile ude
 #    If new configurations are added, they should also be added to
 #    emacs-profiles-orig.el so they can be automatically uncommented.
 #############################################################################
-profiles := gnu stable dev test doom space prelude ericas live efs hell ude
+# make it nicer to print the targets in a meaningful way.
+optional-profiles := doom space prelude ericas live from-scratch hell uncle-daves
+default-profiles := gnu stable dev test
+profiles := $(default-profiles) $(optional-profiles)
+
+# for the configs that have independent update commands
+update-profiles := stable-update dev-update test-update doom-update ericas-update space-update uncle-daves-update from-scratch-update
 
 ############################################################
 #  Target Rules
@@ -203,10 +226,15 @@ $(profiles):
 	printf "\n\nInstall finished for: $@\n"
 	printf "\---------------------------------------------\n"
 
-update-profiles := stable-update dev-update test-update doom-update
 $(update-profiles):
 	printf "\n\nRunning update for profile: $@\n\n"
-	$($@-update-cmd)
+	$($@-cmd)
+
+# for creating a pathname from an update target
+# this could help have a generic update rule so we dont have to
+# have a variable that is the cmd.
+#	echo $@ | sed 'd/-.*$/'
+
 
 # is there a better way? I hope so.
 # link mbsyncrc and hope mu4e is installed properly already.
@@ -230,8 +258,9 @@ retrieve-profiles.el:
 	cp ~/.emacs-profiles.el .
 
 .emacs-profiles.el:
-	printf "\n\nCreating a fresh .emacs-profiles.el from original template.\n\n"
-	cp emacs-profiles-orig.el .emacs-profiles.el
+	printf "\n\nCreating a fresh .emacs-profiles.el from original template.\n"
+	printf "Setting Paths to here $(PWD).\n\n"
+	sed 's:\-PWD\-:$(PWD):' emacs-profiles-orig.el > .emacs-profiles.el
 
 # copy .emacs-profiles.el to ~/
 .PHONY: chemacs-profiles

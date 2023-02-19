@@ -36,13 +36,15 @@ runs cleanly before updating the stable installation with `make stable-update`.
 For the Ericas-Emacs and Doom-Emacs installations there are make targets
 to update those installations. Erica's update includes a  `git pull` to update
 the code base as well as the packages.
-    `make <stable|dev|test|doom>-update`
+    `make <profile-name>-update`
     ie.
+    `make stable-update`
     `make doom-update`
+    `make space-update`
     
-The rest of the configurations simply use _list-packages_ for updates and 
-install all packages on the first run as you would expect. The install and 
-update commands, are to just invoke emacs with that profile.
+Spacemacs does have an update function, which we can call from here.
+for the rest we use a generic-update.el from here. Which does a git pull, 
+followed by updating packages and exiting.
 
 
 ## Read the Makefile
@@ -71,9 +73,9 @@ This repo can install the following:
       - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
       - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
       - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
-      - __efs__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
+      - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
       - __hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
-      - __ude__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
+      - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
 
     - gnu and test are a special case and are always added.
       - __gnu__ A blank emacs.d - vanilla gnu emacs. 
@@ -106,36 +108,43 @@ so that any first run problems can be managed.
 
 ## Emacs-home
 
-In the __Makefile__ _emacs-home_ is set to __~/Emacsn__ this is where 
-an _emacsn_ repo like this one will live, and under it will be all of the 
-emacs configurations.
+In the __Makefile__ _emacs-home_ is set to wherever you pulled __/Emacsn__ 
+to. This is where there will be all of the emacs configurations.
+I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
 
-The default install will place an __emacsn__ repo in _~/Emacsn_ anyway, go 
-with the flow or edit the Makefile and make your own.
 
 ## Installation
 
 ### Get the makefile or this repo.
 
-    git clone https://github.com/ericalinag/Emacsn.git ~/Emacsn
+    cd
+    git clone https://github.com/ericalinag/Emacsn.git 
     cd ~/Emacsn
 
-or really you just need the Makefile, it will create ~/Emacsn for you.
-
-    curl https://github.com/ericalinag/emacsn/master/blob/Makefile > Makefile
-
-Once you are there/have the _Makefile_ install as much as you like.
+Once you are there install as much as you like.
 `make install` will create __stable__ and __dev__ with the default configuration.
 As well as empty/vanilla __gnu__ and __test__.
 
-     make install
-     make doom
-     make space
-     make prelude
-     make ericas
+The minimum you want to do is this.
+
+    make install
+
+To see the other possible targets you can do this.
+
+    make print-optional-profiles
+    
+To install another profile you can do a `make <profile target name>`
+
+    make doom
+    make space
+    make prelude
+    make ericas
+    make from-scratch
      
 or 
      make install-all
+     
+To just install everything from the start.
 
 ### Make targets.
 
@@ -151,9 +160,10 @@ __make install__ Does the following:
         - load packages at __stable__
   - Copy _.emacs-profiles.el_, to _~/_ with each additional profile.
   
+  
 #### install-all
 
-This will add  __doom__, __space__, __ericas__ and __prelude__.
+This installs everything at once. 
 
      make install-all
 
@@ -177,7 +187,7 @@ I can test a fresh installation from github with:
 
 if all works well, I can then do this.
 
-    make update-stable 
+    make stable-stable
 
 To do a `git pull` and bring it up to date with _origin/master_. 
 Followed by a package update.
@@ -186,7 +196,7 @@ Followed by a package update.
 ### Emacs boot choices
 
 The boot profile choices are defined in __~/.emacs-profiles__,
-stable is target of default. 
+stable is the target of default. 
 
 run emacs with profiles like this:
     emacs --with-profile <profile name>
@@ -200,9 +210,13 @@ The __test__ profile is initially empty and therefore vanilla gnu.
 Emacs profile choices are:
  - stable, default
  - dev
+ - ericas
  - doom
  - space
  - prelude
+ - hell
+ - from-scratch
+ - uncle-daves
  - gnu - Completely vanilla gnu emacs.
  - test 
 
