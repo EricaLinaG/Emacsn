@@ -2,7 +2,7 @@
 # few emacs configurations.
 #
 # The default emacs install is mine.  Ericas-emacs.
-# It can be easily changed to be yours.
+# It can be easily changed to be yours or another.
 #
 # There will be a stable and dev install of the default,
 # There is also a test install which defaults to vanilla gnu
@@ -10,14 +10,15 @@
 # with 'make test-install'.
 #
 # There is also a vanilla gnu install, as well as
-# doom, spacemacs, prelude and ericas if you want them.
+# doom, spacemacs, prelude, emacs-live, emacs-from-scratch,
+# emacs-from-hell and uncle-daves-emacs as well as ericas if you
+# want them.
 #
-# There are also daemon profiles for exwm, mail, common,
-# and doom servers.
+# There are also daemon profiles for different installs.
 
 # This Makefile prints lots of more readable stuff,
-# no need to see every echo.
-.SILENT:
+# no need to see every echo unless debugging.
+# .SILENT:
 
 # Where Emacs installations and this Emacsn will live.
 # ~/Emacsn ?
@@ -48,22 +49,23 @@ generic-update := $(emacs-home)/generic-update.el
 #####  Define their install and update commands.
 #####
 #####  This is where you would put your emacs repo in order to use your own.
-#####  It is likely you have no easy way to do a package update or install other
-#####  than using list-packages.
 #####
-#####  Both Spacemacs and Prelude work this way. Follow their examples.
-#####  OR adapt the insert.el and update.el from Ericas-Emacs to your own.
+#####  Everyone has a different way of managing packages. mostly the generic-update
+#####  generic-update.el provided seems to do the trick where there is no
+#####  clear update mechanism other than list packages.
+#####
+#####  Both uncle-daves and Prelude seem to work this way. Follow their examples.
 #############################################################################
 
 # Change these if you want a different flavor of emacs as
 # your default/stable/dev/test repo.
 #
-# Only Ericas and Doom provide a command line way of installing or updating
-# the packages and code base. The rest use list-packages. Which also works
-# with Ericas, and probably doom.
-# But I dont know doom. Kind of why I made this.
+# Only Ericas, Doom and spacemacs provide a command line way of installing
+# or updating the packages and code base. The rest use list-packages.
+# Which also works with Ericas. Ericas keeps its packages in a list, and
+# uses list-packages so probably the generic rule would also work there.
 #
-# Emacs installation repos
+# default profiles source repos
 default-emacs-repo := ericalinag/ericas-emacs.git
 dev-repo := $(default-emacs-repo)
 stable-repo := $(default-emacs-repo)
@@ -103,7 +105,7 @@ stable-update-cmd := $(default-update-cmd-pre)/stable
 #####
 #####  Doom has commands - they say to use them.
 #####
-#####  Ericas has a hack, which works well, but so does list-packages.
+#####  Ericas has a function, which works well, but so does list-packages.
 #####  Its nice to not wait the first time it fires up and also to
 #####  have a single update for code and packages.
 #############################################################################
@@ -119,7 +121,8 @@ space-install-cmd := emacs --with-profile space
 # spacemacs has a function to do its updates so we use that.
 # we do a git pull
 # then call the update function, and then exit.
-# after we repull itself.
+#
+# this is very similar to generic-update.el
 space-update-el := '(lambda ()\
 			(shell-command "git pull origin HEAD")\
 			(configuration-layer/update-packages)\
@@ -129,44 +132,48 @@ space-update-el := '(lambda ()\
 # -t so it comes up in the terminal.
 space-update-cmd := emacsn -tp space -f $(space-update-el)
 
-# needs testing. Should work.
-# The question is if everyones git is origin main or master.
-# A possible way to update configs which rely on list-packages completely.
-
-# using the generic update seems to work.
-prelude-repo := bbatsov/prelude.git
-prelude-install-cmd := emacs --with-profile prelude
-prelude-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/prelude
-
 # doom has hybrid shell/elisp scripts to run.
 doom-repo := hlissner/doom-emacs.git
 doom-install-cmd := $(emacs-home)/doom/bin/doom install
 doom-update-cmd := $(emacs-home)/doom/bin/doom update
 
+# there is a generic-update rule, so we dont need those vars for
+# the following profile installations. or maybe there are other
+# choices for each that I dont know.
+#
+# just the profile to the list of generic profile targets under
+# update-generic-profiles. This just uses list-packages as its updater.
+# The name should be of the form <profile name>~update.
+#
+# The generic rule essentially runs vanilla emacs,
+# changes directorys to the target profile,
+# git pull origin HEAD,
+# list packages,
+# install selected packages.
+# exit
+
+# using the generic update seems to work.
+prelude-repo := bbatsov/prelude.git
+prelude-install-cmd := emacs --with-profile prelude
+
 # using the generic update seems to work.
 live-repo := overtone/emacs-live.git
 live-install-cmd := emacs --with-profile live
-live-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/live
 
 # I'm assuming this works the same as emacs from scratch.
 # so use the generic update function
 hell-repo := daviwil/emacs-from-hell.git
 hell-install-cmd := emacs --with-profile hell
-hell-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/hell
 
 # emacs from scratch has auto updating so we dont need to do that.
 # our generic update still works, it pulls a new version and then
-# runs a package update, which there arent any.
+# runs a package update, which there aren't any.
 from-scratch-repo := daviwil/emacs-from-scratch.git
 from-scratch-install-cmd := emacs --with-profile from-scratch
-from-scratch-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/from-scratch
 
-# Uncle Daves Emacs doesn't provide a way to install or update besides (list-packages)
-# so we just run it.
+# generic update yay.
 uncle-daves-repo := daedreth/UncleDavesEmacs.git
 uncle-daves-install-cmd := emacs --with-profile uncle-daves
-# trying out the generic update... -- totally works. -- maybe make a rule to simplify
-uncle-daves-update-cmd := emacs --script $(generic-update) --chdir $(emacs-home)/uncle-daves
 
 
 #############################################################################
@@ -185,7 +192,14 @@ default-profiles := gnu stable dev test
 profiles := $(default-profiles) $(optional-profiles)
 
 # for the configs that have independent update commands
-update-profiles := stable-update dev-update test-update doom-update ericas-update space-update uncle-daves-update from-scratch-update
+update-profiles := stable-update dev-update test-update doom-update\
+		ericas-update space-update
+
+# If the configuration can use the generic update .el just put it in here
+# watch the '~'.  Theres no need for profile-update-cmd for these.
+# tricky. Use tilde to say where to start deleting to create the path
+update-generic-profiles := uncle-daves~update from-scratch~update \
+			hell~update prelude~update
 
 ############################################################
 #  Target Rules
@@ -226,14 +240,20 @@ $(profiles):
 	printf "\n\nInstall finished for: $@\n"
 	printf "\---------------------------------------------\n"
 
+
+# We just run the command we were given. doom, ericas, spacemacs.
 $(update-profiles):
 	printf "\n\nRunning update for profile: $@\n\n"
 	$($@-cmd)
 
-# for creating a pathname from an update target
-# this could help have a generic update rule so we dont have to
-# have a variable that is the cmd.
-#	echo $@ | sed 'd/-.*$/'
+# generic rule, for generic update method. works for some.
+$(update-generic-profiles):
+	$(eval target-path=$(shell echo $@ | sed 's/~.*$$//g' ))
+	emacs --script $(generic-update) --chdir $(emacs-home)/$(target-path)
+
+foo-bar:
+	$(eval target-path=$(shell echo $@ | sed 's/\-.*$$//g' ))
+	printf "was: $@ is:  $(target-path)"
 
 
 # is there a better way? I hope so.
