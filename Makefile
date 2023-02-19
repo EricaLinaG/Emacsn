@@ -18,7 +18,7 @@
 
 # This Makefile prints lots of more readable stuff,
 # no need to see every echo unless debugging.
-# .SILENT:
+.SILENT:
 
 # Where Emacs installations and this Emacsn will live.
 # ~/Emacsn ?
@@ -246,6 +246,7 @@ $(profiles):
 	git clone $($@-repo-flags) https://github.com/$($@-repo) $(emacs-home)/$@
 	printf "\n\n-------------------------------------------\n"
 	printf "Running install for: $@\n"
+	printf "Not exiting automatically to check errors\n\n"
 	printf "Exit Emacs with C-x C-c as needed when done\n"
 	printf "\-------------------------------------------\n"
 	$($@-install-cmd)
@@ -313,6 +314,7 @@ touch-custom:
 	touch $(config-custom)
 
 # check emacsn out into emacs-home unless we are already there.
+# this is out of date. Its not this complicated anymore.
 mk-emacs-home: touch-custom
 ifneq ($(PWD), $(emacs-home))
 	printf "\n\nCreating Emacs Home: $(emacs-home)\n"
