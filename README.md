@@ -314,9 +314,7 @@ Most of the examples from the chemacs doc are incorporated here.
 
 This repo can install the following:
   -  __Chemacs2__  - Our bootloader.
-
   -  Our Emacs boot choices 
-
     - Install profiles are:
       - Default
         - __default__ is the same as __stable__
