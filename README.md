@@ -37,7 +37,7 @@ test is empty, and therefore vanilla gnu to start with.
 
 There is `make test-install` which will make a test install in the test profile.
 This is to make sure what is pushed installs and 
-runs cleanly before updating the stable installation with `make stable-update`.
+runs cleanly before updating the stable installation with `make stable~update`.
 
 ## Easy updates to configurations.
 
@@ -47,11 +47,11 @@ then update packages in each configuration's preferred way.
 For example:
 
 ```sh
-    make <profile-name>-update
+    make <profile-name>~update
 
-    make stable-update
-    make doom-update
-    make space-update
+    make stable~update
+    make doom~update
+    make space~update
     
     make uncle-daves~update
 ```
@@ -144,7 +144,7 @@ Play. learn, explore. :-)
 
   - Step 6: Optional, pull your changes into __stable__ and update the packages.
 ```sh
-    make stable-update
+    make stable~update
 ```
 
 Rinse - Repeat.
@@ -192,7 +192,7 @@ Doom and Ericas are the only configurations which provide an install function.
     ericas-repo := ericalinag/ericas-emacs.git
     #  ericas-repo-flags := -b with-helm
     ericas-install-cmd := emacs --script install.el --chdir $(emacs-home)/ericas
-    ericas-update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
+    ericas~update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
 ```
 
 Like most emacs configurations Spacemacs just installs everything when it 
@@ -206,7 +206,7 @@ to do an update.
                           (shell-command "git pull origin HEAD")\
                           (configuration-layer/update-packages)\
                           (save-buffers-kill-terminal t)))'
-    space-update-cmd := emacs -nw --with-profile space \
+    space~update-cmd := emacs -nw --with-profile space \
                       --eval $(space-update-el) --chdir $(emacs-home)/space
 ```
 
@@ -214,7 +214,7 @@ Doom has hybrid shell/elisp scripts to run for install and update.
 ```make
     doom-repo := hlissner/doom-emacs.git
     doom-install-cmd := $(emacs-home)/doom/bin/doom install
-    doom-update-cmd := $(emacs-home)/doom/bin/doom update
+    doom~update-cmd := $(emacs-home)/doom/bin/doom update
 ```
 
 ### Profiles with no install function
@@ -316,7 +316,6 @@ This repo can install the following:
   -  __Chemacs2__  - Our bootloader.
 
   -  Our Emacs boot choices 
-    Current available installations can be printed with `make print-profiles`:
 
     - Install profiles are:
       - Default
@@ -366,7 +365,7 @@ the default configuration.
 When I modify my emacs configuration, I use the _dev_ installation. 
 Once _dev_ is pushed to github and I'm happy with it,
 I then try it out with `make test-install`.
-If that is all good I `make stable-update `for new _stable_ installation.
+If that is all good I `make stable~update `for new _stable_ installation.
 
 __test__ is another entry in _~/.emacs-profiles.el_.  The Makefile has 
 an _install-test_ rule, which will remove/create/execute __test__ 
@@ -389,7 +388,7 @@ I can test a fresh installation from github with:
 This will install and run emacs --debug-init on a fresh install from git.
 if all works well, I can then do this to update my stable install.
 
-    make stable-update
+    make stable~update
 
 This does a `git pull` to bring it up to date with _origin HEAD_. 
 Followed by a package update.
