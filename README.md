@@ -106,7 +106,7 @@ Or to install Everything. _This might take a while, and requires baby sitting._;
 ```sh
     make print-optional-profiles
     
-    make doom space uncle-daves from-scratch prelude live hell
+    make doom space uncle-daves from-scratch prelude live from-hell
 ```
 
 At this point you are ready to go. Running emacs will give you your
@@ -280,7 +280,7 @@ So they look like this.
 
     uncle-daves~update
     prelude~update
-    hell~update
+    from-hell~update
     from-scratch~update
     
 This is simply to accommodate profile names with __-__ in them.
@@ -315,11 +315,14 @@ Most of the examples from the chemacs doc are incorporated here.
 This repo can install the following:
     - __Chemacs2__  - Our bootloader.
 
-  - Flavors of Emacs
+  -  Our Emacs boot choices 
     Current available installations can be printed with `make print-profiles`:
+
+    - Install profiles are:
       - __default__ is the same as __stable__
-      - __stable__ and __dev__ and __test__ are 
-      [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
+      - __stable__ and 
+      - __dev__ and 
+      - __test__ are [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
       as the default configuration.
       - __doom__ is [_doom-emacs](https://github.com/doomemacs), 
       - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
@@ -327,28 +330,37 @@ This repo can install the following:
       - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
       - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
       - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
-      - __hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
+      - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
       - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
 
-    - gnu and test are a special case and are always added.
-      - __gnu__ A blank emacs.d - vanilla gnu emacs. 
-      - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
+      - gnu and test are a special case and are always added.
+        - __gnu__ A blank emacs.d - vanilla gnu emacs. 
+        - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
+    - Server profiles are:
+      - Using __stable__
+        - exwm
+        - mail
+        - common
+
+      - Using __doom__ if installed.
+        - doom-server
+
+      - Using Vanilla __gnu__
+        - gnu-server
 
 In addition to the actual installed profiles there are server
-profiles which use them. See __~/.emacs-profiles.el__ for full details
+profiles which use them. See __~/.emacs-profiles.el__ for full details.
 
-Server profiles are:
-  - Stable
-    - exwm
-    - mail
-    - common
-  - Doom
-    - doom-server
-  - Vanilla gnu
-    - gnu-server
+When Emacs runs, it will run the default profile unless told otherwise.
+We have __default__ pointing to the same place as __stable__ by default.
 
-(provide '.emacs-profiles.el)
-;;; emacs-profiles-orig.el ends here
+Run emacs with profiles like this:
+
+    `emacs --with-profile <profile name>`
+or
+    `emacsn -p <profile name>`
+
+## The __test__ profile
 
 There is a __test__ profile which is used to test the pushed version of 
 the default configuration.
@@ -358,7 +370,7 @@ Once _dev_ is pushed to github and I'm happy with it,
 I then try it out with `make test-install`.
 If that is all good I `make stable-update `for new _stable_ installation.
 
-__Test__ is another entry in _~/.emacs-profiles.el_.  The Makefile has 
+__test__ is another entry in _~/.emacs-profiles.el_.  The Makefile has 
 an _install-test_ rule, which will remove/create/execute __test__ 
 with an install from github, it finishes with 
 
@@ -370,8 +382,8 @@ so that any first run problems can be managed.
 ## Managing elisp development
 
 I use these installs to insure I always have a way to do work if I have
-broken anything.  I do my elisp work in dev.  
-When dev is working well and everything is pushed
+broken anything.  I do my elisp work in __dev__.  
+When __dev__ is working well and everything is pushed
 I can test a fresh installation from github with:
 
     make test-install
@@ -387,49 +399,9 @@ Followed by a package update.
 __Note: this might not work properly for configurations on branches.__
 
 
-### Emacs boot choices
+## Running Emacs
 
-The boot profile choices are defined in __~/.emacs-profiles__,
-stable is the target of default. 
-
-run emacs with profiles like this:
-    emacs --with-profile <profile name>
-or
-    emacsn -p <profile name>
-
-If this is a minimal install there will be __gnu__ plain vanilla emacs,
-__stable__, __dev__ and __test__, stable is the default.
-The __test__ profile is initially empty and therefore vanilla gnu.
-
-Emacs profile choices are:
- - Emacs instances
-   - stable, default
-   - dev
-   - test 
-   - gnu - Completely vanilla gnu emacs.
-
-   - Optional installs
-     - ericas
-     - doom
-     - space
-     - prelude
-     - hell
-     - from-scratch
-     - uncle-daves
-
- - Named emacs daemons
-   - Using stable
-     - exwm 
-     - mail 
-     - common 
-
-   - Using vanilla gnus
-     - gnu-server
-
-   - If doom is installed
-     - doom-server
- 
-Emacs will default to __stable__ but can be redirected with
+Running Emacs will use __default__ which is also __stable__ but can be redirected with
 
     emacs --with-profile dev
 
@@ -439,6 +411,8 @@ or
 
 ### Running emacs client to a server
 
+If you've got a named server running you can connect to it like this.
+
 Create a new frame, connect to the socket and use vanilla emacs as fallback
 
     emacsclient -c -s exwm -a emacs
@@ -446,6 +420,7 @@ Create a new frame, connect to the socket and use vanilla emacs as fallback
     emacsclient -c -s doom -a emacs
     
 or,  with emacsn, which will fail if there is no server. - my preference.
+This will just use the default profile. Add -p to specify an other.
 
     emacsn -cws exwm
     emacsn -cws mail
@@ -454,6 +429,26 @@ or,  with emacsn, which will fail if there is no server. - my preference.
 Use an existing emacsclient frame by omitting the `w`:
 
     emacsn -cs mail
+
+### Running named daemons
+
+    emacs --with-profile exwm 
+    emacs --with-profile gnu-server
+    emacs --with-profile doom-server
+or
+
+    emacsn -p exwm
+    emacsn -p gnu-server
+    emacsn -p doom-server
+
+#### Named daemons with emacsn
+
+    emacsn -s exwm
+    emacsn -s mail
+
+Connect with
+
+    emacsn -cws mail
 
 ### Running no name daemons
 
@@ -517,14 +512,8 @@ using the usual emacsclient looks like this:
 
     emacsn -ecws mail
 
-The __emacsn__ script has extensive help and a lot of options. It is
-simpler than emacs it's self.;
+The __emacsn__ script has extensive help and a lot of options. 
 
-Future emacsn enhancements:
-
-I'm feeling the need to add --chdir and --script options to __emacsn__
-that could make life a little easier. And I need to look at Chemacs
-to see why it looses its mind with some emacs options.
 
 # Summary
 

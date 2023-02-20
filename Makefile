@@ -174,8 +174,8 @@ live-install-cmd := emacs --with-profile live
 
 # I'm assuming this works the same as emacs from scratch.
 # so use the generic update function
-hell-repo := daviwil/emacs-from-hell.git
-hell-install-cmd := emacs --with-profile hell
+from-hell-repo := daviwil/emacs-from-hell.git
+from-hell-install-cmd := emacs --with-profile from-hell
 
 # emacs from scratch has auto updating so we dont need to do that.
 # our generic update still works, it pulls a new version and then
@@ -199,7 +199,7 @@ uncle-daves-install-cmd := emacs --with-profile uncle-daves
 #    emacs-profiles-orig.el so they can be automatically uncommented.
 #############################################################################
 # make it nicer to print the targets in a meaningful way.
-optional-profiles := doom space prelude ericas live from-scratch hell uncle-daves
+optional-profiles := doom space prelude ericas live from-scratch from-hell uncle-daves
 default-profiles := gnu stable dev test
 profiles := $(default-profiles) $(optional-profiles)
 
@@ -211,7 +211,7 @@ update-profiles := stable-update dev-update test-update doom-update\
 # watch the '~'.  Theres no need for profile-update-cmd for these.
 # tricky. Use tilde to say where to start deleting to create the path
 update-generic-profiles := uncle-daves~update from-scratch~update \
-			hell~update prelude~update
+			from-hell~update prelude~update
 
 ############################################################
 #  Target Rules

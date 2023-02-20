@@ -29,7 +29,7 @@
  ;;live ("live"    . ((user-emacs-directory . "-PWD-/live")))
 
  ;; Emacs from Hell
- ;;hell ("hell"    . ((user-emacs-directory . "-PWD-/hell")))
+ ;;from-hell ("from-hell"    . ((user-emacs-directory . "-PWD-/from-hell")))
 
  ;; Emacs from Scratch
  ;;from-scratch ("from-scratch"      . ((user-emacs-directory . "-PWD-/from-scratch")))
