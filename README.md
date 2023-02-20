@@ -12,12 +12,12 @@ Scratch, Emacs-Live, or any other, Here is an easy path.
 
 If you have ever ruined your emacs setup and had to go back, or fix it in less than
 ideal circumstances, then this could also be your solution to accidental 
-emacs startup breakage.
+emacs startup breakage. It also installs your emacs for you.
 
 ## emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
-Because I'm lazy and I forget. It has accumulated features over the years, but
-remains a nice wrapper for the emacs and emacsclient command lines.
+Because I'm lazy and I forget. It has accumulated features over the years, 
+and gives me control over my emacs cli.
 
 ## The Default Configuration
 
@@ -313,29 +313,28 @@ as an _Emacs bootloader_ to allow multiple emacs configurations to exist at once
 Most of the examples from the chemacs doc are incorporated here.
 
 This repo can install the following:
-    - __Chemacs2__  - Our bootloader.
+  -  __Chemacs2__  - Our bootloader.
 
   -  Our Emacs boot choices 
     Current available installations can be printed with `make print-profiles`:
 
     - Install profiles are:
-      - __default__ is the same as __stable__
-      - __stable__ and 
-      - __dev__ and 
-      - __test__ are [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
-      as the default configuration.
-      - __doom__ is [_doom-emacs](https://github.com/doomemacs), 
-      - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
-      - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
-      - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
-      - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
-      - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
-      - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
-      - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
-
-      - gnu and test are a special case and are always added.
-        - __gnu__ A blank emacs.d - vanilla gnu emacs. 
+      - Default
+        - __default__ is the same as __stable__
+        - __stable__ and 
+        - __dev__ are the default repo. [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
         - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
+        - __gnu__ is an empty profile and is therefore Vanilla Emacs.
+
+      - Optional configurations
+        - __doom__ is [_doom-emacs](https://github.com/doomemacs), 
+        - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
+        - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
+        - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
+        - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
+        - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
+        - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
+        - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
     - Server profiles are:
       - Using __stable__
         - exwm
@@ -348,11 +347,10 @@ This repo can install the following:
       - Using Vanilla __gnu__
         - gnu-server
 
-In addition to the actual installed profiles there are server
-profiles which use them. See __~/.emacs-profiles.el__ for full details.
+See __~/.emacs-profiles.el__ for full details.
 
 When Emacs runs, it will run the default profile unless told otherwise.
-We have __default__ pointing to the same place as __stable__ by default.
+We have __default__ pointing to __stable__ by default.
 
 Run emacs with profiles like this:
 

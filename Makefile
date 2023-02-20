@@ -81,7 +81,7 @@ test-repo := $(default-emacs-repo)
 # we just need to add the final install folder name.
 # We just have to be where we want them, --chdir works.
 default-install-cmd-pre := emacs --script install.el --chdir $(emacs-home)
-default-update-cmd-pre  := emacs --script update.el --chdir $(emacs-home)
+default~update-cmd-pre  := emacs --script update.el --chdir $(emacs-home)
 
 # An easier rule for those installs that dont have an api for this.
 # dev-install-cmd := emacs --with-profile dev
@@ -91,13 +91,13 @@ default-update-cmd-pre  := emacs --script update.el --chdir $(emacs-home)
 # These could just be the above, emacs will usually try to install and update
 # when it is started the first time. It might just take a while.
 dev-install-cmd := $(default-install-cmd-pre)/dev
-dev-update-cmd := $(default-update-cmd-pre)/dev
+dev~update-cmd := $(default-update-cmd-pre)/dev
 
 test-install-cmd := $(default-install-cmd-pre)/test
-test-update-cmd := $(default-update-cmd-pre)/test
+test~update-cmd := $(default-update-cmd-pre)/test
 
 stable-install-cmd := $(default-install-cmd-pre)/stable
-stable-update-cmd := $(default-update-cmd-pre)/stable
+stable~update-cmd := $(default-update-cmd-pre)/stable
 
 #############################################################################
 #####  Additional Emacs configuration definitions.
@@ -120,7 +120,7 @@ stable-update-cmd := $(default-update-cmd-pre)/stable
 ericas-repo := ericalinag/ericas-emacs.git
 #  ericas-repo-flags := -b with-helm
 ericas-install-cmd := emacs --script install.el --chdir $(emacs-home)/ericas
-ericas-update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
+ericas~update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
 
 space-repo := syl20bnr/spacemacs.git
 space-install-cmd := emacs --with-profile space
@@ -136,13 +136,13 @@ space-update-el := '((lambda ()\
 			(configuration-layer/update-packages)\
 			(save-buffers-kill-terminal t)))'
 
-space-update-cmd := emacs -nw --with-profile space \
+space~update-cmd := emacs -nw --with-profile space \
 		--eval $(space-update-el) --chdir $(emacs-home)/space
 
 # doom has hybrid shell/elisp scripts to run.
 doom-repo := hlissner/doom-emacs.git
 doom-install-cmd := $(emacs-home)/doom/bin/doom install
-doom-update-cmd := $(emacs-home)/doom/bin/doom update
+doom~update-cmd := $(emacs-home)/doom/bin/doom update
 
 # there is a generic-update rule, so we dont need those vars for
 # the following profile installations. or maybe there are other
@@ -193,7 +193,7 @@ uncle-daves-install-cmd := emacs --with-profile uncle-daves
 #    We dont actually install gnu because there isnt anything to do.
 #    it is the same with test initially, - its a placeholder for when
 #    testing recently pushed changes.
-#    Make targets will exist for <profile> and <profile>-update
+#    Make targets will exist for <profile> and <profile>~update
 #
 #    If new configurations are added, they should also be added to
 #    emacs-profiles-orig.el so they can be automatically uncommented.
@@ -204,8 +204,8 @@ default-profiles := gnu stable dev test
 profiles := $(default-profiles) $(optional-profiles)
 
 # for the configs that have independent update commands
-update-profiles := stable-update dev-update test-update doom-update\
-		ericas-update space-update
+update-profiles := stable~update dev~update test~update doom~update\
+		ericas~update space~update
 
 # If the configuration can use the generic update .el just put it in here
 # watch the '~'.  Theres no need for profile-update-cmd for these.
@@ -255,6 +255,8 @@ $(profiles):
 
 
 # We just run the command we were given. doom, ericas, spacemacs.
+# note that its important that the variable name for the ~update-cmd
+# does need a tilde. or it wont match, and nothing runs.
 $(update-profiles):
 	printf "\n\nRunning update for profile: $@\n\n"
 	$($@-cmd)
