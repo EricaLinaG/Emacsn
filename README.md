@@ -332,17 +332,17 @@ This repo can install the following:
         - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
         - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
         - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
-    - Server profiles are:
-      - Using __stable__
-        - exwm
-        - mail
-        - common
+      - Server profiles are:
+        - Using __stable__
+          - exwm
+          - mail
+          - common
 
-      - Using __doom__ if installed.
-        - doom-server
+        - Using __doom__ if installed.
+          - doom-server
 
-      - Using Vanilla __gnu__
-        - gnu-server
+        - Using Vanilla __gnu__
+          - gnu-server
 
 See __~/.emacs-profiles.el__ for full details.
 
