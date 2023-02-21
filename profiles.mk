@@ -53,8 +53,6 @@ no-update := true
 #    You would like update to 'git pull origin', and then
 #	do install-packages for all-selected-packages.
 #
-# Then this is all you need.
-#
 # copy-pasta
 # ------------------------------------------------------------------
 # # Gnu

@@ -116,7 +116,7 @@ Or
 
 ## What to do next.
 
-  -Step 4: Look at 
+  - Step 4: Look at 
     [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
     and add your own emacs config into the mix. Directions are at the top of the makefile .
     - Add your Emacs profile definition
@@ -176,7 +176,7 @@ Here is the template the makefile provides.
 
 ### The Template
 
- Copy this.
+ Copy this down to the bottom.
  Change all the 'gnus' to your profile name and fill in your repo url.
 
  The rest will satisfy your needs If;
@@ -185,7 +185,6 @@ Here is the template the makefile provides.
   -  You would like update to 'git pull origin', and then do 
      install-packages for all-selected-packages.
 
- Then this is all you need.
 
 ```make
 # # Gnu
@@ -302,7 +301,7 @@ Run in window mode or terminal mode.
 
     emacs --with-profile <profile-name>
 
-    # or
+    # or in terminal.
 
     emacsn -tp <profile-name>
     
