@@ -2,7 +2,7 @@
 
 ## A system to enable easy management of multiple emacs configurations.
 
-This is literally just a script and a __Makefile__ to create an easy system of 
+This is just some __Makefile__, a script and some elisp to create an easy system of 
 installing and managing multiple emacs installations from github. 
 The emacs installs just need to work in _.emacs.d_ under normal cirmumstances,
 with an _init.el_.
@@ -23,12 +23,12 @@ and gives me control over my emacs cli.
 
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
 But that can be yours or something else. It is very easy to change at the top of
-the _Makefile_.
+the _profiles.mk_ makefile where all the profile definitions live.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
 and can use yours as the default by visiting and editing this region in the _Makefile_.
 
-    default-emacs-repo := ericalinag/ericas-emacs.git
+    default-profile-name := ericas
 
 ### 3 profiles for the default configuration
 
@@ -37,23 +37,23 @@ test is empty, and therefore vanilla gnu to start with.
 
 There is `make test-install` which will make a test install in the test profile.
 This is to make sure what is pushed installs and 
-runs cleanly before updating the stable installation with `make stable~update`.
+runs cleanly before updating the stable installation with `make stable-update`.
 
 ## Easy updates to configurations.
 
-There are make targets to update the installations. They do a `git pull` and
+There are make targets to update the installations. They might do a `git pull` and
 then update packages in each configuration's preferred way.
 
 For example:
 
 ```sh
-    make <profile-name>~update
+    make <profile-name>-update
 
-    make stable~update
-    make doom~update
-    make space~update
+    make stable-update
+    make doom-update
+    make space-update
     
-    make uncle-daves~update
+    make uncle-daves-update
 ```
     
 
@@ -122,9 +122,15 @@ Or
 
 ## What to do next.
 
-Play. learn, explore. :-)
+  -Step 4: Look at __profiles.mk__ and add your own emacs config into the mix.
+          Directions are at the top of the makefile .
+    - Add your Emacs profile definition
+    - Set it to the default.
+    - Read up on Chemacs2 and whichever Emacs configurations you wish to use.
+      Each has instruction you will want to know. Entire wikis exist.
 
-  - Step 4: Optional, Change the git remote for __dev__ to SSH.
+
+  - Step 5: Optional, Change the git remote for __dev__ to SSH.
       I only do this for _dev_, as its the only one I ever push.
       __dev__ is where I maintain Ericas-Emacs.
 
@@ -135,45 +141,73 @@ Play. learn, explore. :-)
     git remote -v      # just to make sure.
 ```
 
-  - Step 5: Optional, After pushing changes from __dev__, test your configuration 
+  - Step 6: Optional, After pushing changes from __dev__, test your configuration 
   with an install from git.
 
 ```sh
     make test-install 
 ```
 
-  - Step 6: Optional, pull your changes into __stable__ and update the packages.
+  - Step 7: Optional, pull your changes into __stable__ and update the packages.
 ```sh
-    make stable~update
+    make stable-update
 ```
 
-Rinse - Repeat.
+  - Step 7: Optional, remove stuff.
+```sh
+    make from-hell-remove
+
+    make rm-all-optional
+
+    make rm-all-profiles
+```
+
+But you can just do an `rm -rf ...` if you want.
+
+Rinse - Repeat, Have fun.
 
 ## Read the Makefile
 
-Its not too hard, and you'll know everything, mostly.
+Actually, look at _profiles.mk_ first so you can add your Emacs to this. 
+
+You can read _Makefile_ too. but its mostly __Make__ recipes.
+Buts it is not too hard, and you'll know everything, mostly.
 Oh, and take a look at _emacs-profiles-orig.el_. It does have a majority of
 the examples from the Chemacs2 readme.
+You will be editing that by hand in no time anyway.
 
 ## Emacs configurations
 
-So far they are all from github.  Each one needs to specify its piece of
-the github url, the part that follows github.com/. Make does not like __:__
-in many places, so we circumvent that by constructing the url.
+These are defined in _profiles.mk_. This is loaded by the main _Makefile_
 
-It should also specify an install and optionally an update command 
-and repo-flags as desired for the git clone. 
+They are all about the same and I hope they just make sense.
+Here is the one for __Prelude__.
 
-They can all be seen with `make print-...
+```make
+    optional-profiles   += prelude
+    prelude-repo        = $(git-hub)bbatsov/prelude.git
+    prelude-repo-flags  =
+    prelude-pull        = $(git-pull)
+    prelude-install-cmd = emacs --with-profile prelude
+    prelude-update-cmd  = $(generic-update-cmd)
+```
+
+  - It first adds itself to the list of optional-profiles.
+  - Then we define the github uri.
+  - Define any clone flags so we can get branches if we like.
+  - The pull command, Usually, its either `true` or its `git pull origin`
+  - The install command to let the emacs install get all of it's packages
+  - The update command to let emacs update its packages.
+
+The list of available profiles can all be seen with `make print-...`
 
 ```shell
     make print-optional-profiles
     make print-profiles
-    make print-default-profiles
+    make print-default-profiles	
 
     # for the update targets.
     make print-update-profiles
-    make print-update-generic-profiles
 ```
 
 The extra profiles can be installed like so. You may install them
@@ -181,6 +215,9 @@ as you go.  Emacsn modifies your __~/.emacs-profiles.el__
 as you add new profile installs. 
 
 ```shell
+    make doom 
+
+    # or whatever
     make doom space uncle-daves prelude
 ```
 
@@ -189,10 +226,12 @@ as you add new profile installs.
 Doom and Ericas are the only configurations which provide an install function.
 
 ```make
-    ericas-repo := ericalinag/ericas-emacs.git
-    #  ericas-repo-flags := -b with-helm
-    ericas-install-cmd := emacs --script install.el --chdir $(emacs-home)/ericas
-    ericas~update-cmd := emacs --script update.el --chdir $(emacs-home)/ericas
+    optional-profiles  = ericas
+    ericas-repo        = $(git-hub)ericalinag/ericas-emacs.git
+    ericas-repo-flags  =
+    ericas-update-pull = $(git-pull)
+    ericas-install-cmd = emacs --script install.el
+    ericas-update-cmd  = emacs --script update.el
 ```
 
 Like most emacs configurations Spacemacs just installs everything when it 
@@ -200,21 +239,30 @@ runs the first time. But it does have an internal lisp function we can use
 to do an update.
 
 ```make
-    space-repo := syl20bnr/spacemacs.git
-    space-install-cmd := emacs --with-profile space
-    space-update-el := '((lambda ()\
-                          (shell-command "git pull origin HEAD")\
-                          (configuration-layer/update-packages)\
-                          (save-buffers-kill-terminal t)))'
-    space~update-cmd := emacs -nw --with-profile space \
-                      --eval $(space-update-el) --chdir $(emacs-home)/space
+    optional-profiles += space
+    space-repo        = $(git-hub)syl20bnr/spacemacs.git
+    space-repo-flags  =
+    space-pull        = $(git-hub)
+    space-install-cmd = emacs --with-profile space
+    space-update-el   = '((lambda ()\
+                            (configuration-layer/update-packages)\
+			                (save-buffers-kill-terminal t)))'
+
+    space-update-cmd  = emacs -nw --with-profile space \
+                            --eval $(space-update-el)
 ```
 
+
 Doom has hybrid shell/elisp scripts to run for install and update.
+It doesn't want us to pull for it.
+
 ```make
-    doom-repo := hlissner/doom-emacs.git
-    doom-install-cmd := $(emacs-home)/doom/bin/doom install
-    doom~update-cmd := $(emacs-home)/doom/bin/doom update
+    optional-profiles += doom
+    doom-repo         = $(git-hub)hlissner/doom-emacs.git
+    doom-repo-flags   =
+    doom-update-pull  = $(no-pull)
+    doom-install-cmd  = $(emacs-home)/doom/bin/doom install
+    doom-update-cmd   = $(emacs-home)/doom/bin/doom update
 ```
 
 ### Profiles with no install function
@@ -241,11 +289,10 @@ The rest can use this generic update rule.
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
 It is a simplification of the __update.el__ from Ericas emacs.
-It does a `git pull origin HEAD`, updates all packages 
-and then exits.
+It updates all selected packages and then exits.
 
 These configurations usually do not have an install function 
-either so on install we just run them like so. 
+either so on install we just run them. 
 They download and install all their packages. 
 We can check for errors, then `C-x C-c` so that 
 the `make` can continue.
@@ -261,40 +308,22 @@ both update automatically and do not use packages,
 So the update packages doesn't do/hurt anything.
 The update rule will still update the code base from github.
 
+Package update can be turned off with the value `$(no-update)`
+
 ```make
-uncle-daves-repo := daedreth/UncleDavesEmacs.git
-uncle-daves-install-cmd := emacs --with-profile uncle-daves
+# Uncle Daves Emacs
+optional-profiles       += uncle-daves
+uncle-daves-repo        = $(git-hub)daedreth/UncleDavesEmacs.git
+uncle-daves-repo-flags  =
+uncle-daves-update-pull = $(git-pull)
+uncle-daves-install-cmd = emacs --with-profile uncle-daves
+uncle-daves-update-cmd  = $(generic-update-cmd)
 ```
-Profile targets that use the generic update rule go into
-the `update-generic-profiles` list.
 
-__Note: The names in update-generic-profiles use `~` to delimit
-between the name and _update_.__
-
-I am not sure I like this, but it enables us to use the generic
-update and not specify an update command for every configuration.
-And the __~__ allows us to have easy to read names with __-__ in them.
-Its only like this for the generic update profiles.
-
-So they look like this.
-
-    uncle-daves~update
-    prelude~update
-    from-hell~update
-    from-scratch~update
-    
-This is simply to accommodate profile names with __-__ in them.
-
-Using them looks like this.
-
-```shell
-    make uncle-daves~update
-```
     
 ### Summary
-To add a new configuration repo, just define the repo's uri, 
-and add an install command. Define an update command or put it in the 
-`update-generic-profiles` list to use the generic update command.
+To add a new profile to __profiles.mk__ is easy, copy the template
+and fill in the blanks.
 
 The install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
@@ -317,15 +346,17 @@ This repo can install the following:
   -  Our Emacs boot choices 
     - Install profiles are:
       - Default
-        - __default__ is the same as __stable__
+        - __default__ is the same as stable__
         - __stable__ and 
         - __dev__ are the default repo. [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
         - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
         - __gnu__ is an empty profile and is therefore Vanilla Emacs.
 
       - Optional configurations
-        - __doom__ is [_doom-emacs](https://github.com/doomemacs), 
+        - __doom__ is [doom-emacs](https://github.com/doomemacs), 
+          - __doomdir__ is __doom__ with a profile directory.
         - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
+          - __spacemacs__ is __space__ with a profile directory.
         - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
         - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
         - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
@@ -355,44 +386,25 @@ Run emacs with profiles like this:
 or
     `emacsn -p <profile name>`
 
-## The __test__ profile
 
-There is a __test__ profile which is used to test the pushed version of 
-the default configuration.
-
-When I modify my emacs configuration, I use the _dev_ installation. 
-Once _dev_ is pushed to github and I'm happy with it,
-I then try it out with `make test-install`.
-If that is all good I `make stable~update `for new _stable_ installation.
-
-__test__ is another entry in _~/.emacs-profiles.el_.  The Makefile has 
-an _install-test_ rule, which will remove/create/execute __test__ 
-with an install from github, it finishes with 
-
-    `emacs -with-profile test --debug-init`.
-
-so that any first run problems can be managed.
-
-     
 ## Managing elisp development
 
-I use these installs to insure I always have a way to do work if I have
-broken anything.  I do my elisp work in __dev__.  
+I use these installs to insure I always have a way to do work if I have broken anything.  
+
+I do my elisp work in __dev__.  
 When __dev__ is working well and everything is pushed
-I can test a fresh installation from github with:
+__test__ is another entry in _~/.emacs-profiles.el_.   
 
     make test-install
 
-This will install and run emacs --debug-init on a fresh install from git.
-if all works well, I can then do this to update my stable install.
+will remove/create/execute __test__ with a fresh install from github, 
+it finishes with; 
 
-    make stable~update
+    `emacs -with-profile test --debug-init`.
 
-This does a `git pull` to bring it up to date with _origin HEAD_. 
-Followed by a package update.
+if all works well, I can then do this to update my __stable__ install.
 
-__Note: this might not work properly for configurations on branches.__
-
+    make stable-update
 
 ## Running Emacs
 

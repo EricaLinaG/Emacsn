@@ -7,35 +7,16 @@
  ("gnu"      . ((user-emacs-directory . "-PWD-/gnu")))
  ("test"      . ((user-emacs-directory . "-PWD-/test")))
 
- ;;stable ("stable"  . ((user-emacs-directory . "-PWD-/stable")))
- ;;dev ("dev"     . ((user-emacs-directory . "-PWD-/dev")))
-
- ;; ("doom" . ((user-emacs-directory . "-PWD-/doom")
- ;;            (env .https://github.com/overtone/emacs-live.git (("DOOMDIR" . "~/.doom.d")))))
-
- ;;doom ("doom"    . ((user-emacs-directory . "-PWD-/doom")))
+ ;;doom ("doomdir" . ((user-emacs-directory . "-PWD-/doom")
+ ;;doom            (env .https://github.com/overtone/emacs-live.git (("DOOMDIR" . "~/.doom.d")))))
 
  ;; spacemacs example with customization dir.
- ;; (("spacemacs" . ((user-emacs-directory . "-PWD-/space")
- ;;                  (env . (("SPACEMACSDIR" . "~/.spacemacs")))))
+ ;;space (("spacemacs" . ((user-emacs-directory . "-PWD-/space")
+ ;;space                  (env . (("SPACEMACSDIR" . "~/.spacemacs")))))
 
- ;; Spacemacs
- ;;space ("space"   . ((user-emacs-directory . "-PWD-/space")))
 
- ;; Prelude
- ;;prelude ("prelude"   . ((user-emacs-directory . "-PWD-/prelude")))
-
- ;; Emacs live
- ;;live ("live"    . ((user-emacs-directory . "-PWD-/live")))
-
- ;; Emacs from Hell
- ;;from-hell ("from-hell"    . ((user-emacs-directory . "-PWD-/from-hell")))
-
- ;; Emacs from Scratch
- ;;from-scratch ("from-scratch"      . ((user-emacs-directory . "-PWD-/from-scratch")))
-
- ;; Uncle Daves
- ;;uncle-daves ("uncle-daves"      . ((user-emacs-directory . "-PWD-/uncle-daves")))
+ ;; -INSERT-HERE-
+ ;;doom ("doom"    . ((user-emacs-directory . "-PWD-/doom")))
 
  ;; Servers
  ;; Stable
