@@ -16,7 +16,7 @@
 # emacs-from-hell and uncle-daves-emacs as well as ericas if you
 # want them.
 #
-# There are also daemon profiles for different installs.
+# There are also daemon rprofiles for different installs.
 #############################################################################
 
 # Code:
@@ -198,6 +198,7 @@ mv.emacs:
 ifneq ($(move-dot-emacs), 0)
 	ls -l ~/.emacs
 	printf "\n\nMoving ~/.emacs to .bak.xxxx\n"
+	printf "\n\nMoving ~/emacs to .emacs.bak.$(seconds-now)\n"
 	mv ~/.emacs ~/.emacs.bak.$(seconds-now)
 endif
 
@@ -205,7 +206,7 @@ endif
 mv.emacs.d:
 ifneq ($(move-dot-emacs.d), 0)
 	ls -l ~/.emacs.d
-	printf "\n\nMoving ~/emacs.d to .bak.xxxxx\n"
+	printf "\n\nMoving ~/emacs.d to emacs.d.bak.$(seconds-now)\n"
 	mv ~/.emacs.d ~/.emacs.d.bak.$(seconds-now)
 endif
 
@@ -225,9 +226,11 @@ install-chemacs: emacs-profiles.el
 	git clone https://github.com/plexus/chemacs2.git ~/.emacs.d
 
 # Add a gnu profile. Nothing to do really. Point at an empty emacs.d.
-add-gnu:
-	mkdir -p $(emacs-home)/gnu
+add-test:
 	mkdir -p $(emacs-home)/test
+
+add-gnu: add-test
+	mkdir -p $(emacs-home)/gnu
 
 all: mu4e install-all
 
@@ -246,19 +249,14 @@ install: clean prepare-install install-emacsn add-gnu install-chemacs stable dev
 # The install plus: doom, spacemacs, and prelude.
 all: install optional-profiles
 
-# Make targets for managing the testing a fresh install.
-# Nuke it so we can clone a new one.
-remove-test:
-	printf "\n\nRemoving the test install\n"
-	rm -f $(emacs-home)/test
-
 # Clean it out so we can still use it as vanilla
 clean-test:
 	printf "\n\nCleaning out the test install\n"
 	rm -f $(emacs-home)/test/*
 
-# Remove the current test, and test a fresh install from github.
-test-install: remove-test test
+# Remove the current test, do a fresh install from github.
+# Run it with debug-init.
+test-install: test-remove test
 	emacs --with-profile test --debug-init
 
 clean:
