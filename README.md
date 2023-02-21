@@ -4,8 +4,11 @@
 
 This is just some __Makefile__, a script and some elisp to create an easy system of 
 installing and managing multiple emacs installations from github. 
-The emacs installs just need to work in _.emacs.d_ under normal cirmumstances,
-with an _init.el_.
+This system uses [Chemacs2](https://github.com/plexus/chemacs2) for its Emacs
+bootloader. I recommend at least reading through the Readme.
+
+The Emacs configuration installs this uses just need to work in _.emacs.d_ under 
+normal cirmumstances, with an _init.el_. Most configurations do without issue.
 
 If you ever wanted an easy way to compare Doom to spacemacs, to Prelude, Emacs from
 Scratch, Emacs-Live, or any other, Here is an easy path. 
@@ -13,6 +16,8 @@ Scratch, Emacs-Live, or any other, Here is an easy path.
 If you have ever ruined your emacs setup and had to go back, or fix it in less than
 ideal circumstances, then this could also be your solution to accidental 
 emacs startup breakage. It also installs your emacs for you.
+
+You just want to try out a feature without breaking your daily driver.
 
 ## emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
@@ -23,7 +28,9 @@ and gives me control over my emacs cli.
 
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
 But that can be yours or something else. It is very easy to change at the top of
-the _profiles.mk_ makefile where all the profile definitions live.
+the 
+[_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+makefile where all the profile definitions live.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
 and can use yours as the default by visiting and editing this region in the _Makefile_.
@@ -47,13 +54,7 @@ then update packages in each configuration's preferred way.
 For example:
 
 ```sh
-    make <profile-name>-update
-
     make stable-update
-    make doom-update
-    make space-update
-    
-    make uncle-daves-update
 ```
     
 
@@ -72,7 +73,7 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
       You'll probably want to make this your own.
 
   - Step 1: Get this repo from here or from your fork and `cd` into it.
-    I usually just clone it into my Home directory.
+    I usually just clone it into my home directory.
 
 ```shell
     cd
@@ -81,32 +82,21 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
 ```
 
   - Step 2:  Install Chemacs2 as well as the default and gnu profiles.
-    ONLY do the install once. The optional configurations can be installed later.
+    The optional configurations can be installed later.
 
 ```sh
     make install
 ```
 
-Or to install Doom emacs and Spacemacs in addition;
-
-```shell
-    make install doom space
-```
-
-Or to install Everything. _This might take a while, and requires baby sitting._;
-
-```shell
-    make install-all 
-```
-
   - Step 3: install optional emacs configurations. 
   `make print-` can tell you what your choices are.
-  This can be done at anytime as you go.
+  This can be done at anytime as you go. 
 
 ```sh
     make print-optional-profiles
     
-    make doom space uncle-daves from-scratch prelude live from-hell
+    # install Doom-emacs, Spacemacs and Emacs-from-scratch
+    make doom space from-scratch
 ```
 
 At this point you are ready to go. Running emacs will give you your
@@ -122,12 +112,13 @@ Or
 
 ## What to do next.
 
-  -Step 4: Look at __profiles.mk__ and add your own emacs config into the mix.
-          Directions are at the top of the makefile .
+  -Step 4: Look at 
+    [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+    and add your own emacs config into the mix. Directions are at the top of the makefile .
     - Add your Emacs profile definition
     - Set it to the default.
     - Read up on Chemacs2 and whichever Emacs configurations you wish to use.
-      Each has instruction you will want to know. Entire wikis exist.
+     Each has instruction you will want to know. Entire wikis exist.
 
 
   - Step 5: Optional, Change the git remote for __dev__ to SSH.
@@ -141,6 +132,8 @@ Or
     git remote -v      # just to make sure.
 ```
 
+## Creating a workflow
+
   - Step 6: Optional, After pushing changes from __dev__, test your configuration 
   with an install from git.
 
@@ -153,6 +146,8 @@ Or
     make stable-update
 ```
 
+## When a Emacs distro is no longer useful/interesting
+
   - Step 7: Optional, remove stuff.
 ```sh
     make from-hell-remove
@@ -163,22 +158,15 @@ Or
 ```
 
 But you can just do an `rm -rf ...` if you want.
+Don't forget to edit your _~/.emacs-profiles.el_
 
 Rinse - Repeat, Have fun.
 
-## Read the Makefile
-
-Actually, look at _profiles.mk_ first so you can add your Emacs to this. 
-
-You can read _Makefile_ too. but its mostly __Make__ recipes.
-Buts it is not too hard, and you'll know everything, mostly.
-Oh, and take a look at _emacs-profiles-orig.el_. It does have a majority of
-the examples from the Chemacs2 readme.
-You will be editing that by hand in no time anyway.
-
 ## Emacs configurations
 
-These are defined in _profiles.mk_. This is loaded by the main _Makefile_
+These are defined in
+ [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
+ This is loaded by the main _Makefile_
 
 They are all about the same and I hope they just make sense.
 Here is the one for __Prelude__.
@@ -322,8 +310,9 @@ uncle-daves-update-cmd  = $(generic-update-cmd)
 
     
 ### Summary
-To add a new profile to __profiles.mk__ is easy, copy the template
-and fill in the blanks.
+To add a new profile to
+ [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+is easy, copy the template and fill in the blanks.
 
 The install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
@@ -393,7 +382,8 @@ I use these installs to insure I always have a way to do work if I have broken a
 
 I do my elisp work in __dev__.  
 When __dev__ is working well and everything is pushed
-__test__ is another entry in _~/.emacs-profiles.el_.   
+__test__ is another profile in _~/.emacs-profiles.el_ that is just for
+testing a fresh install.   
 
     make test-install
 
@@ -408,7 +398,8 @@ if all works well, I can then do this to update my __stable__ install.
 
 ## Running Emacs
 
-Running Emacs will use __default__ which is also __stable__ but can be redirected with
+Running Emacs will use __default__ which is also __stable__ but can be redirected 
+to the __dev__ profile, for instance, with
 
     emacs --with-profile dev
 
@@ -419,6 +410,9 @@ or
 ### Running emacs client to a server
 
 If you've got a named server running you can connect to it like this.
+There are so many choices in how to do this. They all work just fine.
+Chemacs and emacsn really simplify running Emacs servers and connecting 
+with them.
 
 Create a new frame, connect to the socket and use vanilla emacs as fallback
 
@@ -439,6 +433,9 @@ Use an existing emacsclient frame by omitting the `w`:
 
 ### Running named daemons
 
+Some Chemacs profiles are servers, we dont have to do anything to make them
+start except invoke them.
+
     emacs --with-profile exwm 
     emacs --with-profile gnu-server
     emacs --with-profile doom-server
@@ -450,10 +447,12 @@ or
 
 #### Named daemons with emacsn
 
+Using the default emacs as a server can be done like this.
+
     emacsn -s exwm
     emacsn -s mail
 
-Connect with
+Connect emacsclint in a new frame/window with:
 
     emacsn -cws mail
 
@@ -465,7 +464,7 @@ A vanilla, no-name, daemon - the old fashioned way, not the Chemacs way.
 or
     emacsn -d
 
-Doom emacs daemon
+Doom emacs daemon with the regular doom profile.
 
     emacs --with-profile doom --daemon &
 or
@@ -474,6 +473,8 @@ or
 
 ## The emacsn script
 
+There have already been a number of examples of emacsn usage so you
+are probably getting the idea. Its a very old script, and works well.
 I run emacs a few different ways. I use named daemons for some things.
 its nice to have so clients can be used for mu4e and Exwm.
 
@@ -492,11 +493,11 @@ with Emacs and Emacsclient. It also makes it easy to run elisp functions
 which is leveraged by other options like -e to create an emacs invocation for
 mu4e which runs as emacsclient and connects to a named daemon.
 
-It runs `mu4e` or my `main-window` function to set up emacs in a 
-standard configuration for a project. 
 It knows how to run any elisp function on startup, 
-it can choose different Chemacs profiles.  Creating multiple daemons
-and using them by name is easy.
+it runs `mu4e` or my `main-window` function to set up emacs in a 
+standard configuration for a project. 
+It can also choose different Chemacs profiles. 
+Creating multiple daemons and using them by name is easy.
 It's easy to add others. 
 
 Both of these commands result in the same thing, they both
