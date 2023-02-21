@@ -35,7 +35,9 @@ the
 makefile where all the profile definitions live.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
-and can use yours as the default by visiting and editing this region in the _Makefile_.
+and can use yours as the default by visiting 
+[this region](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+ in _profiles.mk_.
 
     default-profile-name := ericas
 
@@ -169,6 +171,34 @@ Rinse - Repeat, Have fun.
 These are defined in
  [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
  This is loaded by the main _Makefile_
+ 
+Here is the template the makefile provides.
+
+### The Template
+
+ Copy this.
+ Change all the 'gnus' to your profile name and fill in your repo url.
+
+ The rest will satisfy your needs If;
+  -  You are happy with just running emacs once for the 
+     initial package load on install.
+  -  You would like update to 'git pull origin', and then do 
+     install-packages for all-selected-packages.
+
+ Then this is all you need.
+
+```make
+# # Gnu
+# # Gnu Emacs is free, have fun.
+# default-profiles += gnu
+# gnu-repo         = $(git-hub)/your-acct/your-repo.git
+# gnu-repo-flags   =
+# gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
+# gnu-update-pull  = $(git-pull)
+# gnu-update-cmd   = $(generic-update-cmd)
+```
+
+### Some Examples
 
 They are all about the same and I hope they just make sense.
 Here is the one for __Prelude__.
@@ -177,8 +207,8 @@ Here is the one for __Prelude__.
     optional-profiles   += prelude
     prelude-repo        = $(git-hub)bbatsov/prelude.git
     prelude-repo-flags  =
-    prelude-pull        = $(git-pull)
-    prelude-install-cmd = emacs --with-profile prelude
+    prelude-install-cmd = $(emacs-nw-profile) prelude $(kill-emacs)
+    prelude-update-pull = $(git-pull)
     prelude-update-cmd  = $(generic-update-cmd)
 ```
 
@@ -217,44 +247,47 @@ as you add new profile installs.
 ### Profiles which have an install and/or update functionalities.
 
 Doom and Ericas are the only configurations which provide an install function.
+It does make things all a little bit nicer. They can interact as needed and exit
+when done. We do our best for the rest.
 
 ```make
     optional-profiles  = ericas
-    ericas-repo        = $(git-hub)ericalinag/ericas-emacs.git
+    ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
     ericas-repo-flags  =
-    ericas-update-pull = $(git-pull)
     ericas-install-cmd = emacs --script install.el
+    ericas-update-pull = $(git-pull)
     ericas-update-cmd  = emacs --script update.el
 ```
 
 Like most emacs configurations Spacemacs just installs everything when it 
 runs the first time. But it does have an internal lisp function we can use 
-to do an update.
+to do an update. In both cases we run in terminal mode, trust it all went well 
+and save and kill terminal at the end, __$(kill-emacs)__.
 
 ```make
     optional-profiles += space
-    space-repo        = $(git-hub)syl20bnr/spacemacs.git
+    space-repo        = $(git-hub)/syl20bnr/spacemacs.git
     space-repo-flags  =
-    space-pull        = $(git-hub)
-    space-install-cmd = emacs --with-profile space
+    space-install-cmd = $(emacs-nw-profile) space $(kill-emacs)
+    space-update-pull = $(git-pull)
     space-update-el   = '((lambda ()\
                             (configuration-layer/update-packages)\
 			                (save-buffers-kill-terminal t)))'
 
-    space-update-cmd  = emacs -nw --with-profile space \
+    space-update-cmd  = $(emacs-nw-profile) space \
                             --eval $(space-update-el)
 ```
 
 
 Doom has hybrid shell/elisp scripts to run for install and update.
-It doesn't want us to pull for it.
+It doesn't want us to pull for it. Use __$(no-pull)__ to indicate that.
 
 ```make
     optional-profiles += doom
-    doom-repo         = $(git-hub)hlissner/doom-emacs.git
+    doom-repo         = $(git-hub)/hlissner/doom-emacs.git
     doom-repo-flags   =
-    doom-update-pull  = $(no-pull)
     doom-install-cmd  = $(emacs-home)/doom/bin/doom install
+    doom-update-pull  = $(no-pull)
     doom-update-cmd   = $(emacs-home)/doom/bin/doom update
 ```
 
@@ -262,13 +295,18 @@ It doesn't want us to pull for it.
 
 These profiles just run emacs the first time to install all of
 their packages. So the install command amounts to one of these.
+Run in window mode or terminal mode.
 
 ```sh
     emacsn -p <profile-name>
 
+    emacs --with-profile <profile-name>
+
     # or
 
-    emacs --with-profile <profile-name>
+    emacsn -tp <profile-name>
+    
+    emacs -nw --with-profile <profile-name>
 ```
 
 
@@ -306,10 +344,10 @@ Package update can be turned off with the value `$(no-update)`
 ```make
 # Uncle Daves Emacs
 optional-profiles       += uncle-daves
-uncle-daves-repo        = $(git-hub)daedreth/UncleDavesEmacs.git
+uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
 uncle-daves-repo-flags  =
+uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(kill-emacs)
 uncle-daves-update-pull = $(git-pull)
-uncle-daves-install-cmd = emacs --with-profile uncle-daves
 uncle-daves-update-cmd  = $(generic-update-cmd)
 ```
 
@@ -333,10 +371,10 @@ on different branches in the same repo.
 
 This system uses [Chemacs2](https://github.com/plexus/chemacs2) 
 as an _Emacs bootloader_ to allow multiple emacs configurations to exist at once.
-Most of the examples from the chemacs doc are incorporated here.
+Most of the examples from the Chemacs doc are incorporated here.
 
-When a profile is installed, the emacs-profiles.el will automatically
-add in any server profiles or alternative invocations which apply.
+When a profile is installed it will automatically
+add in any pre-defined server profiles or alternative invocations which apply.
 Modify _~/.emacs-profiles.el_ to add new ones or change their names.
 
 Put them back into 
@@ -350,13 +388,19 @@ This repo can install the following:
       - Default
         - __default__ is the same as stable__
         - __stable__ and 
+          - Servers
+            - __exwm__
+            - __mail__
+            - __common__
         - __dev__ are the default repo. [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
         - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
         - __gnu__ is an empty profile and is therefore Vanilla Emacs.
+          - __gnu-server__
 
       - Optional configurations
         - __doom__ is [doom-emacs](https://github.com/doomemacs), 
           - __doomdir__ is __doom__ with a profile directory.
+          - __doom-server__
         - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
           - __spacemacs__ is __space__ with a profile directory.
         - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
@@ -365,17 +409,7 @@ This repo can install the following:
         - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
         - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
         - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
-      - Server profiles are:
-        - Using __stable__
-          - exwm
-          - mail
-          - common
 
-        - Using __doom__ if installed.
-          - doom-server
-
-        - Using Vanilla __gnu__
-          - gnu-server
 
 See __~/.emacs-profiles.el__ for full details.
 
