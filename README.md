@@ -67,8 +67,10 @@ For example:
     
 ## Super Quick Guide
 
-###  git clone ... ; cd Emacsn; make install; make print-optional-profiles
+###  git clone .../Emacsn.git;   cd Emacsn;   make install; 
 
+After that you can do:
+  - `make print-optional-profiles`
   - `make space doom from-hell`
   - `make test-install`
   - `make stable-update`
