@@ -15,9 +15,11 @@ Scratch, Emacs-Live, or any other, Here is an easy path.
 
 If you have ever ruined your emacs setup and had to go back, or fix it in less than
 ideal circumstances, then this could also be your solution to accidental 
-emacs startup breakage. It also installs your emacs for you.
+emacs startup breakage. 
 
 You just want to try out a feature without breaking your daily driver.
+
+It also installs your emacs for you.
 
 ## emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
@@ -29,7 +31,7 @@ and gives me control over my emacs cli.
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
 But that can be yours or something else. It is very easy to change at the top of
 the 
-[_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+[_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
 makefile where all the profile definitions live.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
@@ -101,7 +103,7 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
 
 At this point you are ready to go. Running emacs will give you your
 default __stable__ configuration. you can also specify them specifically
-with these variants
+with these variants, these run the __dev__ profile.
 
     emacs --with-profile dev
     
@@ -113,7 +115,7 @@ Or
 ## What to do next.
 
   -Step 4: Look at 
-    [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+    [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
     and add your own emacs config into the mix. Directions are at the top of the makefile .
     - Add your Emacs profile definition
     - Set it to the default.
@@ -122,7 +124,7 @@ Or
 
 
   - Step 5: Optional, Change the git remote for __dev__ to SSH.
-      I only do this for _dev_, as its the only one I ever push.
+      I only do this for __dev__, as its the only one I ever push.
       __dev__ is where I maintain Ericas-Emacs.
 
 ```sh
@@ -165,7 +167,7 @@ Rinse - Repeat, Have fun.
 ## Emacs configurations
 
 These are defined in
- [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
+ [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
  This is loaded by the main _Makefile_
 
 They are all about the same and I hope they just make sense.
@@ -183,15 +185,18 @@ Here is the one for __Prelude__.
   - It first adds itself to the list of optional-profiles.
   - Then we define the github uri.
   - Define any clone flags so we can get branches if we like.
-  - The pull command, Usually, its either `true` or its `git pull origin`
+  - The pull command, Usually, its either __$(no-pull)__ or __$(git-pull)__
+    which is __true__ and __git pull origin__ respectively.
   - The install command to let the emacs install get all of it's packages
   - The update command to let emacs update its packages.
+    The update-cmd can be __$(no-update)__, __$(generic-update-cmd)__ 
+    or another update command.
 
 The list of available profiles can all be seen with `make print-...`
 
 ```shell
-    make print-optional-profiles
     make print-profiles
+    make print-optional-profiles
     make print-default-profiles	
 
     # for the update targets.
@@ -271,7 +276,7 @@ their packages. So the install command amounts to one of these.
 
 For configurations with no update function. (Most of them)
 
-Only Doom, Ericas and Spacemacs provide an update mechanism.
+So far, only Doom, Ericas and Spacemacs provide an update mechanism.
 The rest can use this generic update rule.
 
 There is a `generic-update.el` that can be used to do updates 
@@ -311,7 +316,7 @@ uncle-daves-update-cmd  = $(generic-update-cmd)
     
 ### Summary
 To add a new profile to
- [_profiles.mk_] (https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+ [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
 is easy, copy the template and fill in the blanks.
 
 The install command is frequently just to run emacs with that profile.
@@ -330,7 +335,15 @@ This system uses [Chemacs2](https://github.com/plexus/chemacs2)
 as an _Emacs bootloader_ to allow multiple emacs configurations to exist at once.
 Most of the examples from the chemacs doc are incorporated here.
 
+When a profile is installed, the emacs-profiles.el will automatically
+add in any server profiles or alternative invocations which apply.
+Modify _~/.emacs-profiles.el_ to add new ones or change their names.
+
+Put them back into 
+[emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el) so they will persist and reappear when you install all of this the next time.
+
 This repo can install the following:
+
   -  __Chemacs2__  - Our bootloader.
   -  Our Emacs boot choices 
     - Install profiles are:
@@ -378,16 +391,18 @@ or
 
 ## Managing elisp development
 
-I use these installs to insure I always have a way to do work if I have broken anything.  
+I use the __dev__, __test__ and __stable__ profile/installs to insure 
+I always have a way to do work if I have broken anything.  
 
 I do my elisp work in __dev__.  
-When __dev__ is working well and everything is pushed
-__test__ is another profile in _~/.emacs-profiles.el_ that is just for
-testing a fresh install.   
+The __test__ profile comes into play when __dev__ is working well 
+and everything is pushed.
+
+Testing a fresh install.   
 
     make test-install
 
-will remove/create/execute __test__ with a fresh install from github, 
+will Remove, Install/create, and Execute __test__ with a fresh install from github, 
 it finishes with; 
 
     `emacs -with-profile test --debug-init`.
@@ -398,12 +413,12 @@ if all works well, I can then do this to update my __stable__ install.
 
 ## Running Emacs
 
-Running Emacs will use __default__ which is also __stable__ but can be redirected 
+Running `emacs` will use __default__ which is also __stable__ but can be redirected 
 to the __dev__ profile, for instance, with
 
     emacs --with-profile dev
 
-or 
+or with emacsn
 
     emacsn -p dev
 
