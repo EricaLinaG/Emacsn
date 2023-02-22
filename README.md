@@ -5,13 +5,15 @@
 This is just some __Makefile__, a script and some elisp to create an easy system of 
 installing and managing multiple emacs installations from github. 
 This system uses [Chemacs2](https://github.com/plexus/chemacs2) for its Emacs
-bootloader. I recommend at least reading through it's __Readme__ even though Emacsn
+boot loader. I recommend at least reading through it's __Readme__ even though Emacsn
 takes care of everything, you'll want to know eventually.
 
-The Emacs configuration installs that Chemacs uses just need to work in _.emacs.d_ under 
+The Emacs configuration installs that Chemacs likes need to work in _.emacs.d_ under 
 normal circumstances, with an _init.el_. Most configurations do this.
 
 ### Why
+
+It just grew organically over time. Have a need, fill a need.
 
 If you ever wanted an easy way to compare Doom to spacemacs, to Prelude, Emacs from
 Scratch, Emacs-Live, or any other, Here is an easy path. 
@@ -40,7 +42,7 @@ makefile where all the profile definitions live.
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
 and can use yours as the default by visiting 
 [this region](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
- in _profiles.mk_. Once you have a profile using it for the defalault is as easy 
+ in _profiles.mk_. Once you have a profile using it for the default is as easy 
  as this.
 
     default-profile-name := ericas
@@ -66,15 +68,30 @@ For example:
 ```
     
 ## Super Quick Guide
+It really is mostly a Makefile.
+###  git clone ... /Emacsn.git;   cd Emacsn;   make install; 
 
-###  git clone .../Emacsn.git;   cd Emacsn;   make install; 
+  - `emacs --with-profile <dev|stable|test|gnu|gnu-server|mail|common|...>`
+  
+See some things.
+  - `M-x describe-variable chemacs-profiles`
+  - `cat ~/.emacs-profiles.el`
+  - `cat ./emacs-profiles-orig.el`
+  - `make print-optional-profiles`
 
 After that you can do:
-  - `make print-optional-profiles`
   - `make space doom from-hell`
+    - `emacsn -p <doom|space|gnu|stable|dev|...>`
+  - Do not do: `emacs --with-profile from-hell` How bad could it be?
+
+Do try:
   - `make test-install`
   - `make stable-update`
   - `make from-hell-remove`
+
+Add your emacs repo to __profiles.mk__ make it the default.
+  - Then; Remove dev, stable and test, add-test, reinstall dev and stable.
+    `make dev-remove stable-remove test-remove add-test dev stable`
   - Have fun.
 
 ## A Quick Guide.
@@ -137,7 +154,7 @@ Or
     - Read up on Chemacs2 and whichever Emacs configurations you wish to use.
      Each has instruction you will want to know. Entire wikis exist.
     - Take a look at _~/.emacs-profiles.el and _Emacsn/emacs-profiles-orig.el_.
-
+      You can put persistent definitions there...
 
   - Step 5: Optional, Change the git remote for __dev__ to SSH.
       I only do this for __dev__, as its the only one I ever push.
