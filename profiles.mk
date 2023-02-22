@@ -56,9 +56,8 @@ no-update := true
 # copy-pasta
 # ------------------------------------------------------------------
 # # Gnu
-# # Gnu Emacs is free, have fun.
 # default-profiles += gnu
-# gnu-repo         = $(git-hub)/your-acct/your-repo.git
+# gnu-repo         = your-repo-url
 # gnu-repo-flags   =
 # gnu-pull         = $(git-pull)
 # gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)

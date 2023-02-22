@@ -51,6 +51,7 @@ include profiles.mk
 profiles := $(default-profiles) $(optional-profiles)
 update-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-update /g')
 remove-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
+remove-default-profiles := $(shell echo $(default-profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
 remove-optional-profiles := $(shell echo $(optonal-profiles) \
 				| sed 's/[a-zA-Z\-]*/&-remove /g')
 insert-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-insert /g')
@@ -71,6 +72,14 @@ test-sed:
 # make print-VARIABLE
 # ie. make print-profiles, make print-default-repo
 print-%  : ; @echo $* = $($*)
+
+# Add a new empty install profile
+add-new-profile-%  :
+	printf "Creating Empty profile installation: $*\n"
+	mkdir -p $*
+	printf "Inserting profile entry.\n"
+	$(call insert-profile,$*)
+
 
 # Profile targets,
 # Clone them to their target directory.
@@ -139,6 +148,9 @@ $(remove-profiles):
 
 rm-all-optional: $(remove-optional-profiles)
 rm-all-profiles: $(remove-profiles)
+rm-default-profiles: $(remove-default-profiles)
+install-default-profiles: add-test stable dev
+reinstall-default-profiles: rm-default-profiles install-default-profiles
 
 # how to set a variable during rule eval.
 test-var-set:
@@ -258,3 +270,87 @@ test-install: test-remove test
 
 clean:
 	rm -f .emacs-profiles.el
+
+
+show-profiles:
+	printf "\n   The current ~/.emacs-profiles:\n"
+	printf "========================================\n"
+	cat ~/.emacs-profiles.el
+
+show-installs:
+	printf "\n   Installations:\n"
+	printf "========================================\n"
+	ls -dfF * | grep '/$$' | sed 's:/$$::'
+
+show-default:
+	printf "\n   The default installation:\n"
+	printf "   Installed in stable, dev and test.\n"
+	printf "========================================\n"
+	grep '^default-profile-name' profiles.mk
+
+show-optional:
+	printf "\n   All Optional installations:\n"
+	printf "========================================\n"
+	printf "$(optional-profiles)"
+
+show-available:
+	printf "\n   UnInstalled, Available installations:\n"
+	printf "========================================\n"
+	comm -23 <(echo $(optional-profiles) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
+	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
+
+status-header:
+	printf "\n\n=======================================\n"
+	printf "   Emacsn: Current Status\n"
+
+status-end:
+	printf "\n========================================\n"
+	printf "       Make targets for installs\n"
+	printf " <name>        - install name\n"
+	printf " <name>-update - update installation of name\n"
+	printf " <name>-remove - remove installation of name\n"
+	printf "========================================\n"
+
+	printf "========================================\n"
+
+status: status-header show-default show-installs show-available status-end
+
+help:
+	printf "==================================================================\n"
+	printf "      Useful make targets.\n"
+	printf "\n    Information\n"
+	printf "==================================================================\n"
+	printf " status         -  The status of the Emacsn, what is installed,\n"
+	printf "                   what is available.\n"
+	printf " show-profiles  -  Basically a 'cat' of ~/.emacs-profiles.el\n"
+	printf " print-%%       -  Print any make variable\n\n"
+	printf "          'make print-profiles'\n"
+
+	printf "\n    Removing installations\n"
+	printf "==================================================================\n"
+	printf " <profile>-remove   - Remove the installation <profile>\n"
+	printf " rm-all-optional    - Remove installs from the optional list.\n"
+	printf " rm-all-profiles    - Scorched earth.\n"
+
+	printf "\n    Managing the defaults as a group, stable, dev and test\n"
+	printf "==================================================================\n"
+	printf " rm-default-profiles        - remove them\n"
+	printf " install-default-profiles   - install them\n"
+	printf " reinstall-default-profiles - remove and reinstall them.\n"
+
+	printf "\n    Managing the test installation.\n"
+	printf "==================================================================\n"
+	printf " test-install - remove it, install it, run it with debug-init.\n"
+	printf " clean-test   - remove it, then add-test.\n"
+	printf " add-test     - Just do a 'mkdir -p test'.\n"
+
+	printf "\n    Profile name targets.\n"
+	printf "==================================================================\n"
+	printf " name  	- install a configuration\n"
+	printf " name -update  - update an install\n"
+	printf " name -remove  - remove an install\n"
+	printf " name -insert  - insert profile entry into ~/.emacs-profiles.el\n"
+	printf " add-new-profile-%%  - Create an empty install and profile entry\n"
+	printf "                       for 'foo'.\n\n"
+	printf "          make add-new-profile-foo\n"
+	printf "==================================================================\n"

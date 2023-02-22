@@ -69,17 +69,22 @@ For example:
     
 ## Super Quick Guide
 It really is mostly a Makefile.
+
+### `make help`
+
 ###  git clone ... /Emacsn.git;   cd Emacsn;   make install; 
 
   - `emacs --with-profile <gnu|stable|dev|test|...>`
   
-See some things.
+### Get the Status and see some things.
+  - `make status`
+  - `make show-profiles`
   - `M-x describe-variable chemacs-profiles`
   - `cat ~/.emacs-profiles.el`
   - `cat ./emacs-profiles-orig.el`
   - `make print-optional-profiles`
 
-After that you can do:
+After that you may do:
   - `make space doom from-hell`
     - `emacsn -p <doom|space|gnu|stable|dev|...>`
   - Do not do: `emacs --with-profile from-hell` How bad could it be?
@@ -91,6 +96,7 @@ Do try:
 
 Add your emacs repo to __profiles.mk__, make it the default. __Then;__
   - `make dev-remove stable-remove test-remove add-test dev stable`
+  or `make rm-default-profiles install-default-profiles`
   - Have fun.
 
 ## A Quick Guide.
@@ -100,11 +106,8 @@ to. This is where all of the emacs configurations will be.
 
 I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
 
-  - Step 0: Optional: Fork this repo. 
-      You'll probably want to make this your own.
-
-  - Step 1: Get this repo from here or from your fork and `cd` into it.
-    I usually just clone it into my home directory.
+Get this repo from here or from your fork and `cd` into it.
+I usually just clone it into my home directory.
 
 ```shell
     cd
@@ -112,27 +115,24 @@ I usually `cd` then clone it so my __emacs-home__ will be _~/Emacsn_
     cd Emacsn
 ```
 
-  - Step 2:  Install Chemacs2 as well as the default and gnu profiles.
+Install Chemacs2 as well as the default and gnu profiles.
     The optional configurations can be installed later.
 
 ```sh
     make install
 ```
 
-  - Step 3: install optional emacs configurations. 
-  `make print-` can tell you what your choices are.
-  This can be done at anytime as you go. 
+`make status` is a nice report of things in Emacsn.
 
+Install optional Emacs configurations. 
+Maybe install Doom-emacs, Spacemacs and Emacs-from-scratch
 ```sh
-    make print-optional-profiles
-    
-    # install Doom-emacs, Spacemacs and Emacs-from-scratch
     make doom space from-scratch
 ```
 
-At this point you are ready to go. Running emacs will give you your
+At this point you are ready to go. Running Emacs will give you your
 default __stable__ configuration. you can also specify them specifically
-with these variants, these run the __dev__ profile.
+
 
     emacs --with-profile dev
     
@@ -143,19 +143,30 @@ Or
 
 ## What to do next.
 
-  - Step 4: Look at 
+### Get the status of Emacsn.
+
+    `make status`
+    `make show-profiles`
+    `make help`
+
+### profiles.mk
+Look at 
     [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
     and add your own emacs config into the mix. Directions are at the top of the makefile .
-    - Add your Emacs profile definition
+### Incorporate your Emacs configuration as the default.
+    - Visit _profiles.mk_
+    - Add your Emacs profile definition to it. 
     - Set it to the default 
-      - Remove stable, dev, and test. `make stable-remove dev-remove test-remove`
-      - Reinstall them with yours. `make stable dev add-test`
-    - Read up on Chemacs2 and whichever Emacs configurations you wish to use.
-     Each has instruction you will want to know. Entire wikis exist.
-    - Take a look at _~/.emacs-profiles.el and _Emacsn/emacs-profiles-orig.el_.
-      You can put persistent definitions there...
+    - Reinstall the default profiles with yours. 
+    `make reinstall-default-profiles`
 
-  - Step 5: Optional, Change the git remote for __dev__ to SSH.
+### See how profile entries are made.
+  - Look at _~/.emacs-profiles.el_ 
+  - Compare that to _Emacsn/emacs-profiles-orig.el_.
+    Persistent profile definitions live there so you have them with every install
+    of Emacsn.
+
+### Change the git remote for __dev__ to SSH.
       I only do this for __dev__, as its the only one I ever push.
       __dev__ is where I maintain Ericas-Emacs.
 
@@ -166,23 +177,28 @@ Or
     git remote -v      # just to make sure.
 ```
 
-## Creating a workflow
+### Create a workflow
 
-  - Step 6: Optional, After pushing changes from __dev__, test your configuration 
-  with an install from git.
+After pushing changes from __dev__, test your configuration with an install from git.
 
 ```sh
     make test-install 
 ```
 
-  - Step 7: Optional, pull your changes into __stable__ and update the packages.
+If that all works well pull your changes into __stable__ and update the packages.
+
 ```sh
     make stable-update
 ```
 
-## When a Emacs distro is no longer useful/interesting
+### Read some docs.
+  - Read up on [Chemacs2](https://github.com/plexus/chemacs2) 
+  and whichever Emacs configurations you wish to use. Each has 
+  instruction you will want to know. Entire wikis exist.
+## When an Emacs distro is no longer useful/interesting
 
   - Step 7: Optional, remove stuff.
+
 ```sh
     make from-hell-remove
 
@@ -195,6 +211,7 @@ But you can just do an `rm -rf ...` if you want.
 Don't forget to edit your _~/.emacs-profiles.el_
 
 Rinse - Repeat, Have fun.
+
 
 ## Emacs configurations
 
@@ -252,8 +269,11 @@ Here is the one for __Prelude__.
     or another update command.
 
 The list of available profiles can all be seen with `make print-...`
+Or `make status` which tells all.
 
 ```shell
+    make status
+
     make print-profiles
     make print-optional-profiles
     make print-default-profiles	
@@ -349,7 +369,8 @@ The rest can use this generic update rule.
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
 It is a simplification of the __update.el__ from Ericas emacs.
-It updates all selected packages and then exits.
+It installs/updates all selected packages and then exits.
+It assumes packages are installed in _elpa_.
 
 These configurations usually do not have an install function 
 either so on install we just run them. 
@@ -386,9 +407,8 @@ To add a new profile to
  [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
 is easy, copy the template and fill in the blanks.
 
-Adding it to the optional-profiles gives it a target in 
-the Makefile. _<name>, <name>-update, <name>-remove, and <name>-insert_
-are all make targets created for the profile.
+Adding it to the optional-profiles gives it all the make targets
+it needs for installation, update, and removal.
 
 The profile's install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
@@ -406,56 +426,88 @@ on different branches in the same repo.
 This system uses [Chemacs2](https://github.com/plexus/chemacs2) 
 as an _Emacs boot loader_ to allow multiple emacs configurations to exist at once.
 Most of the examples from the Chemacs doc are incorporated here.
+Chemacs2 is installed directly into _~/.emacs.d_, if there is already one
+it will be moved out of the way first.
+
+### Persistent profile definitions
 
 When a profile is installed it will automatically
 add in any pre-defined server profiles or alternative invocations which apply.
+_Make uncomments lines beginning with `;;<profile>` from .emacs-profiles.el._
+
 Modify _~/.emacs-profiles.el_ to add new ones or change their names.
 
-Put them back into 
-[emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el) so they will persist and reappear when you install all of this the next time.
+Persist them by putting them back into 
+[emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el). This file is the basis for the next install of Emacsn.
 
-This repo can install the following:
+### Emacs Boot entries and installations.
 
-  -  __Chemacs2__  - Our bootloader.
-  -  Our Emacs boot choices 
-    - Install profiles are:
-      - Default
-        - __default__ is the same as __stable__
-        - __stable__ and 
-          - Servers
-            - __exwm__
-            - __mail__
-            - __common__
-        - __dev__ are the default repo. [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
-        - __test__ is like __gnu__ when clear, but is used to test fresh installs of default.
-        - __gnu__ is an empty profile and is therefore Vanilla Emacs.
-          - __gnu-server__
+#### How to see what is there.
 
-      - Optional configurations
-        - __doom__ is [doom-emacs](https://github.com/doomemacs), 
-          - __doomdir__ is __doom__ with a profile directory.
-          - __doom-server__
-        - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
-          - __spacemacs__ is __space__ with a profile directory.
-        - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
-        - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
-        - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
-        - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
-        - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
-        - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
+Be in the Emacsn directory for most of these.
 
+#### See it with make
 
-See __~/.emacs-profiles.el__ for full details.
+  - `make status`
+  - `make show-profiles`
 
-When Emacs runs, it will run the default profile unless told otherwise.
-We have __default__ pointing to __stable__ by default.
+#### See it all your way
+
+The current profile choices can be seen with either of these.
+  - `M-x describe-variable chemacs-profiles`
+  - `cat ~/.emacs-profiles.el`
+  - `make show-profiles`
+
+Current installations can be seen with this.
+  - `ls -dfF Emacsn/* | grep '/$'`
+  - `make show-installs`
+  
+The current default profile can be seen with this.
+    `grep '^default-profile-name' profiles.mk`
+  - `make show-default`
+    
+Possible installations are known by make.
+    `make print-optional-profiles`
+  - `make show-optional`
+
+#### Our possible Emacs boot choices 
+
+See the commands above for your current reality.
+
+_Note: additional profile entries fall under the installed profile they reference._
+
+  - Default Install Profile
+    - __stable__ and 
+      - __default__ 
+        - Servers
+          - __exwm__
+          - __mail__
+          - __common__
+    - __dev__ are the default repo. 
+    [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
+    - __test__ is for testing default.
+  - Gnu profile is an empty install.
+    - __gnu__ 
+      - __gnu-server__
+
+  - Optional Profiles
+    - __doom__ is [doom-emacs](https://github.com/doomemacs), 
+      - __doomdir__ is __doom__ with a profile directory.
+      - __doom-server__
+    - __space__ is [spacemacs](https://github.com/syl20bnr/spacemacs).
+      - __spacemacs__ is __space__ with a profile directory.
+    - __prelude__ is [prelude emacs](https://github.com/bbatsov/prelude).
+    - __ericas__ is [ericas-emacs](https://github.com/ericalinag/ericas-emacs).
+    - __live__ is [emacs-live](https://github.com/overtone/emacs-live).
+    - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
+    - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
+    - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
 
 Run emacs with profiles like this:
 
     `emacs --with-profile <profile name>`
 or
     `emacsn -p <profile name>`
-
 
 ## Managing elisp development
 
@@ -606,7 +658,7 @@ using the usual emacsclient looks like this:
 The __emacsn__ script has extensive help and a lot of options. 
 
 
-# Summary
+## Summary
 
 I hope that this is a useful project for folks. It has changed the way
 I manage my emacs installs, and it has given me an easy way to
