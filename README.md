@@ -89,7 +89,7 @@ Do try:
   - `make stable-update`
   - `make from-hell-remove`
 
-Add your emacs repo to __profiles.mk__, make it the default.
+Add your emacs repo to __profiles.mk__, make it the default. __Then;__
   - `make dev-remove stable-remove test-remove add-test dev stable`
   - Have fun.
 
@@ -420,7 +420,7 @@ This repo can install the following:
   -  Our Emacs boot choices 
     - Install profiles are:
       - Default
-        - __default__ is the same as stable__
+        - __default__ is the same as __stable__
         - __stable__ and 
           - Servers
             - __exwm__
