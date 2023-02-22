@@ -55,12 +55,12 @@ no-update := true
 #
 # copy-pasta
 # ------------------------------------------------------------------
-# # Gnu
+# # gnu
 # default-profiles += gnu
 # gnu-repo         = your-repo-url
 # gnu-repo-flags   =
-# gnu-pull         = $(git-pull)
 # gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
+# gnu-update-pull  = $(git-pull)
 # gnu-update-cmd   = $(generic-update-cmd)
 # ------------------------------------------------------------------
 #

@@ -70,10 +70,30 @@ For example:
 ## Super Quick Guide
 It really is mostly a Makefile.
 
-### `make help`
 
-###  git clone ... /Emacsn.git;   cd Emacsn;   make install; 
+###  git clone ... /Emacsn.git;   cd Emacsn;    
 
+Get help with `make help`
+
+If your emacs setup works in .emacs.d with an init.el you are
+probably good to go with setting your default to that. 
+
+If you just want to get going and take what is there do this:
+
+  `make install status` You can `make install-new-default` later.
+  
+OR If you want to make your emacs the default now do these two things.
+
+  - `make install-base status`
+  - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
+    - This can be broken into steps if you wish.
+      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+        - Optionally edit _profiles.mk_.
+      - `make assign-default name=my-profile-name`
+      - `make reinstall-default-profiles`
+
+Try it out.
+  - `emacs`
   - `emacs --with-profile <gnu|stable|dev|test|...>`
   
 ### Get the Status and see some things.
@@ -84,7 +104,7 @@ It really is mostly a Makefile.
   - `cat ./emacs-profiles-orig.el`
   - `make print-optional-profiles`
 
-After that you may do:
+After that you may wish to do:
   - `make space doom from-hell`
     - `emacsn -p <doom|space|gnu|stable|dev|...>`
   - Do not do: `emacs --with-profile from-hell` How bad could it be?
@@ -115,12 +135,29 @@ I usually just clone it into my home directory.
     cd Emacsn
 ```
 
-Install Chemacs2 as well as the default and gnu profiles.
-    The optional configurations can be installed later.
+### Installing the base and default profiles.
 
-```sh
-    make install
-```
+There are two paths to take here. Install the basic stuff which will
+give you Ericas-Emacs as the default emacs, or if your emacs install
+has an init.el and normally lives in .emacs.d you can set it to the 
+default now.
+
+#### Choice 1:  Take whatever is there
+Install the base as well as the default profiles. It can all be changed later.
+
+    `make install status`
+
+#### Choice 2: Make your emacs the default.
+
+  - `make install-base status`
+  - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
+    - This can be broken into steps if you wish.
+      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+        - Optionally edit the new profile entry in _profiles.mk_.
+      - `make assign-default name=my-profile-name`
+      - `make reinstall-default-profiles`
+
+### Continuing on.
 
 `make status` is a nice report of things in Emacsn.
 
@@ -152,13 +189,16 @@ Or
 ### profiles.mk
 Look at 
     [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
-    and add your own emacs config into the mix. Directions are at the top of the makefile .
+    and add your own emacs config into the mix. Directions are at the top 
+    of the makefile. Or just do `make install-new-default ...`
+    
 ### Incorporate your Emacs configuration as the default.
-    - Visit _profiles.mk_
-    - Add your Emacs profile definition to it. 
-    - Set it to the default 
-    - Reinstall the default profiles with yours. 
-    `make reinstall-default-profiles`
+  - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
+    - This can be broken into steps if you wish.
+      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+        - Optionally edit the new profile entry in _profiles.mk_.
+      - `make assign-default name=my-profile-name`
+      - `make reinstall-default-profiles`
 
 ### See how profile entries are made.
   - Look at _~/.emacs-profiles.el_ 
@@ -219,6 +259,12 @@ These are defined in
  [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
  This is loaded by the main _Makefile_
  
+There is a target rule to help with making new profiles. It does assume
+basic generic functionality, but that is usually enough.
+
+      `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+      `make status`
+
 Here is the template the makefile provides.
 
 ### The Template
@@ -443,10 +489,6 @@ Persist them by putting them back into
 ### Emacs Boot entries and installations.
 
 #### How to see what is there.
-
-Be in the Emacsn directory for most of these.
-
-#### See it with make
 
   - `make status`
   - `make show-profiles`

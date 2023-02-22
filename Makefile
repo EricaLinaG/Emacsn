@@ -74,11 +74,37 @@ test-sed:
 print-%  : ; @echo $* = $($*)
 
 # Add a new empty install profile
-add-new-profile-%  :
-	printf "Creating Empty profile installation: $*\n"
+new-empty-profile-%  :
+	printf "Creating Empty, vanilla gnu, profile installation: $*\n"
 	mkdir -p $*
 	printf "Inserting profile entry.\n"
 	$(call insert-profile,$*)
+
+# Create a new profile from name and repo. passed on cli.
+# make new-profile name=foobar repo=https://github.com/ericalinag/ericas-emacs.git
+new-profile :
+	printf "Creating new profile definition in profiles.mk\n"
+	printf "Using generic install and update rules.\n"
+	printf "Edit profiles.mk if you want something else.\n"
+	printf "Profile Name: $(name)\n"
+	printf "Repository: $(repo)\n"
+	sed 's/gnu/$(name)/g' profile-template.txt | \
+	sed 's{your-repo-url{$(repo){' >> profiles.mk
+	echo " " >> profiles.mk
+
+assign-default:
+	printf "Assigning $(name) to default in profiles.mk\n"
+	sed 's/\(default-profile-name[ ]*\=\).*/\1 $(name)/g' profiles.mk > profiles.tmp
+	mv profiles.tmp profiles.mk
+
+# Add a new profile and install it.
+# make install-new name=<your profile name> repo=<your repo url>
+install-new:  new-profile
+	$(MAKE) $(name)
+
+# Add a new profile and reinstall the default profiles with it.
+# make install-new-default name=<your profile name> repo=<your repo url>
+install-new-default:  new-profile assign-default reinstall-default-profiles
 
 
 # Profile targets,
@@ -251,8 +277,9 @@ all: install-all
 prepare-install: backup-dot-emacs mk-emacs-home
 
 # prepare and install emacsn, chemacs, chemacs profiles, stable and dev
-# This includes gnu and test profiles which are vanilla gnu emacs
-install: clean prepare-install install-emacsn add-gnu install-chemacs stable dev
+install-base: clean prepare-install install-emacsn add-gnu install-chemacs
+
+install: install-base stable dev
 
 # Prepare and install everything we have. I wouldn't advise.
 # The install plus: doom, spacemacs, and prelude.
@@ -300,25 +327,18 @@ show-available:
 	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
 
 status-header:
-	printf "\n\n=======================================\n"
+	printf "=======================================\n"
 	printf "   Emacsn: Current Status\n"
 
 status-end:
-	printf "\n========================================\n"
-	printf "       Make targets for installs\n"
-	printf " <name>        - install name\n"
-	printf " <name>-update - update installation of name\n"
-	printf " <name>-remove - remove installation of name\n"
-	printf "========================================\n"
-
 	printf "========================================\n"
 
 status: status-header show-default show-installs show-available status-end
 
 help:
 	printf "==================================================================\n"
-	printf "      Useful make targets.\n"
-	printf "\n    Information\n"
+	printf "    Useful make targets.\n"
+	printf "\n  Information\n"
 	printf "==================================================================\n"
 	printf " status         -  The status of the Emacsn, what is installed,\n"
 	printf "                   what is available.\n"
@@ -326,31 +346,49 @@ help:
 	printf " print-%%       -  Print any make variable\n\n"
 	printf "          'make print-profiles'\n"
 
-	printf "\n    Removing installations\n"
+	printf "\n  Removing installations\n"
 	printf "==================================================================\n"
 	printf " <profile>-remove   - Remove the installation <profile>\n"
 	printf " rm-all-optional    - Remove installs from the optional list.\n"
 	printf " rm-all-profiles    - Scorched earth.\n"
 
-	printf "\n    Managing the defaults as a group, stable, dev and test\n"
-	printf "==================================================================\n"
-	printf " rm-default-profiles        - remove them\n"
-	printf " install-default-profiles   - install them\n"
-	printf " reinstall-default-profiles - remove and reinstall them.\n"
-
-	printf "\n    Managing the test installation.\n"
+	printf "\n  Managing the test installation.\n"
 	printf "==================================================================\n"
 	printf " test-install - remove it, install it, run it with debug-init.\n"
 	printf " clean-test   - remove it, then add-test.\n"
 	printf " add-test     - Just do a 'mkdir -p test'.\n"
 
-	printf "\n    Profile name targets.\n"
+	printf "\n  Profile name targets.\n"
 	printf "==================================================================\n"
 	printf " name  	- install a configuration\n"
 	printf " name -update  - update an install\n"
 	printf " name -remove  - remove an install\n"
 	printf " name -insert  - insert profile entry into ~/.emacs-profiles.el\n"
-	printf " add-new-profile-%%  - Create an empty install and profile entry\n"
+
+	printf "\n  Managing the default profiles as a group, stable, dev and test\n"
+	printf "==================================================================\n"
+	printf " rm-default-profiles        - remove them\n"
+	printf " install-default-profiles   - install them\n"
+	printf " reinstall-default-profiles - remove and reinstall them.\n"
+
+	printf "\n  Profile Creation\n"
+	printf "==================================================================\n"
+	printf " new-profile          -  Create a new default profile from name and repo.\/"
+
+	printf "\n make new-profile name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
+	printf " assign-default:      - Assign a name to the default profile.\n"
+	printf "\n make assign-default name=foo\n\n"
+
+	printf " install-new          - Create a new profile, and install it \n"
+
+	printf "\n make install-new name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
+
+	printf " install-new-default  - Create a new profile, set it as default, \n"
+	printf " 		      reinstall the default profiles.\n"
+
+	printf "\n make install-new-default name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
+
+	printf " new-empty-profile-%%  - Create an empty install and profile entry\n"
 	printf "                       for 'foo'.\n\n"
-	printf "          make add-new-profile-foo\n"
+	printf "          make new-empty-profile-foo\n"
 	printf "==================================================================\n"
