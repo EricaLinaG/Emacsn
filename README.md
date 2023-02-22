@@ -71,7 +71,7 @@ For example:
 It really is mostly a Makefile.
 ###  git clone ... /Emacsn.git;   cd Emacsn;   make install; 
 
-  - `emacs --with-profile <dev|stable|test|gnu|gnu-server|mail|common|...>`
+  - `emacs --with-profile <gnu|stable|dev|test|...>`
   
 See some things.
   - `M-x describe-variable chemacs-profiles`
@@ -89,9 +89,8 @@ Do try:
   - `make stable-update`
   - `make from-hell-remove`
 
-Add your emacs repo to __profiles.mk__ make it the default.
-  - Then; Remove dev, stable and test, add-test, reinstall dev and stable.
-    `make dev-remove stable-remove test-remove add-test dev stable`
+Add your emacs repo to __profiles.mk__, make it the default.
+  - `make dev-remove stable-remove test-remove add-test dev stable`
   - Have fun.
 
 ## A Quick Guide.
@@ -245,9 +244,9 @@ Here is the one for __Prelude__.
   - It first adds itself to the list of optional-profiles.
   - Then we define the github uri.
   - Define any clone flags so we can get branches if we like.
+  - The install command to let the emacs install get all of it's packages
   - The pull command, Usually, its either __$(no-pull)__ or __$(git-pull)__
     which is __true__ and __git pull origin__ respectively.
-  - The install command to let the emacs install get all of it's packages
   - The update command to let emacs update its packages.
     The update-cmd can be __$(no-update)__, __$(generic-update-cmd)__ 
     or another update command.
@@ -387,12 +386,17 @@ To add a new profile to
  [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
 is easy, copy the template and fill in the blanks.
 
-The install command is frequently just to run emacs with that profile.
+Adding it to the optional-profiles gives it a target in 
+the Makefile. _<name>, <name>-update, <name>-remove, and <name>-insert_
+are all make targets created for the profile.
+
+The profile's install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
 
-The update is not absolutely needed. It is a convenience.
-But if it has special accommodations like Doom or Ericas, or less so 
-like Spacemacs those needs can be met.
+The update changes directories to the installation, maybe does a git pull,
+and maybe runs emacs to update its packages.
+The generic-update-cmd works for most configurations, it simply gets 
+emacs packages to install-selected.
 
 The _<profile-name>-repo-flags_ allow for creating profiles based 
 on different branches in the same repo.
@@ -400,7 +404,7 @@ on different branches in the same repo.
 ## Chemacs
 
 This system uses [Chemacs2](https://github.com/plexus/chemacs2) 
-as an _Emacs bootloader_ to allow multiple emacs configurations to exist at once.
+as an _Emacs boot loader_ to allow multiple emacs configurations to exist at once.
 Most of the examples from the Chemacs doc are incorporated here.
 
 When a profile is installed it will automatically
