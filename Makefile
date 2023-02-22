@@ -145,7 +145,6 @@ test-var-set:
 	$(eval target-path=$(shell echo $@ | sed 's/\-.*$$//g' ))
 	printf "was: $@ is:  $(target-path)"
 
-# is there a better way? I hope so.
 # link mbsyncrc and hope mu4e is installed properly already.
 .PHONY: mu4e
 mu4e: mbsync
@@ -232,10 +231,8 @@ add-test:
 add-gnu: add-test
 	mkdir -p $(emacs-home)/gnu
 
-all: mu4e install-all
+all: install-all
 
-# Not sure about mu4e installation at this point. I think it just works now.
-# I need to test that.
 
 # Prepare for install
 #  move ~/.emacs, ~/.emacs.d, clone emacsn -> emacs home.
