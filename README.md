@@ -26,12 +26,28 @@ You just want to try out a feature without breaking your daily driver.
 
 It also installs your emacs for you.
 
-## emacsn
+### emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
 Because I'm lazy and I forget. It has accumulated features over the years, 
 and gives me control over my emacs cli.
 
-## The Default Configuration
+### Backups
+__Chemacs2__ uses a file _~/.emacs-profiles.el_ to find out what it can boot 
+emacs into. This file can change a bit as you add and remove emacs configurations
+and boot choices to your system. It can get really confusing if you have more than
+one set of Emacsn. 
+
+Each Emacsn keeps a timestamped copy in _dot-backups/_ any time it changes the
+_~/.emacs-profiles.el_ file. There will also be a copy if you create a new Emacsn.
+This is in anticipation that you are about to smash this one with a new one 
+from somewhere else.
+You may choose to git ignore the _dot-backups/_ folder, or keep it backed up 
+to git. Your choice.
+
+In a similar way, on install, _~/.emacs_ and _~/.emacs.d_ will be timestamped and
+copied to that Emacsn's _dot-backups/_ folder.
+
+### The Default Configuration
 
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
 But that can be yours or something else. It is very easy to change at the top of
@@ -56,7 +72,7 @@ There is `make test-install` which will make a test install in the test profile.
 This is to make sure what is pushed installs and 
 runs cleanly before updating the stable installation with `make stable-update`.
 
-## Easy updates to configurations.
+### Easy updates to configurations.
 
 There are make targets to update the installations. They might do a `git pull` and
 then update packages in each configuration's preferred way.
