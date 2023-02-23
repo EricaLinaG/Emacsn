@@ -25,6 +25,9 @@
 # no need to see every echo unless debugging.
 .SILENT:
 
+# Where to get ourselves from.
+emacsn-repo := https://github.com/ericalinag/Emacsn
+
 # Here, where this Emacsn and its installations will live.
 emacs-home := $(PWD)
 
@@ -38,6 +41,7 @@ config-custom := ~/.config/emacs-custom.el
 # find out if we have a .emacs and .emacs.d to worry about.
 move-dot-emacs := $(or $(and $(wildcard $(HOME)/.emacs),1),0)
 move-dot-emacs.d := $(or $(and $(wildcard $(HOME)/.emacs.d),1),0)
+has-profiles := $(or $(and $(wildcard $(HOME)/.emacs-profiles.el),1),0)
 # so we can have uniquely named backups. being lazy.
 seconds-now := $(shell date +%s)
 
@@ -73,6 +77,9 @@ test-sed:
 # ie. make print-profiles, make print-default-repo
 print-%  : ; @echo $* = $($*)
 
+show-%  : ; @echo $* profile:
+	grep '^$*' profiles.mk
+
 # Add a new empty install profile
 new-empty-profile-%  :
 	printf "Creating Empty, vanilla gnu, profile installation: $*\n"
@@ -89,7 +96,7 @@ new-profile :
 	printf "Profile Name: $(name)\n"
 	printf "Repository: $(repo)\n"
 	sed 's/gnu/$(name)/g' profile-template.txt | \
-	sed 's{your-repo-url{$(repo){' >> profiles.mk
+		sed 's{your-repo-url{$(repo){' >> profiles.mk
 	echo " " >> profiles.mk
 
 assign-default:
@@ -104,7 +111,8 @@ install-new:  new-profile
 
 # Add a new profile and reinstall the default profiles with it.
 # make install-new-default name=<your profile name> repo=<your repo url>
-install-new-default:  new-profile assign-default reinstall-default-profiles
+install-new-default:  new-profile assign-default
+	make reinstall-default-profiles name=$(name) repo=$(repo)
 
 
 # Profile targets,
@@ -122,23 +130,21 @@ install-new-default:  new-profile assign-default reinstall-default-profiles
 #
 
 $(profiles):
-	printf "\n\n-----------------------------------------------------\n"
+	printf "\-----------------------------------------------------\n"
 
 	printf "Adding profile for $@ to ~/.emacs-profiles.el\n"
 	$(call insert-profile,$@)
 
-	printf "\nCloning repo for $@\n\n"
+	printf "Cloning $($@-repo) into $(emacs-home)/$@\n"
 	git clone $($@-repo-flags) $($@-repo) $(emacs-home)/$@
 
-	printf "\n\n-------------------------------------------\n"
+	printf "\-------------------------------------------\n"
 	printf "Running install for: $@\n"
-	printf "Not exiting automatically to check errors\n\n"
-	printf "Exit Emacs with C-x C-c as needed when done\n"
 	printf "\-------------------------------------------\n"
 
 	cd $@; $($@-install-cmd)
 
-	printf "\n\nInstall finished for: $@\n"
+	printf "Install finished for: $@\n"
 	printf "\---------------------------------------------\n"
 
 # Do the work. A make function for side effects.
@@ -164,12 +170,12 @@ $(insert-profiles):
 # then maybe some emacs command to run an update of packages.
 $(update-profiles):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-update$$//g' ))
-	printf "\n\nRunning update for profile: $(profile-name)\n\n"
+	printf "Running update for profile: $(profile-name)\n"
 	cd $(profile-name); ($@-pull); $($@-cmd)
 
 $(remove-profiles):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-remove$$//g' ))
-	printf "\n\nRemoving profile: $(profile-name)\n\n"
+	printf "Removing profile: $(profile-name)\n"
 	rm -rf $(profile-name)
 
 rm-all-optional: $(remove-optional-profiles)
@@ -218,6 +224,12 @@ install-emacsn:
 touch-custom:
 	touch $(config-custom)
 
+backup-profiles:
+ifeq ($(has-profiles), 1)
+	ls -l ~/.emacs-profiles.el
+	printf "\nCopying ~/.emacs-profiles.el to .emacs-profiles.el.$(seconds-now)\n"
+	cp ~/.emacs-profiles.el ~/.emacs-profiles.el.$(seconds-now)
+endif
 # check emacsn out into emacs-home unless we are already there.
 # this is out of date. Its not this complicated anymore.
 mk-emacs-home: touch-custom
@@ -298,6 +310,11 @@ test-install: test-remove test
 clean:
 	rm -f .emacs-profiles.el
 
+# clone emacsn into path.
+# make new-emacsn path=/my/new/place/to/put/emacsn.
+new-emacsn: backup-profiles
+	printf "\n Creating new emacsn at: $(path)"
+	git clone $(emacsn-repo) $(path)
 
 show-profiles:
 	printf "\n   The current ~/.emacs-profiles:\n"
@@ -323,7 +340,7 @@ show-optional:
 show-available:
 	printf "\n   UnInstalled, Available installations:\n"
 	printf "========================================\n"
-	comm -23 <(echo $(optional-profiles) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
+	comm -23 <(echo $(profiles) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
 	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
 
 status-header:
@@ -343,8 +360,14 @@ help:
 	printf " status         -  The status of the Emacsn, what is installed,\n"
 	printf "                   what is available.\n"
 	printf " show-profiles  -  Basically a 'cat' of ~/.emacs-profiles.el\n"
+	printf "    In Emacs:  M-x describe-variable chemacs-profiles \n"
+
 	printf " print-%%       -  Print any make variable\n\n"
-	printf "          'make print-profiles'\n"
+	printf "          'make print-profiles'\n\n"
+	printf " show-<name>    -  Show the profile definition for name.\n\n"
+	printf "          'make show-uncle-daves'\n\n"
+
+	printf " backup-profiles - Make a time stamped backup of ~/.emacs-profiles.el.\n"
 
 	printf "\n  Removing installations\n"
 	printf "==================================================================\n"
@@ -360,10 +383,10 @@ help:
 
 	printf "\n  Profile name targets.\n"
 	printf "==================================================================\n"
-	printf " name  	- install a configuration\n"
-	printf " name -update  - update an install\n"
-	printf " name -remove  - remove an install\n"
-	printf " name -insert  - insert profile entry into ~/.emacs-profiles.el\n"
+	printf " name         - install a configuration\n"
+	printf " name-update  - update an install\n"
+	printf " name-remove  - remove an install\n"
+	printf " name-insert  - insert profile entry into ~/.emacs-profiles.el\n"
 
 	printf "\n  Managing the default profiles as a group, stable, dev and test\n"
 	printf "==================================================================\n"
@@ -371,12 +394,18 @@ help:
 	printf " install-default-profiles   - install them\n"
 	printf " reinstall-default-profiles - remove and reinstall them.\n"
 
+	printf "\n  New Emacsn location ?\n"
+	printf "==================================================================\n"
+	printf " new-emacsn - Just make a whole nother installation of this here.\n"
+
+	printf "\n make new-emacsn path=/my/new/place/to/put/emacsn\n"
+
 	printf "\n  Profile Creation\n"
 	printf "==================================================================\n"
 	printf " new-profile          -  Create a new default profile from name and repo.\/"
 
-	printf "\n make new-profile name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
-	printf " assign-default:      - Assign a name to the default profile.\n"
+	printf "\n make new-profile name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n"
+	printf " assign-default       - Assign a name to the default profile.\n"
 	printf "\n make assign-default name=foo\n\n"
 
 	printf " install-new          - Create a new profile, and install it \n"
@@ -389,6 +418,6 @@ help:
 	printf "\n make install-new-default name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
 
 	printf " new-empty-profile-%%  - Create an empty install and profile entry\n"
-	printf "                       for 'foo'.\n\n"
+	printf "                       for %%.\n\n"
 	printf "          make new-empty-profile-foo\n"
 	printf "==================================================================\n"

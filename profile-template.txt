@@ -5,4 +5,4 @@ gnu-repo-flags   =
 gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
 gnu-update-pull  = $(git-pull)
 gnu-update-cmd   = $(generic-update-cmd)
-## End gnu
+## gnu

@@ -78,27 +78,22 @@ Get help with `make help`
 If your emacs setup works in .emacs.d with an init.el you are
 probably good to go with setting your default to that. 
 
-If you just want to get going and take what is there do this:
-
-  `make install status` You can `make install-new-default` later.
-  
-OR If you want to make your emacs the default now do these two things.
+If you want to make your emacs the default now do these two things.
 
   - `make install-base status`
   - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
-    - This can be broken into steps if you wish.
-      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
-        - Optionally edit _profiles.mk_.
-      - `make assign-default name=my-profile-name`
-      - `make reinstall-default-profiles`
 
-Try it out.
+otherwise do `make install`.
+
+#### Try it out
   - `emacs`
   - `emacs --with-profile <gnu|stable|dev|test|...>`
   
 ### Get the Status and see some things.
   - `make status`
   - `make show-profiles`
+  - `make show-doom`
+  - `make help`
   - `M-x describe-variable chemacs-profiles`
   - `cat ~/.emacs-profiles.el`
   - `cat ./emacs-profiles-orig.el`
@@ -115,8 +110,7 @@ Do try:
   - `make from-hell-remove`
 
 Add your emacs repo to __profiles.mk__, make it the default. __Then;__
-  - `make dev-remove stable-remove test-remove add-test dev stable`
-  or `make rm-default-profiles install-default-profiles`
+  - `make reinstall-default-profiles`
   - Have fun.
 
 ## A Quick Guide.
@@ -143,7 +137,8 @@ has an init.el and normally lives in .emacs.d you can set it to the
 default now.
 
 #### Choice 1:  Take whatever is there
-Install the base as well as the default profiles. It can all be changed later.
+Install the base as well as the default profiles. It can all be changed later
+with `install-new-default`.
 
     `make install status`
 
@@ -168,15 +163,13 @@ Maybe install Doom-emacs, Spacemacs and Emacs-from-scratch
 ```
 
 At this point you are ready to go. Running Emacs will give you your
-default __stable__ configuration. you can also specify them specifically
-
+default __stable__ configuration. You can also specify them specifically
 
     emacs --with-profile dev
     
 Or
     
     emacsn -p dev
-
 
 ## What to do next.
 
@@ -192,7 +185,7 @@ Look at
     and add your own emacs config into the mix. Directions are at the top 
     of the makefile. Or just do `make install-new-default ...`
     
-### Incorporate your Emacs configuration as the default.
+### Incorporate your Emacs configuration as the default if you haven't already.
   - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
     - This can be broken into steps if you wish.
       - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
@@ -201,9 +194,11 @@ Look at
       - `make reinstall-default-profiles`
 
 ### See how profile entries are made.
-  - Look at _~/.emacs-profiles.el_ 
+  - `cat profile-template.txt`
+  - Look at _profiles.mk_           - These are the installations.
+  - Look at _~/.emacs-profiles.el_  - These are the boot entries
   - Compare that to _Emacsn/emacs-profiles-orig.el_.
-    Persistent profile definitions live there so you have them with every install
+    Persistent profile boot definitions live there so you have them with every install
     of Emacsn.
 
 ### Change the git remote for __dev__ to SSH.
@@ -269,26 +264,25 @@ Here is the template the makefile provides.
 
 ### The Template
 
- Copy this down to the bottom.
- Change all the 'gnus' to your profile name and fill in your repo url.
-
- The rest will satisfy your needs If;
-  -  You are happy with just running emacs once for the 
-     initial package load on install.
-  -  You would like update to 'git pull origin', and then do 
-     install-packages for all-selected-packages.
-
+The template used by `make new-profile` is _profile-template.txt_
+and it looks like this.
 
 ```make
-# # Gnu
-# # Gnu Emacs is free, have fun.
-# default-profiles += gnu
-# gnu-repo         = $(git-hub)/your-acct/your-repo.git
-# gnu-repo-flags   =
-# gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
-# gnu-update-pull  = $(git-pull)
-# gnu-update-cmd   = $(generic-update-cmd)
+## gnu
+optional-profiles += gnu
+gnu-repo         = your-repo-url
+gnu-repo-flags   =
+gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
+gnu-update-pull  = $(git-pull)
+gnu-update-cmd   = $(generic-update-cmd)
+## gnu
 ```
+
+This profile definition is by the most common so far. I am
+not sure it is a 100% fit always, but it seems pretty good
+and at least harmless. The install does a git clone,
+runs emacs and then exits, 
+the update does a `git pull origin` and then updates packages.
 
 ### Some Examples
 
