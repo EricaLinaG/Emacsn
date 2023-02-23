@@ -24,7 +24,7 @@ emacs startup breakage.
 
 You just want to try out a feature without breaking your daily driver.
 
-It also installs your emacs for you.
+It also installs your emacs for you. As well as anyone else's.
 
 ### emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
@@ -32,21 +32,32 @@ Because I'm lazy and I forget. It has accumulated features over the years,
 and gives me control over my emacs cli.
 
 ### Backups
-__Chemacs2__ uses a file _~/.emacs-profiles.el_ to find out what it can boot 
-emacs into. This file can change a bit as you add and remove emacs configurations
-and boot choices to your system. It can get really confusing if you have more than
-one set of Emacsn. 
+### Multiple Emacsn
 
-Each Emacsn keeps a timestamped copy in _dot-backups/_ any time it changes the
-_~/.emacs-profiles.el_ file. There will also be a copy if you create a new Emacsn.
-This is in anticipation that you are about to smash this one with a new one 
-from somewhere else.
-You may choose to git ignore the _dot-backups/_ folder, or keep it backed up 
-to git. Your choice.
+I'm not sure this is useful, but it was part of the evolution and I needed it 
+to test all of this. So here it is.
 
-In a similar way, on install, _~/.emacs_ and _~/.emacs.d_ will be timestamped and
-copied to that Emacsn's _dot-backups/_ folder.
+The command `make new-emacsn path=...` will create a fresh Emacsn at path.  
 
+    - `make new-emacsn path=../new-place`
+    - `cd ../new-place`
+
+For multiple Emacsn to work together it is not necessary to do another install. 
+It is only necessary for the Emacsn to re-link to your ~/.emacs-profiles.el in order to
+work. 
+
+    `make init` 
+
+will initialize a new .emacs-profiles.el and link it, as well as
+ensure the _gnu_ and _test_ profiles exist.
+
+Each Emacsn keeps its Chemacs profiles locally and links _~/.emacs-profiles.el_ to
+the one located here. This makes it super easy to switch to a different Emacsn.
+When you are ready `make relink-profiles` re-links the current Emacsn. 
+
+    `make relink-profiles`
+    
+    
 ### The Default Configuration
 
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
@@ -83,6 +94,19 @@ For example:
     make stable-update
 ```
     
+__Chemacs2__ uses a file _~/.emacs-profiles.el_ to find out what it can boot 
+emacs into. Each Emacsn keeps its own _.emacs-profiles.el_ and creates a link
+to _~/.emacs-profiles.el_.
+
+Each Emacsn copies a timestamped copy of _.emacs-profiles.el_ in _dot-backups/_ 
+any time it changes the _.emacs-profiles.el_ file. 
+
+You may choose to git ignore the _dot-backups/_ folder, or keep it backed up 
+to git. Your choice.
+
+In a similar way, on install, _~/.emacs_, _~/.emacs.d_ and ~/.emacs-profiles.el, if
+it is a file, will be timestamped and copied to that Emacsn's _dot-backups/_ folder.
+
 ## Super Quick Guide
 It really is mostly a Makefile.
 
@@ -111,7 +135,7 @@ otherwise do `make install`.
   - `make show-doom`
   - `make help`
   - `M-x describe-variable chemacs-profiles`
-  - `cat ~/.emacs-profiles.el`
+  - `cat .emacs-profiles.el`
   - `cat ./emacs-profiles-orig.el`
   - `make print-optional-profiles`
 
@@ -212,7 +236,7 @@ Look at
 ### See how profile entries are made.
   - `cat profile-template.txt`
   - Look at _profiles.mk_           - These are the installations.
-  - Look at _~/.emacs-profiles.el_  - These are the boot entries
+  - Look at _.emacs-profiles.el_  - These are the boot entries
   - Compare that to _Emacsn/emacs-profiles-orig.el_.
     Persistent profile boot definitions live there so you have them with every install
     of Emacsn.
@@ -259,7 +283,7 @@ If that all works well pull your changes into __stable__ and update the packages
 ```
 
 But you can just do an `rm -rf ...` if you want.
-Don't forget to edit your _~/.emacs-profiles.el_
+Don't forget to edit your _.emacs-profiles.el_
 
 Rinse - Repeat, Have fun.
 
@@ -339,8 +363,9 @@ Or `make status` which tells all.
 ```
 
 The extra profiles can be installed like so. You may install them
-as you go.  Emacsn modifies your __~/.emacs-profiles.el__
-as you add new profile installs. 
+as you go.  Emacsn modifies  __.emacs-profiles.el__
+as you add new profile installs. Your profiles in ~/.emacs-profiles is
+a link to the one here.
 
 ```shell
     make doom 
@@ -491,7 +516,7 @@ When a profile is installed it will automatically
 add in any pre-defined server profiles or alternative invocations which apply.
 _Make uncomments lines beginning with `;;<profile>` from .emacs-profiles.el._
 
-Modify _~/.emacs-profiles.el_ to add new ones or change their names.
+Modify _.emacs-profiles.el_ to add new ones or change their names.
 
 Persist them by putting them back into 
 [emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el). This file is the basis for the next install of Emacsn.
@@ -507,7 +532,7 @@ Persist them by putting them back into
 
 The current profile choices can be seen with either of these.
   - `M-x describe-variable chemacs-profiles`
-  - `cat ~/.emacs-profiles.el`
+  - `cat .emacs-profiles.el`
   - `make show-profiles`
 
 Current installations can be seen with this.

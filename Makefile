@@ -23,34 +23,46 @@
 
 # This Makefile prints lots of more readable stuff,
 # no need to see every echo unless debugging.
-# .SILENT:
+.SILENT:
 
 # Where to get ourselves from.
 emacsn-repo := https://github.com/ericalinag/Emacsn
+
+# Where to put Emacsn helper script
+emacsn-home := ~/bin
+
+###########################################################################
+### Less to change from here down.  Help text is at the bottom.
+### Profile entries are in profiles.mk
+### Templates are all something-template.txt
+###########################################################################
 
 # Here, where this Emacsn and its installations will live.
 emacs-home := $(PWD)
 
 # Here we keep dated versions of .emacs-profiles, .emacs.d, ~/.emacs
 dot-backups := $(PWD)/dot-backups
-find-last-backup := ls -t $(dot-backups) | head -1
 
-# Where to put Emacsn helper script
-emacsn-home := ~/bin
+# The last backup is the current one. We want the second one.
+find-last-backup := ls -t $(dot-backups) | head -2 | tail -1
 
 # We just make sure this exists in a harmless way.
 config-custom := ~/.config/emacs-custom.el
 
-# helper variables for moving .emacs and .emacs.d out of the way
+# helper variables
 # find out if we have a .emacs and .emacs.d to worry about.
 move-dot-emacs := $(or $(and $(wildcard $(HOME)/.emacs),1),0)
 move-dot-emacs.d := $(or $(and $(wildcard $(HOME)/.emacs.d),1),0)
-has-profiles := $(or $(and $(wildcard $(HOME)/.emacs-profiles.el),1),0)
-# so we can have uniquely named backups. being lazy.
+
+#has-profiles := $(or $(and $(wildcard $(HOME)/.emacs-profiles.el),1),0)
+# we only really want to save it if its not a link.
+has-profiles := $(shell find ~ -maxdepth 1 -name .emacs-profiles.el -type f )
+
+# so we can have uniquely named backups.
 # %F.%s = yyyy-mm-dd.epoch-seconds.
 seconds-now := $(shell date +%F.%s)
 
-# We get our brains from here:
+# We get our profile brains from here:
 
 include profiles.mk
 
@@ -104,9 +116,16 @@ new-profile :
 		sed 's{your-repo-url{$(repo){' >> profiles.mk
 	echo " " >> profiles.mk
 
+# change the name of the default-profile-name in profiles.mk
 assign-default:
 	printf "Assigning $(name) to default in profiles.mk\n"
 	sed 's/\(default-profile-name[ ]*\=\).*/\1 $(name)/g' profiles.mk > profiles.tmp
+	mv profiles.tmp profiles.mk
+
+# another way.
+assign-default-% :
+	printf "Assigning $* to default in profiles.mk\n"
+	sed 's/\(default-profile-name[ ]*\=\).*/\1 $*/g' profiles.mk > profiles.tmp
 	mv profiles.tmp profiles.mk
 
 # Add a new profile and install it.
@@ -119,25 +138,10 @@ install-new:  new-profile
 install-new-default:  new-profile assign-default
 	make reinstall-default-profiles name=$(name) repo=$(repo)
 
-
-# Profile targets,
-# Clone them to their target directory.
-# Add/uncomment them into ~/.emacs-profiles.el.
-# Run them how they like to install themselves.
-#
-# Profile entries in emacs-profiles-orig.el start with ;;<profile>
-# ie. ;;stable ("stable" . (....))
-# so that we can easily enable them when a profile is installed.
-# It starts earlier when install-chemacs installs emacs-profiles-orig.el
-# to ~/emacs-profiles.el.
-# Each time we come through here we get it from ~/, add/uncomment the target
-# entries and put it back. We leave a copy here for convenience.
-#
-
 $(profiles):
 	printf "\-----------------------------------------------------\n"
 
-	printf "Adding profile for $@ to ~/.emacs-profiles.el\n"
+	printf "Adding profile for $@ to .emacs-profiles.el\n"
 	$(call insert-profile,$@)
 
 	printf "Cloning $($@-repo) into $(emacs-home)/$@\n"
@@ -171,8 +175,8 @@ mk-server-entry-% :
 # # Uncomment any lines beginning with ;;<profile>
 insert-profile = \
 	$(shell sed '/-INSERT-HERE-/a $(call make-server-entry,$(1))'       \
-		~/.emacs-profiles.el > .emacs-profiles.el)                  \
-	$(shell sed 's/;;$(1)//' .emacs-profiles.el > ~/.emacs-profiles.el) \
+		.emacs-profiles.el > .tmp-profiles.el)                  \
+	$(shell sed 's/;;$(1)//' .tmp-profiles.el > .emacs-profiles.el) \
 	$(call backup-profile)
 
 # the old way. oy.
@@ -188,7 +192,7 @@ insert-profile = \
 # Insert the profile into the .emacs-profiles. Just a test really.
 $(insert-profiles):
 	$(eval profile=$(shell echo $@ | sed 's/\-insert$$//g' ))
-	printf "Adding profile for $(profile) to ~/.emacs-profiles.el\n"
+	printf "Adding profile for $(profile) to .emacs-profiles.el\n"
 	$(call insert-profile,$(profile))
 
 
@@ -217,44 +221,34 @@ test-var-set:
 	$(eval target-path=$(shell echo $@ | sed 's/\-.*$$//g' ))
 	printf "was: $@ is:  $(target-path)"
 
-# link mbsyncrc and hope mu4e is installed properly already.
-.PHONY: mu4e
-mu4e: mbsync
-	printf "On Arch linux, mu4e should be loaded from site packages automatically"
-	printf "if mu has been installed. sudo pacman -S mu\n"
-#       the hacky way I used to do it.
-#	cp -r ~/.cache/yay/mu-git/src/mu/mu4e $(HOME)/elisp/extensions/
 
-.PHONY: mbsync
-mbsync:
-	print "linking mbysyncrc to ~/.mbsyncrc\n\n"
-	ln -s $(PWD)/mbsyncrc $(HOME)/.mbsyncrc
+# Relink the profiles to ~/.emacs-profiles.el
+relink-profiles:
+	$(call link-profiles)
 
-clean-links:
-	rm $(HOME)/.mbsyncrc
+# copy the last saved profile to ~/ uses -t, not sort on extension.
 
-retrieve-profiles.el:
-	printf "\n\nRetrieving .emacs-profiles.el from ~/.\n\n"
-	cp ~/.emacs-profiles.el .
-
-
-  # copy the last saved profile to ~/ uses -t, not sort on extension.
 restore-last-profiles:
 	$(eval last-backup=$(shell $(find-last-backup) ))
-	printf "Restoring last-backup)
-	cp $(last-backup) ~/.emacs-profiles.el
+	printf Restoring last-backup)
+	cp $(last-backup) .emacs-profiles.el
 
 backup-profile = \
-	echo Backing up ~/.emacs-profiles.el to $(dot-backups), $(seconds-now)\
-	cp ~/.emacs-profiles.el $(dot-backups)/.emacs-.profiles.el.$(seconds-now)
+	echo Backing up .emacs-profiles.el to $(dot-backups), $(seconds-now) \
+	cp .emacs-profiles.el $(dot-backups)/.emacs-.profiles.el.$(seconds-now)
 
-# a file dependency might be nice, but really we just want a new one.
+link-profiles = \
+	printf "Linking .emacs-profiles.el to $(HOME)/.emacs-profiles.el.\n" \
+	rm -f $(HOME)/.emacs-profiles.el 			             \
+	ln -s $(HOME)/.emacs-profiles.el .emacs-profiles.el
+
 .PHONY: emacs-profiles.el
+# Create a fresh set of profiles and link them to Home.
 emacs-profiles.el:
 	printf "\n\nCreating a fresh .emacs-profiles.el from original template.\n"
 	printf "Setting Paths to here $(PWD).\n\n"
 	sed 's:\-PWD\-:$(PWD):' emacs-profiles-orig.el > .emacs-profiles.el
-	cp .emacs-profiles.el ~/
+	$(call link-profiles)
 	$(call backup-profile)
 
 # mv .emacs-profiles.el $(Dot-backups)/.emacs-.profiles.el.$(seconds-now)
@@ -267,22 +261,26 @@ touch-custom:
 	touch $(config-custom)
 
 backup-profiles:
-ifeq ($(has-profiles), 1)
-	ls -l ~/.emacs-profiles.el
-	printf "\nCopying ~/.emacs-profiles.el to \
+	printf "\nBacking up .emacs-profiles.el to \
 	$(dot-backups)/.emacs-profiles.el.$(seconds-now)\n"
 	$(call backup-profile)
-endif
 
 # check emacsn out into emacs-home unless we are already there.
 # this is out of date. Its not this complicated anymore.
-mk-emacs-home: touch-custom
+mk-emacs-home:
 ifneq ($(PWD), $(emacs-home))
 	printf "\n\nCreating Emacs Home: $(emacs-home)\n"
 	git clone https://github.com/$(emacsn) $(emacs-home)
 else
 	printf "\n\nWe are in Emacs Home: $(emacs-home)\n"
-	printf "\n\nNOT creating emacs home since we are there.\n"
+endif
+
+# These move .emacs-profiles.el
+.PHONY: mv.emacs-profiles.el
+mv.emacs-profiles.el:
+ifneq ($(has-profiles), 0)
+	printf "\n\nMoving ~/.emacs-profiles.el to $(dot-backups).emacs-profiles-orig.el.$(seconds-now)\n"
+	mv ~/.emacs-profiles.el $(dot-backups)/.emacs-profiles-orig.el.$(seconds-now)
 endif
 
 # These move .emacs and .emacs.d to .bak.<epoch seconds>
@@ -303,9 +301,9 @@ ifneq ($(move-dot-emacs.d), 0)
 	mv ~/.emacs.d ~/.emacs.d.bak.$(seconds-now)
 endif
 
-# Move with preserve dot emacs.
+# BAckup all the dot emacs.
 .PHONY: backup-dot-emacs
-backup-dot-emacs:  mv.emacs.d mv.emacs
+backup-dot-emacs:  mv.emacs.d mv.emacs mv.emacs-profiles.el
 
 # Scorch dot emacs.
 remove-dot-emacs:
@@ -330,9 +328,12 @@ all: install-all
 dot-backups:
 	mkdir -p dot-backups
 
+# The minimum, if Emacsn has been installed once.
+init: dot-backups emacs-profiles.el add-gnu
+
 # Prepare for install
 #  move ~/.emacs, ~/.emacs.d, clone emacsn -> emacs home.
-prepare-install: backup-dot-emacs mk-emacs-home dot-backups
+prepare-install: touch-custom backup-dot-emacs init
 
 # prepare and install emacsn, chemacs, chemacs profiles, stable and dev
 install-base: clean prepare-install install-emacsn add-gnu install-chemacs
@@ -353,9 +354,6 @@ clean-test:
 test-install: test-remove test
 	emacs --with-profile test --debug-init
 
-clean:
-	rm -f .emacs-profiles.el
-
 # clone emacsn into path.
 # make new-emacsn path=/my/new/place/to/put/emacsn.
 new-emacsn: backup-profiles
@@ -365,7 +363,7 @@ new-emacsn: backup-profiles
 show-profiles:
 	printf "\n   The current ~/.emacs-profiles:\n"
 	printf "========================================\n"
-	cat ~/.emacs-profiles.el
+	cat .emacs-profiles.el
 
 show-installs:
 	printf "\n   Installations:\n"
@@ -405,16 +403,16 @@ help:
 	printf "==================================================================\n"
 	printf " status         -  The status of the Emacsn, what is installed,\n"
 	printf "                   what is available.\n"
-	printf " show-profiles  -  Basically a 'cat' of ~/.emacs-profiles.el\n"
+	printf " show-profiles  -  Basically a 'cat' of .emacs-profiles.el\n"
 	printf "    In Emacs:  M-x describe-variable chemacs-profiles \n"
 
-	printf " print-%%       -  Print any make variable\n\n"
+	printf " print-<variable> -  Print any make <variable>\n\n"
 	printf "          'make print-profiles'\n\n"
-	printf " show-<name>    -  Show the profile definition for name.\n\n"
+	printf " show-<name>    -  Show the profile definition for <name>.\n\n"
 	printf "          'make show-uncle-daves'\n\n"
 
-	printf " backup-profiles - Make a time stamped backup of ~/.emacs-profiles.el.\n"
-
+	printf " backup-profiles - Make a time stamped backup of .emacs-profiles.el.\n"
+	printf " backup-dot-emacs -  Backup emacs.d, .emacs and .emacs-profiles.el\n"
 	printf "\n  Removing installations\n"
 	printf "==================================================================\n"
 	printf " <profile>-remove   - Remove the installation <profile>\n"
@@ -432,7 +430,7 @@ help:
 	printf " name         - install a configuration\n"
 	printf " name-update  - update an install\n"
 	printf " name-remove  - remove an install\n"
-	printf " name-insert  - insert profile entry into ~/.emacs-profiles.el\n"
+	printf " name-insert  - insert profile entry into .emacs-profiles.el\n"
 
 	printf "\n  Managing the default profiles as a group, stable, dev and test\n"
 	printf "==================================================================\n"
@@ -440,11 +438,15 @@ help:
 	printf " install-default-profiles   - install them\n"
 	printf " reinstall-default-profiles - remove and reinstall them.\n"
 
-	printf "\n  New Emacsn location ?\n"
+	printf "\n  Secondary Emacsn location ?\n"
 	printf "==================================================================\n"
-	printf " new-emacsn - Just make a whole nother installation of this here.\n"
+	printf " new-emacsn - Just make a fresh install of Emacsn somewhere.\n"
 
-	printf "\n make new-emacsn path=/my/new/place/to/put/emacsn\n"
+	printf "\n make new-emacsn path=/my/new/place/to/put/emacsn\n\n"
+
+	printf " init - All that is needed to initialize a second Emacsn.\n"
+	printf "        This creates and relinks .emacs-profiles.el.\n"
+	printf " relink-profiles - Relink .emacs-profiles.el to here.\n"
 
 	printf "\n  Profile Management\n"
 	printf "==================================================================\n"
@@ -463,15 +465,11 @@ help:
 
 	printf "\n make install-new-default name=foo repo=https://github.com/ericalinag/ericas-emacs.git\n\n"
 
-	printf " new-empty-profile-%%  - Create an empty install and profile entry\n"
-	printf "                       for %%.\n\n"
+	printf " new-empty-profile-<name>  - Create an empty install and profile entry\n"
+	printf "                       for <name>.\n\n"
 	printf "          make new-empty-profile-foo\n\n"
 
-	printf " backup-profiles - Copy ~/.emacs-profiles to $(dot-backups)\n"
+	printf " backup-profiles - Copy .emacs-profiles to $(dot-backups)\n"
 	printf "		   with a timestamp.\n"
-	printf " restore-profiles - Copy the last backup of .emacs-profiles.el to ~/\n"
-	printf "
-	printf " retrieve-profiles - Copy ~/.emacs-profiles to $(PWD)"
-
-
+	printf " restore-last-profiles - Copy the last backup of .emacs-profiles.el to ~/\n"
 	printf "==================================================================\n"
