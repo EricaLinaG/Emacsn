@@ -327,10 +327,12 @@ add-gnu: add-test
 
 all: install-all
 
+dot-backups:
+	mkdir -p dot-backups
 
 # Prepare for install
 #  move ~/.emacs, ~/.emacs.d, clone emacsn -> emacs home.
-prepare-install: backup-dot-emacs mk-emacs-home
+prepare-install: backup-dot-emacs mk-emacs-home dot-backups
 
 # prepare and install emacsn, chemacs, chemacs profiles, stable and dev
 install-base: clean prepare-install install-emacsn add-gnu install-chemacs
