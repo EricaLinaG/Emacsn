@@ -13,8 +13,13 @@ Most configurations do this.
 
 ### Why
 
-This just grew organically over time. Have a need, fill a need, scratch an itch, 
-have some fun.
+This just grew organically over time out of the _Makefile_ I used
+to install my Emacs configuration. 
+
+Have a need, fill a need, scratch an itch, sure would be nice if..., have some fun.
+
+That's how atrocities in __Make__ are born.
+
 
 Try out other Emacs configurations safely and easily.
 

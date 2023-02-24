@@ -2,23 +2,20 @@
 ;;; Commentary:
 ;;; Code:
 
-(
- ;;stable ("default" . ((user-emacs-directory . "-PWD-/stable")))
+(("default" . ((user-emacs-directory . "-PWD-/stable")))
  ("gnu"      . ((user-emacs-directory . "-PWD-/gnu")))
+ ("gnu-server" . ((user-emacs-directory . "-PWD-/gnu")
+	          (server-name . "gnu")))
  ("test"      . ((user-emacs-directory . "-PWD-/test")))
+ ("test-server" . ((user-emacs-directory . "-PWD-/test")
+	          (server-name . "test")))
 
- ;;doom ("doomdir" . ((user-emacs-directory . "-PWD-/doom")
- ;;doom            (env .https://github.com/overtone/emacs-live.git (("DOOMDIR" . "~/.doom.d")))))
-
- ;; spacemacs example with customization dir.
- ;;space (("spacemacs" . ((user-emacs-directory . "-PWD-/space")
- ;;space                  (env . (("SPACEMACSDIR" . "~/.spacemacs")))))
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; -INSERT-HERE-
- ;;doom ("doom"    . ((user-emacs-directory . "-PWD-/doom")))
 
- ;; Servers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;; Persistent profiles from here down.
+
  ;; Stable
  ;;stable ("exwm" . ((user-emacs-directory . "-PWD-/stable")
  ;;stable  	     (server-name . "exwm")))
@@ -28,13 +25,16 @@
  ;;stable 	       (server-name . "common")))
 
  ;; Doom
- ;;doom ("doom-server" . ((user-emacs-directory . "-PWD-/doom")
- ;;doom                   (server-name . "doom")
- ;;doom                   (env . (("DOOMDIR" . "~/.doom.d")))))
+ ;;doom ("doomdir-server" . ((user-emacs-directory . "-PWD-/doom")
+ ;;doom                      (server-name . "doom")
+ ;;doom                      (env . (("DOOMDIR" . "~/.doom.d")))))
 
- ;; Vanilla
- ("gnu-server" . ((user-emacs-directory . "-PWD-/gnu")
-	          (server-name . "gnu")))
+ ;;doom ("doomdir" . ((user-emacs-directory . "-PWD-/doom")
+ ;;doom            (env . (("DOOMDIR" . "~/.doom.d")))))
+
+ ;; spacemacs example with customization dir.
+ ;;space (("spacemacs" . ((user-emacs-directory . "-PWD-/space")
+ ;;space                  (env . (("SPACEMACSDIR" . "~/.spacemacs")))))
 
  )
 

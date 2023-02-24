@@ -91,8 +91,8 @@ include configurations.mk
 # Set up our profile lists from whatever we got.
 #############################################################################
 configs := $(default-configs) $(optional-configs)
-update-configs := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-update /g')
-remove-configs := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
+update-configs := $(shell echo $(configs) | sed 's/[a-zA-Z\-]*/&-update /g')
+remove-configs := $(shell echo $(configs) | sed 's/[a-zA-Z\-]*/&-remove /g')
 remove-default-installs := $(shell echo $(default-configs) | sed 's/[a-zA-Z\-]*/&-remove /g')
 remove-optional-installs := $(shell echo $(optional-configs) \
 				| sed 's/[a-zA-Z\-]*/&-remove /g')
@@ -190,6 +190,7 @@ $(configs):
 
 # Function to generate a chemacs-profile server entry from a name and an
 # installation profile name.
+# Server name will be the Install name. - see server-entry-template.txt
 make-server-entry = $(shell sed 's/\-NAME\-/$(1)/g' server-entry-template.txt | \
 			sed 's/\-INSTALLNAME\-/$(2)/g'   | \
 			sed 's:\-PWD\-:$(emacs-home):g')
@@ -316,7 +317,7 @@ emacs-profiles.el:
 # mv .emacs-profiles.el $(Dot-backups)/.emacs-profiles.el.$(seconds-now)
 
 install-emacsn:
-	printf "\n\nCopying emacsn to $(emacsn-home)\n"
+	printf "\n\nInstalling emacsn to $(emacsn-home)\n"
 	cp emacsn $(emacsn-home)
 
 touch-custom:
@@ -392,15 +393,13 @@ all: install-all
 dot-backups:
 	mkdir -p dot-backups
 
-# The minimum, initialize an Emacsn with nothing but gnu.
-init: dot-backups emacs-profiles.el add-gnu
-
-# Prepare for install
-#  move ~/.emacs, ~/.emacs.d, clone emacsn -> emacs home.
-prepare-install: touch-custom backup-dot-emacs init
+# The minimum, initialize an Emacsn with nothing but gnu and test.
+# back up the profiles if they arent a link.
+init: dot-backups emacs-profiles.el relink-profiles add-gnu     \
+	touch-custom mv.emacs-profiles.el
 
 # prepare and install emacsn, chemacs, chemacs profiles, stable and dev
-install-base: clean prepare-install install-emacsn add-gnu install-chemacs
+install-base: init backup-dot-emacs install-emacsn install-chemacs
 
 install: install-base stable dev
 
@@ -412,6 +411,7 @@ all: install optional-configs
 clean-test:
 	printf "\n\nCleaning out the test install\n"
 	rm -f $(emacs-home)/test/*
+
 
 # Remove the current test, do a fresh install from github.
 # Run it with debug-init.
@@ -453,8 +453,8 @@ show-available:
 	printf "\n	make show-doom \n"
 
 status-header:
-	printf "=======================================\n"
 	printf "Emacsn: Current Status\n"
+	printf "=======================================\n"
 	printf $(installs-message)
 	printf "\n"
 
