@@ -69,16 +69,16 @@ no-update := true
 ##########################################################################
 # The Default Profile
 # Change this to use a different configuration with (default|stable)|dev|test.
-default-profile-name = ericas
+default-configuration-name = ericas
 
 # Dev, stable and test.
-# shouldn't need to touch these.
-default-profile     = $($(default-profile-name)-profile)
-default-repo        = $($(default-profile-name)-repo)
-default-repo-flags  = $($(default-profile-name)-repo-flags)
-default-update-pull = $($(default-profile-name)-update-pull)
-default-install-cmd = $($(default-profile-name)-install-cmd)
-default-update-cmd  = $($(default-profile-name)-update-cmd)
+# Create a virtual default configuration for everyone.
+default-profile     = $($(default-configuration-name)-profile)
+default-repo        = $($(default-configuration-name)-repo)
+default-repo-flags  = $($(default-configuration-name)-repo-flags)
+default-update-pull = $($(default-configuration-name)-update-pull)
+default-install-cmd = $($(default-configuration-name)-install-cmd)
+default-update-cmd  = $($(default-configuration-name)-update-cmd)
 
 # Dev
 default-configs  := dev

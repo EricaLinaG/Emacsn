@@ -63,10 +63,25 @@ config-custom := ~/.config/emacs-custom.el
 move-dot-emacs := $(or $(and $(wildcard $(HOME)/.emacs),1),0)
 move-dot-emacs.d := $(or $(and $(wildcard $(HOME)/.emacs.d),1),0)
 
-#has-profiles := $(or $(and $(wildcard $(HOME)/.emacs-profiles.el),1),0)
+# as-profiles := $(or $(and $(wildcard $(HOME)/.emacs-profiles.el),1),0)
 # we only really want to save it if its not a link.
 has-profiles := $(shell find ~ -maxdepth 1 -name .emacs-profiles.el -type f )
 
+# Find out if we have installs and display the right stuff.
+have-installs = $(shell ls -dfF * | grep '/$$' | grep -v dot-backups | wc -l)
+installs-message = "There are $(have-installs) Emacs configurations installed"
+please-init = "There are no Emacs configurations\n\
+Please 'make install' or 'make init'\n\
+if you already have Chemacs."
+
+ifeq ($(have-installs),0)
+installs-message := $(please-init)
+endif
+
+installs := 'There are no configurations installed.'
+ifneq ($(have-installs),0)
+installs := $(shell ls -dfF * | grep '/$$' | sed 's:/$$::' | grep -v dot-backups)
+endif
 
 # We get our profile brains from here:
 
@@ -146,7 +161,9 @@ replace-default:  assign-default
 
 # Add a new configuration and reinstall the default profiles with it.
 # make install-new-default name=<your profile name> repo=<your repo url>
-install-new-default:  new-config replace-default
+install-new-default: new-config assign-default
+	make reinstall-defaults
+
 
 $(configs):
 	printf "\-----------------------------------------------------\n"
@@ -404,43 +421,45 @@ test-install: test-remove test
 # clone emacsn into path.
 # make new-emacsn path=/my/new/place/to/put/emacsn.
 new-emacsn: backup-profiles
-	printf "\n Creating new emacsn at: $(path)"
+	printf "\n Creating new emacsn at: $(path)\n"
 	git clone $(emacsn-repo) $(path)
 
 show-profiles:
-	printf "\n   The current ~/.emacs-profiles:\n"
+	printf "\nThe current ~/.emacs-profiles:\n"
 	printf "========================================\n"
 	cat .emacs-profiles.el
 
 show-installs:
-	printf "\n   Installations:\n"
+	printf "\nInstallations:\n"
 	printf "========================================\n"
-	ls -dfF * | grep '/$$' | sed 's:/$$::' | grep -v dot-backups
-	printf "\n   See an install configuration with show-<configuration-name>\n"
-	printf "\n   make show-doom \n"
-
+	echo $(installs)
 show-default:
-	printf "\n   The default installation:\n"
-	printf "   Installed in stable, dev and test.\n"
+	printf "\nThe default installation:\n"
 	printf "========================================\n"
 	grep '^default-configuration-name' configurations.mk
 
 show-optional:
-	printf "\n   All Optional installations:\n"
+	printf "\nAll Optional installations:\n"
 	printf "========================================\n"
 	printf "$(optional-configs)"
 
 show-available:
-	printf "\n   UnInstalled, Available installations:\n"
+	printf "\nUnInstalled, Available installations:\n"
 	printf "========================================\n"
 	comm -23 <(echo $(configs) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
 	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
 
+	printf "\nSee an install configuration with show-<configuration-name>\n"
+	printf "\n	make show-doom \n"
+
 status-header:
 	printf "=======================================\n"
-	printf "   Emacsn: Current Status\n"
+	printf "Emacsn: Current Status\n"
+	printf $(installs-message)
+	printf "\n"
 
 status-end:
+	printf "\nUse 'make help' to get help.\n"
 	printf "========================================\n"
 
 status: status-header show-default show-installs show-available status-end
