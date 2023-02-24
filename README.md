@@ -8,15 +8,15 @@ This system uses [Chemacs2](https://github.com/plexus/chemacs2) for its Emacs
 boot loader. I recommend at least reading through it's __Readme__ even though Emacsn
 takes care of everything, you'll want to know eventually.
 
-The Emacs configuration installs that Chemacs likes need to work in _.emacs.d_ under 
-normal circumstances, with an _init.el_. Most configurations do this.
+Chemacs likes Emacs configurations which install in _.emacs.d_ and use an _init.el_.
+Most configurations do this.
 
 ### Why
 
-It just grew organically over time. Have a need, fill a need.
+This just grew organically over time. Have a need, fill a need, scratch an itch, 
+have some fun.
 
-If you ever wanted an easy way to compare Doom to spacemacs, to Prelude, Emacs from
-Scratch, Emacs-Live, or any other, Here is an easy path. 
+Try out other Emacs configurations safely and easily.
 
 If you have ever ruined your emacs setup and had to go back, or fix it in less than
 ideal circumstances, then this could also be your solution to accidental 
@@ -25,6 +25,28 @@ emacs startup breakage.
 You just want to try out a feature without breaking your daily driver.
 
 It also installs your emacs for you. As well as anyone else's.
+
+It makes your Chemacs profiles for you.  It snapshots them. You can edit them,
+you'll have to actually. So far its only additive.
+
+Your custom profiles can be persisted for subsequent installs.
+
+All the data/code is template driven and easy to change. 
+
+It maintains a library of installable Emacs configurations - profiles.
+
+Adds a regular and server entry for each installed configuration.
+
+Its super easy to make a new profile/configuration entry out of some new repo you found.
+
+Makes a dev and stable install for the default configuration.
+
+Provides a test profile and commands to do fresh test installs.
+
+The default profiles, `dev, stable, test`, can be easily reassigned 
+and rebuilt with any configuration.
+
+Each installation gets two boot profiles. <name> and <name>-server.
 
 ### emacsn
 This is a shell script Emacs wrapper, __emacsn__ to make life a little easier.
@@ -44,12 +66,12 @@ The command `make new-emacsn path=...` will create a fresh Emacsn at path.
 
 For multiple Emacsn to work together it is not necessary to do another install. 
 It is only necessary for the Emacsn to re-link to your ~/.emacs-profiles.el in order to
-work. 
+work. `init` creates an Emacsn with nothing but a vanilla __gnu__ profile, 
+along with __test__ but without his friends __dev__ and __stable__.
 
     `make init` 
 
-will initialize a new .emacs-profiles.el and link it, as well as
-ensure the _gnu_ and _test_ profiles exist.
+This will also initialize a new .emacs-profiles.el and link it.
 
 Each Emacsn keeps its Chemacs profiles locally and links _~/.emacs-profiles.el_ to
 the one located here. This makes it super easy to switch to a different Emacsn.
@@ -123,11 +145,24 @@ If you want to make your emacs the default now do these two things.
   - `make install-base status`
   - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
 
+
 otherwise do `make install`.
 
 #### Try it out
   - `emacs`
   - `emacs --with-profile <gnu|stable|dev|test|...>`
+  
+#### Add a new repo for now or later.
+
+You can add yours or any emacs repo as an install profile at any time.
+Then install it later.
+
+  - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+  - `make my-profile-name`
+
+You can add a profile and install your emacs repo any time with this.
+  
+  - `make install-new name=my-profile-name repo=The-url-to-my-emacs-repo`
   
 ### Get the Status and see some things.
   - `make status`
@@ -149,8 +184,6 @@ Do try:
   - `make stable-update`
   - `make from-hell-remove`
 
-Add your emacs repo to __profiles.mk__, make it the default. __Then;__
-  - `make reinstall-default-profiles`
   - Have fun.
 
 ## A Quick Guide.
@@ -232,6 +265,9 @@ Look at
         - Optionally edit the new profile entry in _profiles.mk_.
       - `make assign-default name=my-profile-name`
       - `make reinstall-default-profiles`
+        - Which is
+          - `make rm-default-profiles`
+          - `make install-default-profiles`
 
 ### See how profile entries are made.
   - `cat profile-template.txt`
@@ -305,7 +341,8 @@ Here is the template the makefile provides.
 ### The Template
 
 The template used by `make new-profile` is _profile-template.txt_
-and it looks like this.
+and it's profile name is gnu and it looks like this.
+
 
 ```make
 ## gnu
@@ -318,16 +355,26 @@ gnu-update-cmd   = $(generic-update-cmd)
 ## gnu
 ```
 
-This profile definition is by the most common so far. I am
+This profile definition is the most common so far. I am
 not sure it is a 100% fit always, but it seems pretty good
-and at least harmless. The install does a git clone,
-runs emacs and then exits, 
-the update does a `git pull origin` and then updates packages.
+and at least harmless. 
+
+  - The install does a git clone your-repo-url
+    - Runs emacs -nw with the __gnu__ profile 
+      - while giving it the function call for it to kill its self.
+  - The update changes directories to the configuration and then;
+    - does a _$(git-pull)_ ie. `git pull origin`
+    - then it does `generic-update` which runs an elisp script to update packages.
 
 ### Some Examples
 
 They are all about the same and I hope they just make sense.
 Here is the one for __Prelude__.
+
+After doing a `make status` you might be curious what all those are.
+You can see them like this. `make show-<profile>` ie.
+
+`make show-prelude`
 
 ```make
     optional-profiles   += prelude
@@ -348,24 +395,17 @@ Here is the one for __Prelude__.
     The update-cmd can be __$(no-update)__, __$(generic-update-cmd)__ 
     or another update command.
 
-The list of available profiles can all be seen with `make print-...`
-Or `make status` which tells all.
+The extra profiles can be installed like so. You may install them and 
+remove them, and add to them as you like. 
 
-```shell
-    make status
-
-    make print-profiles
-    make print-optional-profiles
-    make print-default-profiles	
-
-    # for the update targets.
-    make print-update-profiles
-```
-
-The extra profiles can be installed like so. You may install them
-as you go.  Emacsn modifies  __.emacs-profiles.el__
+Emacsn modifies  __.emacs-profiles.el__
 as you add new profile installs. Your profiles in ~/.emacs-profiles is
 a link to the one here.
+
+Note: Emacsn is additive, so you can end up with duplicated
+definitions which need to be cleaned up.
+The most recent are at the top. Its generally only annoying.
+
 
 ```shell
     make doom 
@@ -378,7 +418,9 @@ a link to the one here.
 
 Doom and Ericas are the only configurations which provide an install function.
 It does make things all a little bit nicer. They can interact as needed and exit
-when done. We do our best for the rest.
+when done. We do our best for the rest. Somehow it does feel right to just say
+hey! you over there, install all your stuff, put it over there, turn out the 
+lights when your done. ok ?
 
 ```make
     optional-profiles  = ericas
@@ -450,16 +492,16 @@ The rest can use this generic update rule.
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
 It is a simplification of the __update.el__ from Ericas emacs.
-It installs/updates all selected packages and then exits.
+It installs/updates all-selected-packages and then exits.
 It assumes packages are installed in _elpa_.
 
 These configurations usually do not have an install function 
 either so on install we just run them. 
-They download and install all their packages. 
-We can check for errors, then `C-x C-c` so that 
-the `make` can continue.
+They download and install all their packages. If we want them to
+wait for us, we leave off the __$(kill-emacs)__.
 
-Their install command is usually this.
+Their install command is usually this, add -nw if you want in terminal.
+
 ```make
     emacs --with-profile <profile-name>
 ```
@@ -486,7 +528,10 @@ uncle-daves-update-cmd  = $(generic-update-cmd)
 ### Summary
 To add a new profile to
  [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
-is easy, copy the template and fill in the blanks.
+is easy, `make new-profile name=some-name repo=some-repo`.
+To add it and install it do this;
+
+`make install-new name=some-name repo=some-repo`.
 
 Adding it to the optional-profiles gives it all the make targets
 it needs for installation, update, and removal.
@@ -494,7 +539,7 @@ it needs for installation, update, and removal.
 The profile's install command is frequently just to run emacs with that profile.
 Exceptions are Doom Emacs, and Ericas-Emacs.
 
-The update changes directories to the installation, maybe does a git pull,
+The update changes directories to the installation, maybe does a `git pull`,
 and maybe runs emacs to update its packages.
 The generic-update-cmd works for most configurations, it simply gets 
 emacs packages to install-selected.
@@ -514,19 +559,34 @@ it will be moved out of the way first.
 
 When a profile is installed it will automatically
 add in any pre-defined server profiles or alternative invocations which apply.
-_Make uncomments lines beginning with `;;<profile>` from .emacs-profiles.el._
+_Emacsn uncomments lines beginning with `;;<profile>` from .emacs-profiles.el._
+It does also create a server profile entry for each installation.
 
+Persist your code by putting them back into 
+[emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el). This file is the basis for the next fresh install of Emacsn.
+
+With the proper comment prefix it will install its self.
 Modify _.emacs-profiles.el_ to add new ones or change their names.
 
-Persist them by putting them back into 
-[emacs-profiles-orig.el](https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-orig.el). This file is the basis for the next install of Emacsn.
+You can of course just check your _.emacs-profiles.el_ in with everything else.
+That does get tricky if you have more than one Emacsn.
 
 ### Emacs Boot entries and installations.
+
+For each installation profile installed there are two chemacs entries made,
+one as the name given, and another with a _-server_ prefix, which is a server.
 
 #### How to see what is there.
 
   - `make status`
   - `make show-profiles`
+  
+#### Adding new boot profile entries
+    - make insert-profile name=foo profile=stable
+    - make insert-server-profile name=foo-server profile=stable
+
+It is very easy to add new entriest which point at other installations,
+although I'm not sure why you would.
 
 #### See it all your way
 
@@ -536,16 +596,19 @@ The current profile choices can be seen with either of these.
   - `make show-profiles`
 
 Current installations can be seen with this.
-  - `ls -dfF Emacsn/* | grep '/$'`
+  - `ls -dfF Emacsn/* | grep '/$'` | grep -v dot-backups
   - `make show-installs`
   
 The current default profile can be seen with this.
     `grep '^default-profile-name' profiles.mk`
-  - `make show-default`
     
 Possible installations are known by make.
     `make print-optional-profiles`
   - `make show-optional`
+  
+Their definitions can be seen with show-<name>
+  - `make show-space`
+  - 
 
 #### Our possible Emacs boot choices 
 
@@ -586,7 +649,7 @@ Run emacs with profiles like this:
 or
     `emacsn -p <profile name>`
 
-## Managing elisp development
+## Managing elisp, emacs configuration, development
 
 I use the __dev__, __test__ and __stable__ profile/installs to insure 
 I always have a way to do work if I have broken anything.  
