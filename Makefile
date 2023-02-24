@@ -16,7 +16,7 @@
 # emacs-from-hell and uncle-daves-emacs as well as ericas if you
 # want them.
 #
-# There are also daemon rprofiles for different installs.
+# There are also daemon profiles for different installs.
 #############################################################################
 
 # Code:
@@ -32,15 +32,15 @@ emacsn-repo := https://github.com/ericalinag/Emacsn
 emacsn-home := ~/bin
 
 ###########################################################################
-### Less to change from here down.  Help text is at the bottom.
-### Profile entries are in profiles.mk
+### Less to change from here down.
+### Emacs configuration entries are in configurations.mk
 ### Templates are all something-template.txt
 ###########################################################################
 
 # Here, where this Emacsn and its installations will live.
 emacs-home := $(PWD)
 
-# Here we keep dated versions of .emacs-profiles, .emacs.d, ~/.emacs
+# Here we keep dated versions of .emacs-profiles.el, .emacs.d, ~/.emacs
 dot-backups := $(PWD)/dot-backups
 
 # Our timestamp.
@@ -70,25 +70,25 @@ has-profiles := $(shell find ~ -maxdepth 1 -name .emacs-profiles.el -type f )
 
 # We get our profile brains from here:
 
-include profiles.mk
+include configurations.mk
 
 #############################################################################
 # Set up our profile lists from whatever we got.
 #############################################################################
-profiles := $(default-profiles) $(optional-profiles)
-update-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-update /g')
-remove-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
-remove-default-profiles := $(shell echo $(default-profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
-remove-optional-profiles := $(shell echo $(optonal-profiles) \
+configs := $(default-configs) $(optional-configs)
+update-configs := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-update /g')
+remove-configs := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-remove /g')
+remove-default-installs := $(shell echo $(default-configs) | sed 's/[a-zA-Z\-]*/&-remove /g')
+remove-optional-installs := $(shell echo $(optional-configs) \
 				| sed 's/[a-zA-Z\-]*/&-remove /g')
-insert-profiles := $(shell echo $(profiles) | sed 's/[a-zA-Z\-]*/&-insert /g')
+insert-configs := $(shell echo $(configs) | sed 's/[a-zA-Z\-]*/&-insert /g')
 
 test-sed:
-	echo $(profiles)
-	echo '$(profiles)' | sed 's/[a-zA-Z\-]*/&-update /g'
+	echo $(configs)
+	echo '$(configs)' | sed 's/[a-zA-Z\-]*/&-update /g'
 
-# > make print-update-profiles
-# update-profiles := ericas-update space-update doom-update prelude-update
+# > make print-update-configs
+# update-configs := ericas-update space-update doom-update prelude-update
 #      live-update from-hell-update from-scratch-update uncle-daves-update
 
 
@@ -97,54 +97,58 @@ test-sed:
 ############################################################
 # Very handy rule to print any make variable.
 # make print-VARIABLE
-# ie. make print-profiles, make print-default-repo
+# ie. make print-configs, make print-default-repo
 print-%  : ; @echo $* = $($*)
 
-show-%  : ; @echo $* profile:
-	grep '^$*' profiles.mk
+show-%  : ; @echo $* configuration:
+	grep '^$*' configurations.mk
 
-# Add a new empty install profile
-new-empty-profile-%  :
+# Create a new empty install and boot entry for name.
+new-empty-install-%  :
 	printf "Creating Empty, vanilla gnu, profile installation: $*\n"
 	mkdir -p $*
 	printf "Inserting profile entry.\n"
 	$(call insert-boot,$*,$*)
 
 # Create a new profile from name and repo. passed on cli.
-# make new-profile name=foobar repo=https://github.com/ericalinag/ericas-emacs.git
-new-profile :
-	printf "Creating new installation profile definition in profiles.mk\n"
+# make new-config name=foobar repo=https://github.com/ericalinag/ericas-emacs.git
+new-config :
+	printf "Creating new installation profile definition in configurations.mk\n"
 	printf "Using generic install and update rules.\n"
-	printf "Edit profiles.mk if you want something else.\n"
+	printf "Edit configurations.mk if you want something else.\n"
 	printf "Profile Name: $(name)\n"
 	printf "Repository: $(repo)\n"
-	sed 's/gnu/$(name)/g' profile-template.txt | \
-		sed 's{your-repo-url{$(repo){' >> profiles.mk
-	echo " " >> profiles.mk
+	sed 's/gnu/$(name)/g' config-template.txt | \
+		sed 's{your-repo-url{$(repo){' >> configurations.mk
+	echo " " >> configurations.mk
 
-# change the name of the default-profile-name in profiles.mk
+# change the name of the default-configuration-name in configurations.mk
 assign-default:
-	printf "Assigning $(name) to default in profiles.mk\n"
-	sed 's/\(default-profile-name[ ]*\=\).*/\1 $(name)/g' profiles.mk > profiles.tmp
-	mv profiles.tmp profiles.mk
+	printf "Assigning $(name) to default in configurations.mk\n"
+	sed 's/\(default-configuration-name[ ]*\=\).*/\1 $(name)/g' configurations.mk > configurations.tmp
+	mv configurations.tmp configurations.mk
 
 # Another way to assign-default-foo.
 assign-default-% :
-	printf "Assigning $* to default in profiles.mk\n"
-	sed 's/\(default-profile-name[ ]*\=\).*/\1 $*/g' profiles.mk > profiles.tmp
-	mv profiles.tmp profiles.mk
+	printf "Assigning $* to default in configurations.mk\n"
+	sed 's/\(default-configuration-name[ ]*\=\).*/\1 $*/g' configurations.mk > configurations.tmp
+	mv configurations.tmp configurations.mk
 
 # Add a new profile and install it.
 # make install-new name=<your profile name> repo=<your repo url>
-install-new:  new-profile
+install-new:  new-config
 	$(MAKE) $(name)
 
-# Add a new profile and reinstall the default profiles with it.
-# make install-new-default name=<your profile name> repo=<your repo url>
-install-new-default:  new-profile assign-default
-	make reinstall-default-profiles name=$(name) repo=$(repo)
+# Assign a new default configuration profile name, reinstall the defaults.
+# replace-default name=doom
+replace-default:  assign-default
+	make reinstall-defaults
 
-$(profiles):
+# Add a new configuration and reinstall the default profiles with it.
+# make install-new-default name=<your profile name> repo=<your repo url>
+install-new-default:  new-config replace-default
+
+$(configs):
 	printf "\-----------------------------------------------------\n"
 
 	printf "Adding profile for $@ and $@-server to .emacs-profiles.el\n"
@@ -229,8 +233,8 @@ insert-server-boot = \
 #	$(call backup-profile)
 
 
-# Insert the profile into the .emacs-profiles. Just a test really.
-$(insert-profiles):
+# Insert the config into the .emacs-profiles. Just a test really.
+$(insert-configs):
 	$(eval profile=$(shell echo $@ | sed 's/\-insert$$//g' ))
 	printf "Adding profile for $(profile) to .emacs-profiles.el\n"
 	$(call insert-boot,$(profile),$(profile))
@@ -240,21 +244,21 @@ $(insert-profiles):
 # cd to the installation's direcory,
 # maybe do a git pull,
 # then maybe some emacs command to run an update of packages.
-$(update-profiles):
+$(update-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-update$$//g' ))
 	printf "Running update for profile: $(profile-name)\n"
 	cd $(profile-name); ($@-pull); $($@-cmd)
 
-$(remove-profiles):
+$(remove-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-remove$$//g' ))
-	printf "Removing profile: $(profile-name)\n"
+	printf "Removing install: $(profile-name)\n"
 	rm -rf $(profile-name)
 
-rm-all-optional: $(remove-optional-profiles)
-rm-all-profiles: $(remove-profiles)
-rm-default-profiles: $(remove-default-profiles)
-install-default-profiles: add-test stable dev
-reinstall-default-profiles: rm-default-profiles install-default-profiles
+rm-optional: $(remove-optional-configs)
+rm-installs: $(remove-configs)
+rm-defaults: $(remove-default-configs)
+install-defaults: add-test stable dev
+reinstall-defaults: rm-defaults install-defaults
 
 # how to set a variable during rule eval.
 test-var-set:
@@ -385,7 +389,7 @@ install: install-base stable dev
 
 # Prepare and install everything we have. I wouldn't advise.
 # The install plus: doom, spacemacs, and prelude.
-all: install optional-profiles
+all: install optional-configs
 
 # Clean test out so we can use it as vanilla
 clean-test:
@@ -412,24 +416,24 @@ show-installs:
 	printf "\n   Installations:\n"
 	printf "========================================\n"
 	ls -dfF * | grep '/$$' | sed 's:/$$::' | grep -v dot-backups
-	printf "\n   See an install profile with show-<profile-name>\n"
+	printf "\n   See an install configuration with show-<configuration-name>\n"
 	printf "\n   make show-doom \n"
 
 show-default:
 	printf "\n   The default installation:\n"
 	printf "   Installed in stable, dev and test.\n"
 	printf "========================================\n"
-	grep '^default-profile-name' profiles.mk
+	grep '^default-configuration-name' configurations.mk
 
 show-optional:
 	printf "\n   All Optional installations:\n"
 	printf "========================================\n"
-	printf "$(optional-profiles)"
+	printf "$(optional-configs)"
 
 show-available:
 	printf "\n   UnInstalled, Available installations:\n"
 	printf "========================================\n"
-	comm -23 <(echo $(profiles) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
+	comm -23 <(echo $(configs) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
 	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
 
 status-header:

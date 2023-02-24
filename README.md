@@ -33,7 +33,7 @@ Your custom profiles can be persisted for subsequent installs.
 
 All the data/code is template driven and easy to change. 
 
-It maintains a library of installable Emacs configurations - profiles.
+It maintains a library of installable Emacs configurations.
 
 Adds a regular and server entry for each installed configuration.
 
@@ -85,13 +85,13 @@ When you are ready `make relink-profiles` re-links the current Emacsn.
 The default configuration is mine; [Ericas-Emacs](https://github.com/ericalinag/ericas-emacs).
 But that can be yours or something else. It is very easy to change at the top of
 the 
-[_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
+[_configurations.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk)
 makefile where all the profile definitions live.
 
 If your configuration is set up with an init.el and goes in ~/.emacs.d you are golden
 and can use yours as the default by visiting 
-[this region](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
- in _profiles.mk_. Once you have a profile using it for the default is as easy 
+[this region](https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk)
+ in _configurations.mk_. Once you have a profile using it for the default is as easy 
  as this.
 
     default-profile-name := ericas
@@ -157,10 +157,10 @@ otherwise do `make install`.
 You can add yours or any emacs repo as an install profile at any time.
 Then install it later.
 
-  - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
-  - `make my-profile-name`
+  - `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
+  - `make my-profile-name` - to install it.
 
-You can add a profile and install your emacs repo any time with this.
+You can add a profile and install your emacs repo all at once with this.
   
   - `make install-new name=my-profile-name repo=The-url-to-my-emacs-repo`
   
@@ -172,7 +172,7 @@ You can add a profile and install your emacs repo any time with this.
   - `M-x describe-variable chemacs-profiles`
   - `cat .emacs-profiles.el`
   - `cat ./emacs-profiles-orig.el`
-  - `make print-optional-profiles`
+  - `make print-optional-configs`
 
 After that you may wish to do:
   - `make space doom from-hell`
@@ -220,10 +220,10 @@ with `install-new-default`.
   - `make install-base status`
   - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
     - This can be broken into steps if you wish.
-      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
-        - Optionally edit the new profile entry in _profiles.mk_.
+      - `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
+        - Optionally edit the new profile entry in _configurations.mk_.
       - `make assign-default name=my-profile-name`
-      - `make reinstall-default-profiles`
+      - `make reinstall-defaults`
 
 ### Continuing on.
 
@@ -252,26 +252,36 @@ Or
     `make show-profiles`
     `make help`
 
-### profiles.mk
-Look at 
-    [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
-    and add your own emacs config into the mix. Directions are at the top 
-    of the makefile. Or just do `make install-new-default ...`
+### configurations.mk
+
+Look at it with `make show-optional` or visit 
+    [_configurations.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk)
+Add your own emacs config into the mix. Directions are at the top of the makefile. 
+Or just do `make install-new-default ...`
     
 ### Incorporate your Emacs configuration as the default if you haven't already.
   - `make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo`
     - This can be broken into steps if you wish.
-      - `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
-        - Optionally edit the new profile entry in _profiles.mk_.
+      - `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
+        - Optionally edit the new profile entry in _configurations.mk_.
       - `make assign-default name=my-profile-name`
-      - `make reinstall-default-profiles`
+      - `make reinstall-defaults`
         - Which is
-          - `make rm-default-profiles`
-          - `make install-default-profiles`
+          - `make rm-defaults`
+          - `make install-defaults`
+          
+  `make new-empty-install-foo` will create a new empty vanilla emacs named __foo__.
+  
+Switch the default profiles to a different configuration default with `replace-defaults`.
+
+    `make replace-defaults name=doom`
+
 
 ### See how profile entries are made.
-  - `cat profile-template.txt`
-  - Look at _profiles.mk_           - These are the installations.
+  - `cat emacs-profiles-orig.txt`
+  - `cat boot-entry-template.txt`
+  - `cat server-entry-template.txt`
+  - Look at _configurations.mk_           - These are the installations.
   - Look at _.emacs-profiles.el_  - These are the boot entries
   - Compare that to _Emacsn/emacs-profiles-orig.el_.
     Persistent profile boot definitions live there so you have them with every install
@@ -313,9 +323,11 @@ If that all works well pull your changes into __stable__ and update the packages
 ```sh
     make from-hell-remove
 
-    make rm-all-optional
+    make rm-optional
 
-    make rm-all-profiles
+    make rm-defaults
+
+    make rm-installs
 ```
 
 But you can just do an `rm -rf ...` if you want.
@@ -327,26 +339,26 @@ Rinse - Repeat, Have fun.
 ## Emacs configurations
 
 These are defined in
- [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk).
+ [_configurations.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk).
  This is loaded by the main _Makefile_
  
-There is a target rule to help with making new profiles. It does assume
+There is a target rule to help with making new configurations. It does assume
 basic generic functionality, but that is usually enough.
 
-      `make new-profile name=my-profile-name repo=The-url-to-my-emacs-repo`
+      `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
       `make status`
 
 Here is the template the makefile provides.
 
 ### The Template
 
-The template used by `make new-profile` is _profile-template.txt_
+The template used by `make new-config` is _config-template.txt_
 and it's profile name is gnu and it looks like this.
 
 
 ```make
 ## gnu
-optional-profiles += gnu
+optional-configs += gnu
 gnu-repo         = your-repo-url
 gnu-repo-flags   =
 gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
@@ -377,7 +389,7 @@ You can see them like this. `make show-<profile>` ie.
 `make show-prelude`
 
 ```make
-    optional-profiles   += prelude
+    optional-configs    += prelude
     prelude-repo        = $(git-hub)bbatsov/prelude.git
     prelude-repo-flags  =
     prelude-install-cmd = $(emacs-nw-profile) prelude $(kill-emacs)
@@ -385,7 +397,7 @@ You can see them like this. `make show-<profile>` ie.
     prelude-update-cmd  = $(generic-update-cmd)
 ```
 
-  - It first adds itself to the list of optional-profiles.
+  - It first adds itself to the list of optional-configs.
   - Then we define the github uri.
   - Define any clone flags so we can get branches if we like.
   - The install command to let the emacs install get all of it's packages
@@ -395,17 +407,8 @@ You can see them like this. `make show-<profile>` ie.
     The update-cmd can be __$(no-update)__, __$(generic-update-cmd)__ 
     or another update command.
 
-The extra profiles can be installed like so. You may install them and 
+The extra configs/profiles can be installed like so. You may install them and 
 remove them, and add to them as you like. 
-
-Emacsn modifies  __.emacs-profiles.el__
-as you add new profile installs. Your profiles in ~/.emacs-profiles is
-a link to the one here.
-
-Note: Emacsn is additive, so you can end up with duplicated
-definitions which need to be cleaned up.
-The most recent are at the top. Its generally only annoying.
-
 
 ```shell
     make doom 
@@ -413,6 +416,15 @@ The most recent are at the top. Its generally only annoying.
     # or whatever
     make doom space uncle-daves prelude
 ```
+
+Emacsn modifies  __.emacs-profiles.el__
+as you add new profile installs. Your profiles in ~/.emacs-profiles is
+a link to the one here.
+
+Note: _Emacsn is additive, so you can end up with duplicated
+definitions which need to be cleaned up.
+The most recent are at the top. Its generally only slightly annoying._
+
 
 ### Profiles which have an install and/or update functionalities.
 
@@ -423,7 +435,7 @@ hey! you over there, install all your stuff, put it over there, turn out the
 lights when your done. ok ?
 
 ```make
-    optional-profiles  = ericas
+    optional-configs   = ericas
     ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
     ericas-repo-flags  =
     ericas-install-cmd = emacs --script install.el
@@ -437,7 +449,7 @@ to do an update. In both cases we run in terminal mode, trust it all went well
 and save and kill terminal at the end, __$(kill-emacs)__.
 
 ```make
-    optional-profiles += space
+    optional-configs  += space
     space-repo        = $(git-hub)/syl20bnr/spacemacs.git
     space-repo-flags  =
     space-install-cmd = $(emacs-nw-profile) space $(kill-emacs)
@@ -455,7 +467,7 @@ Doom has hybrid shell/elisp scripts to run for install and update.
 It doesn't want us to pull for it. Use __$(no-pull)__ to indicate that.
 
 ```make
-    optional-profiles += doom
+    optional-configs  += doom
     doom-repo         = $(git-hub)/hlissner/doom-emacs.git
     doom-repo-flags   =
     doom-install-cmd  = $(emacs-home)/doom/bin/doom install
@@ -463,9 +475,9 @@ It doesn't want us to pull for it. Use __$(no-pull)__ to indicate that.
     doom-update-cmd   = $(emacs-home)/doom/bin/doom update
 ```
 
-### Profiles with no install function
+### Configurations with no install function
 
-These profiles just run emacs the first time to install all of
+These configurations just run emacs the first time to install all of
 their packages. So the install command amounts to one of these.
 Run in window mode or terminal mode.
 
@@ -516,7 +528,7 @@ Package update can be turned off with the value `$(no-update)`
 
 ```make
 # Uncle Daves Emacs
-optional-profiles       += uncle-daves
+optional-configs        += uncle-daves
 uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
 uncle-daves-repo-flags  =
 uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(kill-emacs)
@@ -527,13 +539,13 @@ uncle-daves-update-cmd  = $(generic-update-cmd)
     
 ### Summary
 To add a new profile to
- [_profiles.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/profiles.mk)
-is easy, `make new-profile name=some-name repo=some-repo`.
+ [_configurations.mk_](https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk)
+is easy, `make new-config name=some-name repo=some-repo`.
 To add it and install it do this;
 
 `make install-new name=some-name repo=some-repo`.
 
-Adding it to the optional-profiles gives it all the make targets
+Adding it to the optional-configs  gives it all the make targets
 it needs for installation, update, and removal.
 
 The profile's install command is frequently just to run emacs with that profile.
@@ -554,6 +566,16 @@ as an _Emacs boot loader_ to allow multiple emacs configurations to exist at onc
 Most of the examples from the Chemacs doc are incorporated here.
 Chemacs2 is installed directly into _~/.emacs.d_, if there is already one
 it will be moved out of the way first.
+
+#### Profiles and Configs.
+
+Chemacs calls it's boot entries '_profiles_'. I call the record which defines 
+a profile a '_config_'. There is a direct relationship between the two. Installing
+a configuration will result in a _profile_ entry of the same name. So profile-name can
+also be the name of a configuration, but not necessarily.
+
+There are always at least two profiles for each installed configuration. One as 
+the name of the configuration the other as configuration-name_-server_ 
 
 ### Persistent profile definitions
 
@@ -593,6 +615,7 @@ although I'm not sure why you would.
 The current profile choices can be seen with either of these.
   - `M-x describe-variable chemacs-profiles`
   - `cat .emacs-profiles.el`
+  - `cat ~/.emacs-profiles.el`
   - `make show-profiles`
 
 Current installations can be seen with this.
@@ -600,11 +623,11 @@ Current installations can be seen with this.
   - `make show-installs`
   
 The current default profile can be seen with this.
-    `grep '^default-profile-name' profiles.mk`
+    `grep '^default-profile-name' configurations.mk`
     
 Possible installations are known by make.
-    `make print-optional-profiles`
-  - `make show-optional`
+    `make print-optional-configs`
+  - `make show-<config-name>`
   
 Their definitions can be seen with show-<name>
   - `make show-space`

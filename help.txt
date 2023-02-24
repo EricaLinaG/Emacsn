@@ -1,5 +1,8 @@
 ==================================================================
   Useful make targets.
+  make <target> options
+
+
   Information
 ==================================================================
  status           -  The status of the Emacsn, what is installed,
@@ -14,50 +17,80 @@
  show-<name>      -  Show the profile definition for <name>.
           'make show-uncle-daves'
 
- backup-profiles  - Make a time stamped backup of .emacs-profiles.el.
+ backup-profiles  -  Make a time stamped backup of .emacs-profiles.el.
  backup-dot-emacs -  Move/backup emacs.d, .emacs and .emacs-profiles.el
 
 
-  Removing installations
+  Installation management
 ==================================================================
- <profile>-remove   - Remove the installation <profile>
- rm-all-optional    - Remove installs from the optional list.
- rm-all-profiles    - Scorched earth.
+ new-config         - Create a new configuration profile from name and repo.
+
+        make new-config name=foo repo=https://github.com/...
+
+ <name>             - Install the configuration named <name>.
+
+ new-empty-install-<name>  - Create an empty install and profile entry for <name>.
+                             Essentially a vanilla gnu install and boot entry.
+
+        make new-empty-install-foo
+
+ install-new        - Create a new configuration and install it.
+                    takes a name and a repository url.
+
+        make install-new name=foo repo=https://github.com/...
+
+ <name>-remove      - Remove an install
+ rm-optional        - Remove all installed configurations on the optional list.
+ rm-installs        - Scorched earth.
+
 
   Managing the test installation.
 ==================================================================
- test-install - remove it, install it, run it with debug-init.
- clean-test   - remove it, then add-test.
- add-test     - Just do a 'mkdir -p test'.
+ test-install       - Remove test, install it, run it with debug-init.
+ clean-test         - Remove test, then add-test.
+ add-test           - Just do a 'mkdir -p test'.
 
-  Profile name targets.
-==================================================================
- name         - install a configuration
- name-update  - update an install
- name-remove  - remove an install
- name-insert  - insert profile entry into .emacs-profiles.el
 
-  Managing the default profiles as a group, stable, dev and test
+  Configuration name targets.
 ==================================================================
- rm-default-profiles        - remove them
- install-default-profiles   - install them
- reinstall-default-profiles - remove and reinstall them.
+ <name>             - Install a configuration
+ <name>-update      - Update an install
+ <name>-remove      - Remove an install
 
-  Secondary Emacsn location ?
+  Managing the default profiles as a group; stable, dev and test
 ==================================================================
- new-emacsn   - Just make a fresh install of Emacsn somewhere.
+ rm-defaults        - Remove the stable, dev and test installs
+ install-defaults   - Install fresh stable, dev, an empty test.
+ reinstall-defaults - Remove and reinstall them.
+ assign-default     - Use this configuration to create stable, dev and test.
+
+        make assign-default name=foo
+
+ replace-defaults   - Change the default installs to a different configuration
+                      and reinstall.
+
+        make replace-default name=doom
+
+ install-new-default -  Create a new config profile, set it as default,
+ 		        reinstall the default profiles.
+
+        make install-new-default name=foo repo=https://github.com/...
+
+  Multiple Emacsn
+=================================================================
+ new-emacsn   - Make a fresh install of Emacsn somewhere.
 
             make new-emacsn path=/my/new/place/to/put/emacsn
 
- init         - All that is needed to initialize a second Emacsn.
-                This creates and relinks a fresh .emacs-profiles.el.
+ init         - All that is needed to initialize a fresh second Emacsn.
+                This creates and re-links a fresh .emacs-profiles.el.
 
- relink-profiles - Relink .emacs-profiles.el to the one we have here.
+ relink-profiles - Re-link ~/.emacs-profiles.el to the one we have here.
 
   Installation Profile Management
 ==================================================================
- new-profile           -  Create a new default profile from name and repo.
- insert-profile        -  Insert another profile into .emacs-profiles.el.
+
+ insert-profile     -  Insert another profile into .emacs-profiles.el.
 
            make insert-server-profile name=foo profile=gnu
 
@@ -65,26 +98,7 @@
 
         make insert-server-profile name=foo profile=gnu
 
- new-profile           -  Add a new installation profile to be installed later.
 
-        make new-profile name=foo repo=https://github.com/...
-
- assign-default        -  Assign a name to the default profile.
-
-        make assign-default name=foo
-
- install-new           -  Create a new profile, and install it
-
-        make install-new name=foo repo=https://github.com/...
-
- install-new-default   -  Create a new profile, set it as default,
- 		          reinstall the default profiles.
-
-        make install-new-default name=foo repo=https://github.com/...
-
- new-empty-profile-<name>  - Create an empty install and profile entry for <name>.
-
-        make new-empty-profile-foo
 
  backup-profiles       -  Copy .emacs-profiles to $(dot-backups) with a timestamp.
  restore-last-profiles -  Copy the previous version of .emacs-profiles.el to current.

@@ -1,4 +1,4 @@
-# profiles.mk --- definitions for Emacs configurations to enable
+# configurations.mk --- definitions for Emacs configurations to install, remove.
 #
 # Commentary:
 # Just a bunch of make variables with profile name prefixes.
@@ -56,7 +56,7 @@ no-update := true
 # copy-pasta
 # ------------------------------------------------------------------
 # # gnu
-# default-profiles += gnu
+# optional-configs += gnu
 # gnu-repo         = your-repo-url
 # gnu-repo-flags   =
 # gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
@@ -81,28 +81,28 @@ default-install-cmd = $($(default-profile-name)-install-cmd)
 default-update-cmd  = $($(default-profile-name)-update-cmd)
 
 # Dev
-default-profiles := dev
+default-configs  := dev
 dev-repo         = $(default-repo)
 dev-update-pull  = $(default-update-pull)
 dev-install-cmd  = $(default-install-cmd)
 dev-update-cmd   = $(default-update-cmd)
 
 # Stable
-default-profiles   += stable
+default-configs    += stable
 stable-repo        = $(default-repo)
 stable-update-pull = $(default-update-pull)
 stable-install-cmd = $(default-install-cmd)
 stable-update-cmd  = $(default-update-cmd)
 
 # Test
-default-profiles += test
+default-configs  += test
 test-repo        = $(default-repo)
 test-update-pull = $(default-update-pull)
 test-install-cmd = $(default-install-cmd)
 test-update-cmd  = $(default-update-cmd)
 
-# > make print-default-profiles
-# default-profiles := dev stable test
+# > make print-default-configs
+# default-configs := dev stable test
 
 #############################################################################
 #####  Additional Emacs configuration definitions.
@@ -134,9 +134,9 @@ test-update-cmd  = $(default-update-cmd)
 #####  but I dont know these others well.
 #############################################################################
 
-# First one: set optional-profiles
+# First one: set optional-configs
 # Ericas-Emacs
-optional-profiles  = ericas
+optional-configs   = ericas
 ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
 ericas-repo-flags  =
 ericas-update-pull = $(git-pull)
@@ -146,7 +146,7 @@ ericas-update-cmd  = emacs --script update.el
 # Spacemacs
 # We can construct a lisp function to do its update.
 # probably its install too. I havent gone looking.
-optional-profiles += space
+optional-configs  += space
 space-repo        = $(git-hub)/syl20bnr/spacemacs.git
 space-repo-flags  =
 space-update-pull = $(git-hub)
@@ -161,7 +161,7 @@ space-update-cmd  = emacs -nw --with-profile space \
 # Doom
 # doom has hybrid shell/elisp scripts to run.
 # doom doesn't need or want a pull, it takes care of that.
-optional-profiles += doom
+optional-configs  += doom
 doom-repo         = $(git-hub)/hlissner/doom-emacs.git
 doom-repo-flags   =
 doom-update-pull  = $(no-pull)
@@ -170,7 +170,7 @@ doom-update-cmd   = $(emacs-home)/doom/bin/doom upgrade
 
 # Prelude
 # using a pull with the generic update seems to work.
-optional-profiles   += prelude
+optional-configs    += prelude
 prelude-repo        = $(git-hub)/bbatsov/prelude.git
 prelude-repo-flags  =
 prelude-update-pull = $(git-pull)
@@ -179,7 +179,7 @@ prelude-update-cmd  = $(generic-update-cmd)
 
 # Emacs-Live
 # using a pull with the generic update seems to work.
-optional-profiles += live
+optional-configs  += live
 live-repo         = $(git-hub)/overtone/emacs-live.git
 live-repo-flags   =
 live-update-pull  = $(git-pull)
@@ -188,7 +188,7 @@ live-update-cmd   = $(generic-update-cmd)
 
 # Emacs from Hell
 # Im assuming its the same as Emacs from Scratch.
-optional-profiles     += from-hell
+optional-configs      += from-hell
 from-hell-repo        = $(git-hub)/daviwil/emacs-from-hell.git
 from-hell-repo-flags  =
 from-hell-update-pull = $(git-pull)
@@ -198,7 +198,7 @@ from-hell-update-cmd  = $(no-update)
 # Emacs from Scratch
 # emacs from scratch has auto updating so we dont need to do that.
 # we'll just pull the code and let it take care of its self.
-optional-profiles        += from-scratch
+optional-configs         += from-scratch
 from-scratch-repo        = $(git-hub)/daviwil/emacs-from-scratch.git
 from-scratch-repo-flags  =
 from-scratch-update-pull = $(git-pull)
@@ -208,14 +208,14 @@ from-scratch-update-cmd  = $(no-update)
 # Uncle Daves Emacs
 # I think this might also be the same as Emacs from Scratch.
 # I havent looked to see if it has auto update on.
-optional-profiles       += uncle-daves
+optional-configs        += uncle-daves
 uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
 uncle-daves-repo-flags  =
 uncle-daves-update-pull = $(git-pull)
 uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(kill-emacs)
 uncle-daves-update-cmd  = $(generic-update-cmd)
 
-# make print-optional-profiles
-# optional-profiles := ericas space doom prelude live from-hell from-scratch uncle-daves
+# make print-optional-configs
+# optional-configs  := ericas space doom prelude live from-hell from-scratch uncle-daves
 
-# profiles.mk ends here
+# configurations.mk ends here
