@@ -95,9 +95,10 @@ It really is mostly a Makefile.
 
     - `git clone https://gitub.com/EricaLinaG/Emacsn.git`
     - `cd Emacsn`
-    - `make help` Get help
+    - `make help` 
 
-    - `make status` The current Emacsn status.
+    - `make status`      - The current Emacsn status.
+    - `make browse-doom` - Open the configuration repository url in $BROWSER.
 
 If your emacs setup works in .emacs.d with an init.el you are
 probably good to go with setting your default to that. 
@@ -135,6 +136,7 @@ You can add a profile and install it all at once with this.
   - `make status`
   - `make show-profiles`
   - `make show-doom`
+  - `make browse-doom`
   - `make help`
   - `M-x describe-variable chemacs-profiles`
   - `cat .emacs-profiles.el`
@@ -202,6 +204,7 @@ with `install-new-default`.
 ### Get the status of Emacsn.
 
     `make status`
+    `make show-optional`
     `make show-profiles`
     `make help`
 
@@ -539,6 +542,9 @@ one as the name given, and another with a _-server_ prefix, which is a server.
   
 Their definitions can be seen with show-<name>
   - `make show-<config-name>`
+  
+Visit the repository with browse
+  - `make browse-<config-name>`
 
 #### Adding new boot profile entries
 
@@ -588,6 +594,7 @@ _Note: additional profile entries fall under the installed profile they referenc
     - __from-scratch__ is [emacs-from-scratch](https://github.com/daviwil/emacs-from-scratch).
     - __from-hell__ is [emacs-from-hell](https://github.com/daviwil/emacs-from-hell).
     - __uncle-daves__ is [Uncle Daves Emacs](https://github.com/daedreth/UncleDavesEmacs.git).
+    - __And theres more...__
 
 Run emacs with profiles like this:
 

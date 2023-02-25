@@ -8,17 +8,21 @@
  status           -  The status of the Emacsn, what is installed,
                      what is available.
  show-profiles    -  Basically a 'cat' of .emacs-profiles.el
-
       In Emacs:  M-x describe-variable chemacs-profiles
 
- print-<variable> -  Print any make <variable>
-          'make print-profiles'
+ show-optional    -  A list of all configuration names.
+ show-available   -  Known configurations which are not installed.
 
- show-<name>      -  Show the profile definition for <name>.
+ show-<name>      - Show the configuration definition for <name>.
+ browse-<name>    - Open the repository url for <name> in the $BROWSER.
+
           'make show-uncle-daves'
 
  backup-profiles  -  Make a time stamped backup of .emacs-profiles.el.
  backup-dot-emacs -  Move/backup emacs.d, .emacs and .emacs-profiles.el
+
+ print-<variable> - Print any make <variable>
+          'make print-profiles'
 
 
   Installation management

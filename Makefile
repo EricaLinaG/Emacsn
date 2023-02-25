@@ -118,6 +118,9 @@ print-%  : ; @echo $* = $($*)
 show-%  : ; @echo $* configuration:
 	grep '^$*' configurations.mk
 
+browse-% :
+	$(shell $(BROWSER) $($*-repo))
+
 # Create a new empty install and boot entry for name.
 new-empty-install-%  :
 	printf "Creating Empty, vanilla gnu, profile installation: $*\n"
@@ -433,6 +436,7 @@ show-installs:
 	printf "\nInstallations:\n"
 	printf "========================================\n"
 	echo $(installs)
+
 show-default:
 	printf "\nThe default installation:\n"
 	printf "========================================\n"
@@ -442,15 +446,19 @@ show-optional:
 	printf "\nAll Optional installations:\n"
 	printf "========================================\n"
 	printf "$(optional-configs)"
+	printf "\n make browse-<name> to visit the repo url for <name>.\n"
 
 show-available:
-	printf "\nUnInstalled, Available installations:\n"
+	printf "\nUnInstalled configurations:\n"
 	printf "========================================\n"
 	comm -23 <(echo $(configs) | cut -d= -f2 | sed 's/ /\n/g' | sort) \
 	<(ls -dfF * | grep '/$$' | sed 's:/$$::' | sort)
 
-	printf "\nSee an install configuration with show-<configuration-name>\n"
+	printf "========================================\n"
+	printf "See an install configuration with show-<configuration-name>\n"
 	printf "\n	make show-doom \n"
+	printf "\nVisit the repo url.\n"
+	printf "\n      make browse-doom \n"
 
 status-header:
 	printf "Emacsn: Current Status\n"
