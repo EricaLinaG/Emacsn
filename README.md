@@ -126,7 +126,8 @@ Then install it later.
   - `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
   - `make my-profile-name` - to install it.
 
-You can add a profile and install your emacs repo all at once with this.
+You can add a profile and install it all at once with this.
+
   
   - `make install-new name=my-profile-name repo=The-url-to-my-emacs-repo`
   
@@ -558,17 +559,17 @@ be the same name as the configuration.
 _Note: additional profile entries fall under the installed profile they reference._
 
   - Default Install Profile
-    - __stable__ and 
-      - __default__ 
-        - Servers
-          - __stable-server__
-          - __exwm__
-          - __mail__
-          - __common__
-    - __dev__ are the default repo. 
+    - __stable__ 
+    - __default__ 
+      - Servers
+        - __stable-server__
+        - __exwm__
+        - __mail__
+        - __common__
+    - __dev__ 
       - __dev-server__
     [ericas-emacs](https://github.com/ericalinag/ericas-emacs)
-    - __test__ is for testing default.
+    - __test__ 
       - __test-server__
     
   - Gnu profile is an empty install.
