@@ -308,6 +308,7 @@ link-profiles = \
 relink-profiles:
 	$(call link-profiles)
 
+
 .PHONY: emacs-profiles.el
 # Create a fresh set of profiles and link them to Home.
 emacs-profiles.el:
@@ -401,6 +402,9 @@ dot-backups:
 init: dot-backups emacs-profiles.el relink-profiles add-gnu     \
 	touch-custom mv.emacs-profiles.el
 
+# all we need to reconnect and use an existing Emacsn install.
+re-link: relink-profiles
+
 # prepare and install emacsn, chemacs, chemacs profiles, stable and dev
 install-base: init backup-dot-emacs install-emacsn install-chemacs
 
@@ -442,6 +446,11 @@ show-default:
 	printf "========================================\n"
 	grep '^default-configuration-name' configurations.mk
 
+list-configs:
+	printf "\nKnown Emacs congifurations:\n"
+	printf "========================================\n"
+	grep '.*-status' configurations.mk | sed 's/-status.*=/\t/'
+
 show-optional:
 	printf "\nAll Optional installations:\n"
 	printf "========================================\n"
@@ -470,7 +479,7 @@ status-end:
 	printf "\nUse 'make help' to get help.\n"
 	printf "========================================\n"
 
-status: status-header show-default show-installs show-available status-end
+status: status-header show-default show-installs show-available list-configs status-end
 
 help:
 	cat help.txt

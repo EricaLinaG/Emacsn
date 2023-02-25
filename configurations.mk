@@ -137,6 +137,7 @@ test-update-cmd  = $(default-update-cmd)
 # First one: set optional-configs
 # Ericas-Emacs
 optional-configs   = ericas
+ericas-status      = Works
 ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
 ericas-repo-flags  =
 ericas-update-pull = $(git-pull)
@@ -147,6 +148,7 @@ ericas-update-cmd  = emacs --script update.el
 # We can construct a lisp function to do its update.
 # probably its install too. I havent gone looking.
 optional-configs  += space
+space-status      = Works
 space-repo        = $(git-hub)/syl20bnr/spacemacs.git
 space-repo-flags  =
 space-update-pull = $(git-hub)
@@ -162,6 +164,7 @@ space-update-cmd  = emacs -nw --with-profile space \
 # doom has hybrid shell/elisp scripts to run.
 # doom doesn't need or want a pull, it takes care of that.
 optional-configs  += doom
+doom-status       = Works
 doom-repo         = $(git-hub)/hlissner/doom-emacs.git
 doom-repo-flags   =
 doom-update-pull  = $(no-pull)
@@ -169,8 +172,8 @@ doom-install-cmd  = $(emacs-home)/doom/bin/doom install
 doom-update-cmd   = $(emacs-home)/doom/bin/doom upgrade
 
 # Prelude
-# using a pull with the generic update seems to work.
 optional-configs    += prelude
+prelude-status      = Works
 prelude-repo        = $(git-hub)/bbatsov/prelude.git
 prelude-repo-flags  =
 prelude-update-pull = $(git-pull)
@@ -178,8 +181,8 @@ prelude-install-cmd = $(emacs-nw-profile) prelude $(kill-emacs)
 prelude-update-cmd  = $(generic-update-cmd)
 
 # Emacs-Live
-# using a pull with the generic update seems to work.
 optional-configs  += live
+live-status       = Works
 live-repo         = $(git-hub)/overtone/emacs-live.git
 live-repo-flags   =
 live-update-pull  = $(git-pull)
@@ -189,6 +192,7 @@ live-update-cmd   = $(generic-update-cmd)
 # Emacs from Hell
 # Im assuming its the same as Emacs from Scratch.
 optional-configs      += from-hell
+from-hell-status      = Works
 from-hell-repo        = $(git-hub)/daviwil/emacs-from-hell.git
 from-hell-repo-flags  =
 from-hell-update-pull = $(git-pull)
@@ -199,6 +203,7 @@ from-hell-update-cmd  = $(no-update)
 # emacs from scratch has auto updating so we dont need to do that.
 # we'll just pull the code and let it take care of its self.
 optional-configs         += from-scratch
+from-scratch-status      = Works
 from-scratch-repo        = $(git-hub)/daviwil/emacs-from-scratch.git
 from-scratch-repo-flags  =
 from-scratch-update-pull = $(git-pull)
@@ -209,6 +214,7 @@ from-scratch-update-cmd  = $(no-update)
 # I think this might also be the same as Emacs from Scratch.
 # I havent looked to see if it has auto update on.
 optional-configs        += uncle-daves
+uncle-daves-status      = Works
 uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
 uncle-daves-repo-flags  =
 uncle-daves-update-pull = $(git-pull)
@@ -217,6 +223,7 @@ uncle-daves-update-cmd  = $(generic-update-cmd)
 
 ## purcell
 optional-configs += purcell
+purcell-status       = Works
 purcell-repo         = https://github.com/purcell/emacs.d.git
 purcell-repo-flags   =
 purcell-install-cmd  = $(emacs-nw-profile) purcell $(kill-emacs)
@@ -226,6 +233,7 @@ purcell-update-cmd   = $(generic-update-cmd)
 
 ## centaur
 optional-configs += centaur
+centaur-status       = Works
 centaur-repo         = https://github.com/seagle0128/.emacs.d.git
 centaur-repo-flags   =
 centaur-install-cmd  = $(emacs-nw-profile) centaur $(kill-emacs)
@@ -235,24 +243,29 @@ centaur-update-cmd   = $(generic-update-cmd)
 
 ## sachac
 optional-configs += sachac
+sachac-status       = Tested. Doesnt install. Various problems. Unavailble references.
 sachac-repo         = https://github.com/sachac/.emacs.d.git
 sachac-repo-flags   =
-sachac-install-cmd  = $(emacs-nw-profile) sachac $(kill-emacs)
+sachac-install-cmd  = ln -s Sacha.el init.el; $(emacs-nw-profile) sachac $(kill-emacs)
 sachac-update-pull  = $(git-pull)
 sachac-update-cmd   = $(generic-update-cmd)
 ## sachac
 
 ## lolsmacs
 optional-configs += lolsmacs
+lolsmacs-status       = Works
 lolsmacs-repo         = https://github.com/grettke/lolsmacs.git
 lolsmacs-repo-flags   =
-lolsmacs-install-cmd  = $(emacs-nw-profile) lolsmacs $(kill-emacs)
+lolsmacs-install-cmd  = cd lolsmacs; ln -s lolsmacs.el init.el; \
+			echo \(lolsmacs-init\) >> init.el; \
+			$(emacs-nw-profile) lolsmacs $(kill-emacs)
 lolsmacs-update-pull  = $(git-pull)
 lolsmacs-update-cmd   = $(generic-update-cmd)
 ## lolsmacs
 
 ## scimax
 optional-configs += scimax
+scimax-status       = Works
 scimax-repo         = https://github.com/jkitchin/scimax.git
 scimax-repo-flags   =
 scimax-install-cmd  = $(emacs-nw-profile) scimax $(kill-emacs)
@@ -262,23 +275,43 @@ scimax-update-cmd   = $(generic-update-cmd)
 
 ## panadestein
 optional-configs += panadestein
+panadestein-status       = Doesnt work. Cant untangle itself to get an init.el
 panadestein-repo         = https://github.com/Panadestein/emacsd.git
 panadestein-repo-flags   =
-panadestein-install-cmd  = $(emacs-nw-profile) panadestein $(kill-emacs)
+panadestein-install-cmd  = cd panadestein; $(emacs-nw-profile) panadestein \
+				--eval '(with-temp-buffer                  \
+	  				  (find-file "content/index.org")  \
+      					  (org-babel-execute-buffer))'     \
+			   $(emacs-nw-profile) panadestein $(kill-emacs)
+
 panadestein-update-pull  = $(git-pull)
 panadestein-update-cmd   = $(generic-update-cmd)
 ## panadestein
 
-## this wont work right off. needs untangling.
+## rougier : this wont work right off. needs untangling. And we have to fool it into
+## rougier : to putting itself here rather than ~/.emacs.org.
+## rougier : The install stops so you can see, how it fails.
+## rougier : It is documented. See: 'make browse-rougier'.
+## rougier : for org configs we run emacs twice on install, once to untangle,
+## rougier : and again to initialize it. I left the kill off of the first invocation
+## rougier : because thats where the problem lies. Once the untangling works, a
+## rougier : kill can be added.
 ## rougier
 optional-configs += rougier
+rougier-status       = !! Almost. Untangle fails. See the readme - make browse-rougier
 rougier-repo         = https://github.com/rougier/dotemacs.git
 rougier-repo-flags   =
-rougier-install-cmd  = $(emacs-nw-profile) rougier $(kill-emacs)
+rougier-install-cmd  = cd rougier; rm -f ~/.emacs.org ; \
+			ln -s $(PWD)/rougier ~/.emacs.org ;  \
+			$(emacs-nw-profile) rougier                    \
+				--eval '(with-temp-buffer              \
+	  				  (find-file "dotemacs.org")   \
+      					  (org-babel-execute-buffer))' \
+			$(emacs-nw-profile) rougier $(kill-emacs)
+
 rougier-update-pull  = $(git-pull)
 rougier-update-cmd   = $(generic-update-cmd)
 ## rougier
-
 
 # make print-optional-configs
 # optional-configs  := ericas space doom prelude live from-hell from-scratch uncle-daves

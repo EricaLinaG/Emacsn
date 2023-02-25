@@ -11,47 +11,58 @@ takes care of everything, you'll want to know eventually.
 Chemacs likes Emacs configurations which install in _.emacs.d_ and use an _init.el_.
 Most configurations do this.
 
-### Why
+### Why Make
 
 This just grew organically over time out of the _Makefile_ I used
-to install my Emacs configuration. 
+to install my Emacs configuration and friends. 
+
+Actually it grew like a well fed tumor when I started using Chemacs.
+
+Its a Unixy command line solution.
 
 Have a need, fill a need, scratch an itch, sure would be nice if..., have some fun.
 
-That's how atrocities in __Make__ are born.
+That's how atrocities in __Make__ are born. 
 
+The [Makefile](https://github.com/EricaLinaG/Emacsn/blob/main/Makefile)
+is full of all sorts of weird little make tricks and over 30 calls to sed. 
 
-Try out other Emacs configurations safely and easily.
+It has been fun and gone quite quickly.
+Make is so compose-able it is easy to end up with elegant solutions for unexpected 
+things with just dependencies.
+Its simplicity is nice, its quirks and challenges are just that.
 
-If you have ever ruined your emacs setup and had to go back, or fix it in less than
-ideal circumstances, then this could also be your solution to accidental 
-emacs startup breakage. 
+### Why
 
-You just want to try out a feature without breaking your daily driver.
+Computers are supposed to work for us and I like ease.
 
-It also installs your emacs for you. As well as anyone else's.
+The makefile already installed stuff from git. And moved some
+configuration files here and there. 
 
-It makes your Chemacs profiles for you.  It snapshots them. You can edit them,
-you'll have to actually. So far its only additive.
+All I thought I wanted was to:
+  - Keep a dev and a stable version of my configuration.
+  - An easy way to test a fresh install from git.
+  - An easy way to update an install from git and refresh packages.
 
-Your custom profiles can be persisted for subsequent installs.
+It just sort of bloomed after that. You know something is right when 
+features just start falling out of the code.
 
-All the data/code is template driven and easy to change. 
-
-It maintains a library of installable Emacs configurations.
-
-Adds a regular and server entry for each installed configuration.
-
-Its super easy to make a new profile/configuration entry out of some new repo you found.
-
-Makes a dev and stable install for the default configuration.
-
-Provides a test profile and commands to do fresh test installs.
-
-The default profiles, `dev, stable, test`, can be easily reassigned 
-and rebuilt with any configuration.
-
-Each installation automatically gets two boot profiles. <name> and <name>-server.
+  - It has a default profile which gets dev, stable and test installs.
+  - There is always vanilla gnu and gnu-server boot profiles.
+  - On install it runs what it needs to update the new install's packages.
+  - It makes your Chemacs profiles for you.  
+  - Each installation automatically gets two boot profiles. <name> and <name>-server.
+  - It makes snapshots backups of your profiles any time they change. 
+  - Your custom profiles can be persisted for subsequent installs.
+  - All the data/code is template driven and easy to change. 
+  - It maintains a list of installable Emacs configurations.
+  - Single command to make a new configuration from a repository url and install it.
+  - The default profiles, `dev, stable, test`, can be reassigned 
+and rebuilt with a single command.
+  - A configuration can point at a repository branch if desired.
+  - Its possible to have more than one working Emacsn.
+  - It has status
+  - It has help
 
 ### emacsn - the script
 
@@ -258,16 +269,15 @@ For multiple Emacsn to work together it is not necessary to do another install.
 It is only necessary for the Emacsn to re-link to your ~/.emacs-profiles.el in order to
 work. `init` creates an Emacsn with nothing but a vanilla __gnu__ profile, 
 along with __test__ but without his friends __dev__ and __stable__.
+It then links to _~/.emacs-profiles.el_ to become the active Emacsn that Chemacs sees.
 
     `make init` 
 
-This will also initialize a new .emacs-profiles.el and link it.
-
 Each Emacsn keeps its Chemacs profiles locally and links _~/.emacs-profiles.el_ to
 the one located here. This makes it super easy to switch to a different Emacsn.
-When you are ready `make relink-profiles` re-links the current Emacsn. 
+When you are ready `make re-link` re-links the current Emacsn. 
 
-    `make relink-profiles`
+    `make re-link`
     
     
 ## Emacs configurations
