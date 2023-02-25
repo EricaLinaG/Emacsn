@@ -310,7 +310,7 @@ relink-profiles:
 emacs-profiles.el:
 	printf "\n\nCreating a fresh .emacs-profiles.el from original template.\n"
 	printf "Setting Paths to here $(PWD).\n\n"
-	sed 's:\-PWD\-:$(PWD):' emacs-profiles-orig.el > .emacs-profiles.el
+	sed 's:\-PWD\-:$(PWD):' emacs-profiles-template.el > .emacs-profiles.el
 	$(call link-profiles)
 	$(call backup-profile)
 
