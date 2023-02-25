@@ -215,6 +215,71 @@ uncle-daves-update-pull = $(git-pull)
 uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(kill-emacs)
 uncle-daves-update-cmd  = $(generic-update-cmd)
 
+## purcell
+optional-configs += purcell
+purcell-repo         = https://github.com/purcell/emacs.d.git
+purcell-repo-flags   =
+purcell-install-cmd  = $(emacs-nw-profile) purcell $(kill-emacs)
+purcell-update-pull  = $(git-pull)
+purcell-update-cmd   = $(generic-update-cmd)
+## purcell
+
+## centaur
+optional-configs += centaur
+centaur-repo         = https://github.com/seagle0128/.emacs.d.git
+centaur-repo-flags   =
+centaur-install-cmd  = $(emacs-nw-profile) centaur $(kill-emacs)
+centaur-update-pull  = $(git-pull)
+centaur-update-cmd   = $(generic-update-cmd)
+## centaur
+
+## sachac
+optional-configs += sachac
+sachac-repo         = https://github.com/sachac/.emacs.d.git
+sachac-repo-flags   =
+sachac-install-cmd  = $(emacs-nw-profile) sachac $(kill-emacs)
+sachac-update-pull  = $(git-pull)
+sachac-update-cmd   = $(generic-update-cmd)
+## sachac
+
+## lolsmacs
+optional-configs += lolsmacs
+lolsmacs-repo         = https://github.com/grettke/lolsmacs.git
+lolsmacs-repo-flags   =
+lolsmacs-install-cmd  = $(emacs-nw-profile) lolsmacs $(kill-emacs)
+lolsmacs-update-pull  = $(git-pull)
+lolsmacs-update-cmd   = $(generic-update-cmd)
+## lolsmacs
+
+## scimax
+optional-configs += scimax
+scimax-repo         = https://github.com/jkitchin/scimax.git
+scimax-repo-flags   =
+scimax-install-cmd  = $(emacs-nw-profile) scimax $(kill-emacs)
+scimax-update-pull  = $(git-pull)
+scimax-update-cmd   = $(generic-update-cmd)
+## scimax
+
+## panadestein
+optional-configs += panadestein
+panadestein-repo         = https://github.com/Panadestein/emacsd.git
+panadestein-repo-flags   =
+panadestein-install-cmd  = $(emacs-nw-profile) panadestein $(kill-emacs)
+panadestein-update-pull  = $(git-pull)
+panadestein-update-cmd   = $(generic-update-cmd)
+## panadestein
+
+## this wont work right off. needs untangling.
+## rougier
+optional-configs += rougier
+rougier-repo         = https://github.com/rougier/dotemacs.git
+rougier-repo-flags   =
+rougier-install-cmd  = $(emacs-nw-profile) rougier $(kill-emacs)
+rougier-update-pull  = $(git-pull)
+rougier-update-cmd   = $(generic-update-cmd)
+## rougier
+
+
 # make print-optional-configs
 # optional-configs  := ericas space doom prelude live from-hell from-scratch uncle-daves
 
