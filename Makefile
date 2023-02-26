@@ -290,7 +290,6 @@ restore-profiles-% :
 
 # function to make a timestamped copy of .emacs-profiles.el
 backup-profile = \
-	echo Backing up .emacs-profiles.el to $(dot-backups), $(seconds-now); \
 	cp .emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
 
 backup-profiles:
