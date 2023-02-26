@@ -281,7 +281,8 @@ panadestein-repo-flags   =
 panadestein-install-cmd  = cd panadestein; $(emacs-nw-profile) panadestein \
 				--eval '(with-temp-buffer                  \
 	  				  (find-file "content/index.org")  \
-      					  (org-babel-execute-buffer))'     \
+      					  (org-babel-execute-buffer)       \
+					  $(kill-emacs))'                  \
 			   $(emacs-nw-profile) panadestein $(kill-emacs)
 
 panadestein-update-pull  = $(git-pull)

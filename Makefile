@@ -449,7 +449,7 @@ show-default:
 list-configs:
 	printf "\nKnown Emacs congifurations:\n"
 	printf "========================================\n"
-	grep '.*-status' configurations.mk | sed 's/-status.*=/\t/'
+	grep '.*-status' configurations.mk | sed 's/-status.*=/    \t/'
 
 show-optional:
 	printf "\nAll Optional installations:\n"

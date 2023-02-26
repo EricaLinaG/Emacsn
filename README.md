@@ -437,13 +437,53 @@ Run in window mode or terminal mode.
     emacs -nw --with-profile <profile-name>
 ```
 
+### Configurations that are org files
+
+These are a bit trickier, and this one in particular because it wants to install itself
+somewhere else.  Some configurations only come as an org file that needs to be 
+untangled into an _init.el_. 
+
+I hope its an _init.el_. Frequently it is not and there is a convoluted install
+process. :
+
+    - So for the install we cd into the config and link _~/.emacs.org_ back
+
+Install steps:
+    - cd into the config
+    - link _~/.emacs.org_ back to there. 
+    - Run emacs to load the org file and untangle it. 
+    - exit emacs
+    - Run emacs again with the profile to initialize the packages.
+
+
+```make
+    ## rougier
+    optional-configs += rougier
+    rougier-status       = !! Almost. Untangle fails. See the readme - make browse-rougier
+    rougier-repo         = https://github.com/rougier/dotemacs.git
+    rougier-repo-flags   =
+    rougier-install-cmd  = cd rougier; rm -f ~/.emacs.org ; \
+	    		ln -s $(PWD)/rougier ~/.emacs.org ;        \
+		    	$(emacs-nw-profile) rougier                \
+			    	--eval '(with-temp-buffer              \
+                             (find-file "dotemacs.org")    \
+      				         (org-babel-execute-buffer)    \
+                             $(kill-emacs))'               \
+                rm -f ~/.emacs.org                        \
+                $(emacs-nw-profile) rougier $(kill-emacs)
+
+rougier-update-pull  = $(git-pull)
+rougier-update-cmd   = $(generic-update-cmd)
+## rougier
+```
 
 ### The generic update rule
 
 For configurations with no update function. (Most of them)
 
 So far, only Doom, Ericas and Spacemacs provide an update mechanism.
-The rest can use this generic update rule.
+The rest can use this generic update rule.(with-temp-buffer
+  (insert "Hello!"))
 
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
