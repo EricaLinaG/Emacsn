@@ -1,1 +1,2 @@
- ("-NAME-" . ((user-emacs-directory . "-PWD-/-INSTALLNAME-") (server-name . "-INSTALLNAME-")))
+ ("-NAME-" . ((user-emacs-directory . "-PWD-/-INSTALLNAME-")
+              (server-name . "-INSTALLNAME-")))

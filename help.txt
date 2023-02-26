@@ -25,6 +25,43 @@
           'make print-profiles'
 
 
+  Chemacs boot profile extras
+==================================================================
+ insert-profile        - Insert another profile into .emacs-profiles.el.
+
+           make insert-server-profile name=foo profile=gnu
+
+ insert-server-profile - Add a server boot entry for name and profile.
+
+        make insert-server-profile name=foo profile=gnu
+
+ rm-boot-profile-<name> -  Remove <name> and <name>-server from .emacs-profiles.el
+
+ insert-server-profile-<name> -  Add a server profile for <name>-server
+ insert-boot-profile-<name>   -  Add a simple boot profile for <name>
+
+
+  Profile Backup Management
+==================================================================
+ backup-profiles       -  Copy .emacs-profiles to $(dot-backups) with a timestamp.
+ list-backups          -  Show the list of backup
+ show-backup-#         -  Show the contents of the #th backup.
+ show-last-backup      -  Show-backup-2
+ restore-profiles-#    -  Copy the nth # version of .emacs-profiles.el to current.
+
+
+  Multiple Emacsn
+=================================================================
+ new-emacsn   - Make a fresh install of Emacsn somewhere.
+
+            make new-emacsn path=/my/new/place/to/put/emacsn
+
+ init         - All that is needed to initialize a fresh second Emacsn.
+                This creates and re-links a fresh .emacs-profiles.el.
+
+ relink-profiles - Re-link ~/.emacs-profiles.el to the one we have here.
+
+
   Installation management
 ==================================================================
  new-config         - Create a new configuration profile from name and repo.
@@ -81,29 +118,4 @@
 
         make install-new-default name=foo repo=https://github.com/...
 
-
-  Multiple Emacsn
-=================================================================
- new-emacsn   - Make a fresh install of Emacsn somewhere.
-
-            make new-emacsn path=/my/new/place/to/put/emacsn
-
- init         - All that is needed to initialize a fresh second Emacsn.
-                This creates and re-links a fresh .emacs-profiles.el.
-
- relink-profiles - Re-link ~/.emacs-profiles.el to the one we have here.
-
-
-  Installation Profile Management
-==================================================================
- insert-profile     -  Insert another profile into .emacs-profiles.el.
-
-           make insert-server-profile name=foo profile=gnu
-
- insert-server-profile -  Add a server boot entry for name and profile.
-
-        make insert-server-profile name=foo profile=gnu
-
- backup-profiles       -  Copy .emacs-profiles to $(dot-backups) with a timestamp.
- restore-last-profiles -  Copy the previous version of .emacs-profiles.el to current.
 ==================================================================

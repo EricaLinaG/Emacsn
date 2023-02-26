@@ -51,9 +51,10 @@ seconds-now := $(shell date +%F.%s)
 
 # The last backup is the current one. We want the second one.
 # uses -t, not sort on extension.
-find-last-backup := ls -t $(dot-backups) | head -2 | tail -1
+find-last-backup := ls -ta $(dot-backups)/.emacs-profiles.el* | head -2 | tail -1
 # Sorted with sort. so by title date.
 find-last-backup := ls -a $(dot-backups) | sort -r | head -2 | tail -1
+backups  := ls -ta $(dot-backups)/.emacs-profiles.el* | sort -r
 
 # We just make sure this exists in a harmless way.
 config-custom := ~/.config/emacs-custom.el
@@ -205,11 +206,6 @@ make-boot-entry = $(shell sed 's/\-NAME\-/$(1)/g' boot-entry-template.txt | \
 			sed 's:\-PWD\-:$(emacs-home):g')
 
 # # tester.
-# # mk-server-entry-foo
-# mk-server-entry-% :
-# 	echo $*  Making server entry
-# 	echo 	'$(call make-server-entry,$*,$*)'
-
 # mk-server-entry-foo profile=stable
 mk-server-entry-% :
 	echo $*  Making entry
@@ -223,13 +219,22 @@ insert-profile:
 insert-server-profile:
 	$(call insert-server-boot,$(name),$(profile))
 
+rm-boot = \
+	$(shell \
+		sed '/."$(1)"/d' .emacs-profiles.el |        \
+		sed '/."$(1)-server"/d' > .tmp-profiles.el ; \
+		mv .tmp-profiles.el .emacs-profiles.el)
+
+rm-boot-profile-% :
+	printf "Removing boot entries for: $*\n"
+	$(call rm-boot,$*)
 
 # # Find -insert-here- and put an entry in.
 # # Uncomment any lines beginning with ;;<profile>
 insert-boot = \
 	$(shell \
-		sed '/-INSERT-HERE-/a $(call make-boot-entry,$(1),$(1))' \
-		.emacs-profiles.el | \
+		sed '/."$(1)"/d' .emacs-profiles.el | \
+		sed '/-INSERT-HERE-/a $(call make-boot-entry,$(1),$(1))' | \
 		sed 's/;;$(1)//' > .tmp-profiles.el   ;  \
 		mv .tmp-profiles.el .emacs-profiles.el)	 \
 	$(call backup-profile)
@@ -238,28 +243,17 @@ insert-boot = \
 # # Uncomment any lines beginning with ;;<profile>
 insert-server-boot = \
 	$(shell \
-	    	sed '/-INSERT-HERE-/a $(call make-server-entry,$(1)-server,$(1))' \
-		.emacs-profiles.el | \
+		sed '/."$(1)-server"/d' .emacs-profiles.el | \
+		sed '/-INSERT-HERE-/a $(call make-server-entry,$(1)-server,$(1))' | \
 		sed 's/;;$(1)//' > .tmp-profiles.el   ;  \
 		mv .tmp-profiles.el .emacs-profiles.el)	 \
 	$(call backup-profile)
-
-# the old way. oy.
-# insert-profile = \
-# 	$(shell sed '/-INSERT-HERE-/a \
-# 		\\(\"$(1)\" . \
-# 		\(\(user-emacs-directory \. \"$(emacs-home)/$(1)\"\)\)\)' \
-# 		~/.emacs-profiles.el > .emacs-profiles.el)                \
-# 	$(shell sed 's/;;$(1)//' .emacs-profiles.el > ~/.emacs-profiles.el)
-#	$(call backup-profile)
-
 
 # Insert the config into the .emacs-profiles. Just a test really.
 $(insert-configs):
 	$(eval profile=$(shell echo $@ | sed 's/\-insert$$//g' ))
 	printf "Adding profile for $(profile) to .emacs-profiles.el\n"
 	$(call insert-boot,$(profile),$(profile))
-
 
 # We just run the commands we were given for the profile.
 # cd to the installation's direcory,
@@ -272,6 +266,8 @@ $(update-configs):
 
 $(remove-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-remove$$//g' ))
+	printf "Removing profile entries for: $(profile-name)\n"
+	$(call rm-boot,$(profile-name))
 	printf "Removing install: $(profile-name)\n"
 	rm -rf $(profile-name)
 
@@ -286,17 +282,34 @@ test-var-set:
 	$(eval target-path=$(shell echo $@ | sed 's/\-.*$$//g' ))
 	printf "was: $@ is:  $(target-path)"
 
-
-# copy the last saved profile to ~/ see above for find-last-backup
-restore-last-profiles:
-	$(eval last-backup=$(shell $(find-last-backup) ))
-	printf Restoring last-backup)
-	cp $(last-backup) .emacs-profiles.el
+# restore the nth saved .emacs-profiles.el.
+restore-profiles-% :
+	$(eval nth-backup=$(dot-backups)/$(shell $(backups) | sed '$*q;d'))
+	printf "Restoring $(nth-backup)\n"
+	cp $(nth-backup) .emacs-profiles.el
 
 # function to make a timestamped copy of .emacs-profiles.el
 backup-profile = \
-	echo Backing up .emacs-profiles.el to $(dot-backups), $(seconds-now) \
+	echo Backing up .emacs-profiles.el to $(dot-backups), $(seconds-now); \
 	cp .emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
+
+backup-profiles:
+	printf "\nBacking up .emacs-profiles.el to \
+	      $(dot-backups)/.emacs-profiles.el.$(seconds-now)\n"
+	$(call backup-profile)
+
+list-backups:
+	printf "current backups are:"
+	$(dot-backups)
+
+# show-backup-# - given a number, shows nth the backup file.
+show-backup-%:
+	$(eval nth-backup=$(shell $(backups) | sed '$*q;d'))
+	printf "$(nth-backup)\n"
+	cat $(nth-backup)
+
+show-last-backum: show-backup-2
+
 
 # function to remove and link to ~/.emacs-profiles.el
 link-profiles = \
@@ -307,7 +320,6 @@ link-profiles = \
 # Relink the profiles to ~/.emacs-profiles.el
 relink-profiles:
 	$(call link-profiles)
-
 
 .PHONY: emacs-profiles.el
 # Create a fresh set of profiles and link them to Home.
@@ -326,11 +338,6 @@ install-emacsn:
 
 touch-custom:
 	touch $(config-custom)
-
-backup-profiles:
-	printf "\nBacking up .emacs-profiles.el to \
-	      $(dot-backups)/.emacs-profiles.el.$(seconds-now)\n"
-	$(call backup-profile)
 
 # check emacsn out into emacs-home unless we are already there.
 # this is out of date. Its not this complicated anymore.
@@ -437,7 +444,7 @@ show-profiles:
 	cat .emacs-profiles.el
 
 show-installs:
-	printf "\nInstallations:\n"
+	yprintf "\nInstallations:\n"
 	printf "========================================\n"
 	echo $(installs)
 

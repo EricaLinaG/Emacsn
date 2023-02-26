@@ -47,18 +47,18 @@ All I thought I wanted was to:
 It just sort of bloomed after that. You know something is right when 
 features just start falling out of the code.
 
-  - It has a default profile which gets dev, stable and test installs.
+  - It has multiple Emacs configurations to choose from.
+  - It has a default configuration which gets _dev, stable_ and _test_ profiles and installs.
+  - The default profiles can be reassigned to any known configuration.
   - There is always vanilla gnu and gnu-server boot profiles.
-  - On install it runs what it needs to update the new install's packages.
+  - On install it runs what it can to update the new install's packages.
   - It makes your Chemacs profiles for you.  
   - Each installation automatically gets two boot profiles. <name> and <name>-server.
-  - It makes snapshots backups of your profiles any time they change. 
-  - Your custom profiles can be persisted for subsequent installs.
+  - It makes snapshot backups of your profiles any time they change. 
+  - Your custom Chemacas profiles can be persisted for subsequent installs.
   - All the data/code is template driven and easy to change. 
   - It maintains a list of installable Emacs configurations.
-  - Single command to make a new configuration from a repository url and install it.
-  - The default profiles, `dev, stable, test`, can be reassigned 
-and rebuilt with a single command.
+  - Single command to create a new configuration from a repository url and install it.
   - A configuration can point at a repository branch if desired.
   - Its possible to have more than one working Emacsn.
   - It has status
@@ -249,8 +249,8 @@ Or
     make rm-installs
 ```
 
-But you can just do an `rm -rf ...` if you want.
-Don't forget to edit your _.emacs-profiles.el_
+But you can just do an `rm -rf ...` if you want. But you will have to edit 
+your _.emacs-profiles.el_
 
 Rinse - Repeat, Have fun.
 
@@ -364,10 +364,6 @@ remove them, and add to them as you like.
 Emacsn modifies  __.emacs-profiles.el__
 as you add new profile installs. Your profiles in ~/.emacs-profiles is
 a link to the one here.
-
-Note: _Emacsn is additive, so you can end up with duplicated
-definitions which need to be cleaned up.
-The most recent are at the top. Its generally only slightly annoying._
 
 
 ### Profiles which have an install and/or update functionalities.
