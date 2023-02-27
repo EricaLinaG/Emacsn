@@ -33,7 +33,7 @@
  ;;doom            (env . (("DOOMDIR" . "~/.doom.d")))))
 
  ;; spacemacs example with customization dir.
- ;;space (("spacemacs" . ((user-emacs-directory . "-PWD-/space")
+ ;;space  ("spacemacs" . ((user-emacs-directory . "-PWD-/space")
  ;;space                  (env . (("SPACEMACSDIR" . "~/.spacemacs")))))
 
  )
