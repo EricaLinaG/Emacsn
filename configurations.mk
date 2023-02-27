@@ -318,3 +318,24 @@ rougier-update-cmd   = $(generic-update-cmd)
 # optional-configs  := ericas space doom prelude live from-hell from-scratch uncle-daves
 
 # configurations.mk ends here
+## for-writers
+optional-configs += for-writers
+for-writers-status       = Almost Works.. needs a profiles with SPACEMACSDIR to here.
+for-writers-message      =
+for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
+for-writers-repo-flags   =
+for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(kill-emacs)
+for-writers-update-pull  = $(git-pull)
+for-writers-update-cmd   = $(generic-update-cmd)
+## for-writers
+
+## hotel-california-for-writers
+optional-configs += hotel-california-for-writers
+hotel-califonia-for-writers-status = Requires steps and a profile with DOOMDIR to here.
+hotel-california-for-writers-message      =
+hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
+hotel-california-for-writers-repo-flags   =
+hotel-california-for-writers-install-cmd  = $(emacs-nw-profile) doomd-for-writers $(kill-emacs)
+hotel-california-for-writers-update-pull  = $(git-pull)
+hotel-california-for-writers-update-cmd   = $(generic-update-cmd)
+## hotel-california-for-writers

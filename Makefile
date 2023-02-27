@@ -128,6 +128,7 @@ new-empty-install-%  :
 	mkdir -p $*
 	printf "Inserting profile entry.\n"
 	$(call insert-boot,$*,$*)
+	$(call insert-server-boot,$*-server,$*)
 
 # Create a new profile from name and repo. passed on cli.
 # make new-config name=foobar repo=https://github.com/ericalinag/ericas-emacs.git
@@ -287,6 +288,7 @@ restore-profiles-% :
 	$(eval nth-backup=$(dot-backups)/$(shell $(backups) | sed '$*q;d'))
 	printf "Restoring $(nth-backup)\n"
 	cp $(nth-backup) .emacs-profiles.el
+	$(call link-profiles)
 
 # function to make a timestamped copy of .emacs-profiles.el
 backup-profile = \
@@ -443,7 +445,7 @@ show-profiles:
 	cat .emacs-profiles.el
 
 show-installs:
-	yprintf "\nInstallations:\n"
+	printf "\nInstallations:\n"
 	printf "========================================\n"
 	echo $(installs)
 
