@@ -147,17 +147,17 @@ ericas-update-cmd  = emacs --script update.el
 # Spacemacs
 # We can construct a lisp function to do its update.
 # probably its install too. I havent gone looking.
-optional-configs  += space
-space-status      = Works
-space-repo        = $(git-hub)/syl20bnr/spacemacs.git
-space-repo-flags  =
-space-update-pull = $(git-hub)
-space-install-cmd = $(emacs-nw-profile) space $(kill-emacs)
-space-update-el   = '((lambda ()\
+optional-configs  += spacemacs
+spacemacs-status      = Works
+spacemacs-repo        = $(git-hub)/syl20bnr/spacemacs.git
+spacemacs-repo-flags  =
+spacemacs-update-pull = $(git-hub)
+spacemacs-install-cmd = $(emacs-nw-profile) spacemacs $(kill-emacs)
+spacemacs-update-el   = '((lambda ()\
 			(configuration-layer/update-packages)\
 			(save-buffers-kill-terminal t)))'
 
-space-update-cmd  = emacs -nw --with-profile space \
+spacemacs-update-cmd  = emacs -nw --with-profile spacemacs \
 			  --eval $(space-update-el)
 
 # Doom
@@ -315,27 +315,35 @@ rougier-update-cmd   = $(generic-update-cmd)
 ## rougier
 
 # make print-optional-configs
-# optional-configs  := ericas space doom prelude live from-hell from-scratch uncle-daves
+# optional-configs  := ericas spacemacs doom prelude live from-hell from-scratch uncle-daves
 
 # configurations.mk ends here
+
 ## for-writers
+## this is a .spacemacs.d repo
+## to manage that in chemacs we need to know its doom.
+## the -arch variable tells us its spacemacs. This gives us special behavior
+## for configurations which are 'just' configurations for doom or spacemacs.
 optional-configs += for-writers
-for-writers-status       = Almost Works.. needs a profiles with SPACEMACSDIR to here.
+for-writers-arch	 = spacemacs
+for-writers-status       = Works.
 for-writers-message      =
 for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
 for-writers-repo-flags   =
 for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(kill-emacs)
 for-writers-update-pull  = $(git-pull)
-for-writers-update-cmd   = $(generic-update-cmd)
+for-writers-update-cmd   = $(spacemacs-update-cmd)
 ## for-writers
 
 ## hotel-california-for-writers
+## this is a .doom.d repo
 optional-configs += hotel-california-for-writers
-hotel-califonia-for-writers-status = Requires steps and a profile with DOOMDIR to here.
+hotel-california-for-writers-arch         = doom
+hotel-california-for-writers-status       = Doom configuration.
 hotel-california-for-writers-message      =
 hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
 hotel-california-for-writers-repo-flags   =
 hotel-california-for-writers-install-cmd  = $(emacs-nw-profile) doomd-for-writers $(kill-emacs)
 hotel-california-for-writers-update-pull  = $(git-pull)
-hotel-california-for-writers-update-cmd   = $(generic-update-cmd)
+hotel-california-for-writers-update-cmd   = $(doom-update-cmd)
 ## hotel-california-for-writers

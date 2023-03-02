@@ -11,6 +11,50 @@ takes care of everything, you'll want to know eventually.
 Chemacs likes Emacs configurations which install in _.emacs.d_ and use an _init.el_.
 Most configurations do this.
 
+### Why
+
+I wanted to maintain a stable and dev installation of my emacs.
+
+The best way to learn how other people use emacs is to try their configuration.
+I wanted to explore Doom and Spacemacs and this turned out to be a real pain.
+Chemacs changes that. 
+
+But then each has its own install and update instructions. That I really dont
+want to remember. 
+
+My configuration was easy. I just moved my __.emacs__ to my emacs configuraton's
+init.el. After that it just worked. Doom was different and similarly easy.
+Spacemacs was harder, but was handled easily.
+
+I got easy ones at first Prelude, Live, Emacs from Scratch, Uncle Daves, Centaur, Purcell.
+These are all basically an __.emacs.d__ with an __init.el__.
+
+Then there are the __Org__ based configurations which are different yet
+again. Each one seems to have some convoluted install process as well.
+
+Finally, there are the Emacs for writers and Emacs Hotel California for writers,
+which are not actually emacs configurations in the classic sense. The first 
+is a spacemacs.d configuration directory, and the latter is a doom.d configuraton
+directory.  In those cases, we only need to be sure that spacemacs and doom are
+installed and that we make a chemacs entry for Spacemacs or doom pointing back to
+these installs. It is actually nice. But a pattern I had not yet encountered.
+And havent accomodated yet either.
+
+My motivations were simple initially. 
+  - I wanted 
+    - dev,stable and test installs for me.
+    - To Explore:
+      - Doom and Spacemacs.
+      - [Emacs for writing.](https://github.com/thinkhuman/writingwithemacs/)
+      - Org configurations that people use to find process improvements and ideas.
+
+I can't resist making a system especially when it falls in your lap.
+I had a good variety of initial inputs, in actually using it common 
+tasks were integrated over and over and it became this.
+
+It keeps getting easier to manage any emacs configuration
+regardless of their methods.
+
 ### Why Make
 
 This just grew organically over time out of the _Makefile_ I used
@@ -32,33 +76,31 @@ Make is so compose-able it is easy to end up with elegant solutions for unexpect
 things with just dependencies.
 Its simplicity is nice, its quirks and challenges are just that.
 
-### Why
+I had no intention of it getting to this place. Writing it in elisp is
+fun too. :-).
 
-Computers are supposed to work for us and I like ease.
+### What
 
-The makefile already installed stuff from git. And moved some
-configuration files here and there. 
-
-All I thought I wanted was to:
+All I thought I wanted was:
   - Keep a dev and a stable version of my configuration.
-  - An easy way to test a fresh install from git.
-  - An easy way to update an install from git and refresh packages.
+  - Easy to test a fresh install from git.
+  - Easy to update an install from git and refresh packages.
+  - Easy to try some Emacs distro from github.
 
 It just sort of bloomed after that. You know something is right when 
-features just start falling out of the code.
+features you need just start falling out of the code.
 
-  - It has multiple Emacs configurations to choose from.
+  - It has a list of installable Emacs configurations.
+  - Single command to create a new configuration from a repository url and install it.
   - It has a default configuration which gets _dev, stable_ and _test_ profiles and installs.
-  - The default profiles can be reassigned to any known configuration.
+  - The default profile/installs can be reassigned to any known configuration.
   - There is always vanilla gnu and gnu-server boot profiles.
   - On install it runs what it can to update the new install's packages.
   - It makes your Chemacs profiles for you.  
   - Each installation automatically gets two boot profiles. <name> and <name>-server.
   - It makes snapshot backups of your profiles any time they change. 
-  - Your custom Chemacas profiles can be persisted for subsequent installs.
+  - Your custom Chemacs profiles can be persisted for subsequent installs.
   - All the data/code is template driven and easy to change. 
-  - It maintains a list of installable Emacs configurations.
-  - Single command to create a new configuration from a repository url and install it.
   - A configuration can point at a repository branch if desired.
   - Its possible to have more than one working Emacsn.
   - It has status
@@ -472,6 +514,37 @@ rougier-update-pull  = $(git-pull)
 rougier-update-cmd   = $(generic-update-cmd)
 ## rougier
 ```
+
+### Doom.d and spacemacs.d configuations.
+
+These configurations are not full Emacs configurations in the traditional sense.
+These are actually configurations for Doom and Spacemacs which normally go
+in _~/.doom.d_ and _~/.spacemacs_. Chemacs handles these with an extra entry
+in the profile telling it where this directory is.
+
+Emacs for writers is a _.spacemacs_ type repo.  We just need to tell it
+that is what it is, and tell it which installation it should use for its
+base emacs.
+
+These configurations introduced a new variable, __-arch__ this tells Emacsn 
+that this configuration uses doom or spacemacs and it sets up the Chemacs
+profiles accordingly. Pointing at the proper emacs install and informing it
+that it should load its configuration from here.
+
+``` make
+## for-writers
+optional-configs += for-writers
+for-writers-arch	     = spacemacs
+for-writers-status       = Almost works, testing -arch var.
+for-writers-message      =
+for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
+for-writers-repo-flags   =
+for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(kill-emacs)
+for-writers-update-pull  = $(git-pull)
+for-writers-update-cmd   = $(generic-update-cmd)
+## for-writers
+```
+
 
 ### The generic update rule
 

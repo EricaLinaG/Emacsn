@@ -1,1 +1,1 @@
- ("-NAME-" . ((user-emacs-directory . "-PWD-/-INSTALLNAME-")))
+ ("-NAME-" . ((user-emacs-directory . "-PWD-/-INSTALLNAME-") -ATTRS-))

@@ -196,23 +196,55 @@ $(configs):
 # Function to generate a chemacs-profile server entry from a name and an
 # installation profile name.
 # Server name will be the Install name. - see server-entry-template.txt
-make-server-entry = $(shell sed 's/\-NAME\-/$(1)/g' server-entry-template.txt | \
-			sed 's/\-INSTALLNAME\-/$(2)/g'   | \
+make-server-entry = $(shell sed 's/\-NAME\-/$(1)-server/g' server-entry-template.txt | \
+			sed 's/\-INSTALLNAME\-/$(call target-install,$(1))/g'   | \
+			sed 's/\-SERVERNAME\-/$(1)/g'   | \
+			sed 's:\-ATTRS\-:$(call make-dir-entry,$(1)):g'   | \
 			sed 's:\-PWD\-:$(emacs-home):g')
 
 # Function to generate a chemacs-profile entry from a name and an
 # installation profile name. Usually they are the same.
 make-boot-entry = $(shell sed 's/\-NAME\-/$(1)/g' boot-entry-template.txt | \
-			sed 's/\-INSTALLNAME\-/$(2)/g'   | \
+			sed 's/\-INSTALLNAME\-/$(call target-install,$(1))/g'   | \
+			sed 's:\-ATTRS\-:$(call make-dir-entry,$(1)):g'   | \
 			sed 's:\-PWD\-:$(emacs-home):g')
+
+# uppercase something.
+uc  = $(shell echo $(1) | tr a-z A-Z)
+
+target-install = $(shell if [[ -n "$($(1)-arch)" ]]; then \
+				echo $($(1)-arch); \
+				else               \
+				echo $(1);         \
+				fi)
+
+# Take an install target name.
+# Take an install target name.
+# capitolize the value of target-arch for the first bit,
+# DOOMDIR, and SPACEMACSDIR are our hopes. otherwise probably does nothing.
+# add the path to install - this is more important. these types of configs
+# are doom.d or spacemacs.d and actually use those other config installs.
+# if there isnt an -arch value it does nothing.
+make-dir-entry = $(shell if [[ -n "$($(1)-arch)" ]]; then                 \
+			   sed 's/\-ARCH\-/$(call uc,$($(1)-arch))/g'     \
+			   config-dir-template.txt |                      \
+			   sed 's:\-PWD\-:$(emacs-home)/$(1):g' ; \
+			 fi)
+
+mk-dir-entry-% :
+	echo $*  Making dir entry
+	echo 	'$(call make-dir-entry,$*)'
 
 # # tester.
 # mk-server-entry-foo profile=stable
 mk-server-entry-% :
 	echo $*  Making entry
-	echo 	'$(call make-server-entry,$*,$(profile))'
+	echo 	'$(call make-server-entry,$*))'
+mk-entry-% :
+	echo $*  Making entry
+	echo 	'$(call make-boot-entry,$*))'
 
-# make insert-server-profile name=foo profile=gnu
+# gake insert-server-profile name=foo profile=gnu
 insert-profile:
 	$(call insert-boot,$(name),$(profile))
 
@@ -230,12 +262,14 @@ rm-boot-profile-% :
 	printf "Removing boot entries for: $*\n"
 	$(call rm-boot,$*)
 
+uc  = $(shell echo $(1) | tr a-z A-Z)
+
 # # Find -insert-here- and put an entry in.
 # # Uncomment any lines beginning with ;;<profile>
 insert-boot = \
 	$(shell \
 		sed '/."$(1)"/d' .emacs-profiles.el | \
-		sed '/-INSERT-HERE-/a $(call make-boot-entry,$(1),$(1))' | \
+		sed '/-INSERT-HERE-/a $(call make-boot-entry,$(1))' | \
 		sed 's/;;$(1)//' > .tmp-profiles.el   ;  \
 		mv .tmp-profiles.el .emacs-profiles.el)	 \
 	$(call backup-profile)
@@ -245,7 +279,7 @@ insert-boot = \
 insert-server-boot = \
 	$(shell \
 		sed '/."$(1)-server"/d' .emacs-profiles.el | \
-		sed '/-INSERT-HERE-/a $(call make-server-entry,$(1)-server,$(1))' | \
+		sed '/-INSERT-HERE-/a $(call make-server-entry,$(1))' | \
 		sed 's/;;$(1)//' > .tmp-profiles.el   ;  \
 		mv .tmp-profiles.el .emacs-profiles.el)	 \
 	$(call backup-profile)
@@ -304,7 +338,7 @@ list-backups:
 	$(dot-backups)
 
 # show-backup-# - given a number, shows nth the backup file.
-show-backup-%:
+show-backup-% :
 	$(eval nth-backup=$(shell $(backups) | sed '$*q;d'))
 	printf "$(nth-backup)\n"
 	cat $(nth-backup)
