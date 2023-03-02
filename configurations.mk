@@ -21,20 +21,25 @@ git-lab   := https://gitlab.com
 emacs-profile = emacs --with-profile
 emacs-nw-profile = emacs -nw --with-profile
 kill-emacs = --eval '(save-buffers-kill-terminal t)'
-
+org-tangle-buffer = (org-babel-execute-buffer)
 # A generic update script to run package update.
 # for use with configurations which dont provide a
 # an update other than list-packages U.
 generic-update := $(emacs-home)/generic-update.el
 generic-update-cmd := emacs -nw --script $(generic-update)
 
-# These are necessary for those who with to not have a pull or
+# A shell no-op/noop so we dont need to worry when composing with
+# things that dont want to do anything.
+# Extra names for clarity in code.
+# no-pull is necessary for those who wish to not have a pull or
 # an update on update. It allows this compounded shell command to work
-#            cd foo;  ; emacs -nw --scripte $(generic-update)
-# by putting true in the empty spot.
-# no-update isnt necessary because its at the end. But you never know.
-no-pull   := true
-no-update := true
+# with and without a command. For example with no-pull and git-pull.
+#            cd foo;true; emacs -nw --script $(generic-update)
+#            cd foo;git pull origin; emacs -nw --script $(generic-update)
+no-pull    := true
+no-update  := true
+no-install := true
+no-op      := true
 
 
 #############################################################################
@@ -70,6 +75,8 @@ no-update := true
 # The Default Profile
 # Change this to use a different configuration with (default|stable)|dev|test.
 default-configuration-name = ericas
+default-org-profile = stable
+org-emacs-nw = $(emacs-nw-profile) $(default-org-profile)
 
 # Dev, stable and test.
 # Create a virtual default configuration for everyone.
@@ -241,12 +248,21 @@ centaur-update-pull  = $(git-pull)
 centaur-update-cmd   = $(generic-update-cmd)
 ## centaur
 
+## Sacha keeps an el but, seems best to tangle it anyway. So,
+## we do. then we run again with the new init.el that we have
+## to fake out with a link. Why no one makes init.el...
 ## sachac
 optional-configs += sachac
-sachac-status       = Tested. Doesnt install. Various problems. Unavailble references.
+sachac-status       = Tested. Fails to load. Various problems. Requires hacking.
 sachac-repo         = https://github.com/sachac/.emacs.d.git
 sachac-repo-flags   =
-sachac-install-cmd  = ln -s Sacha.el init.el; $(emacs-nw-profile) sachac $(kill-emacs)
+sachac-install-cmd  = $(org-emacs-nw) \
+			--eval '(with-temp-buffer         \
+	  			(find-file "Sacha.org")   \
+				$(org-untangle))	  \
+				$(kill-emacs)'            \
+			ln -s Sacha.el init.el;           \
+			$(emacs-nw-profile) sachac $(kill-emacs)
 sachac-update-pull  = $(git-pull)
 sachac-update-cmd   = $(generic-update-cmd)
 ## sachac
@@ -256,7 +272,7 @@ optional-configs += lolsmacs
 lolsmacs-status       = Works
 lolsmacs-repo         = https://github.com/grettke/lolsmacs.git
 lolsmacs-repo-flags   =
-lolsmacs-install-cmd  = cd lolsmacs; ln -s lolsmacs.el init.el; \
+lolsmacs-install-cmd  = ln -s lolsmacs.el init.el; \
 			echo \(lolsmacs-init\) >> init.el; \
 			$(emacs-nw-profile) lolsmacs $(kill-emacs)
 lolsmacs-update-pull  = $(git-pull)
@@ -274,14 +290,19 @@ scimax-update-cmd   = $(generic-update-cmd)
 ## scimax
 
 ## panadestein
+## Basically this needs to be tangled by a different install with org +...
+## we go untangle it to hopefully make an init.el. Then we run emacs again
+## with the new profile so it can load its self up.
+## added $(default-org-profile) so we can use a known good emacs with org
+## completely configured so that untangling all the various things work.
 optional-configs += panadestein
-panadestein-status       = Doesnt work. Cant untangle itself to get an init.el
+panadestein-status       = Cant untangle itself to get an init.el
 panadestein-repo         = https://github.com/Panadestein/emacsd.git
 panadestein-repo-flags   =
-panadestein-install-cmd  = cd panadestein; $(emacs-nw-profile) panadestein \
+panadestein-install-cmd  = $(org-emacs-nw) \
 				--eval '(with-temp-buffer                  \
 	  				  (find-file "content/index.org")  \
-      					  (org-babel-execute-buffer)       \
+					  $(org-untangle)                  \
 					  $(kill-emacs))'                  \
 			   $(emacs-nw-profile) panadestein $(kill-emacs)
 
@@ -295,19 +316,21 @@ panadestein-update-cmd   = $(generic-update-cmd)
 ## rougier : It is documented. See: 'make browse-rougier'.
 ## rougier : for org configs we run emacs twice on install, once to untangle,
 ## rougier : and again to initialize it. I left the kill off of the first invocation
-## rougier : because thats where the problem lies. Once the untangling works, a
-## rougier : kill can be added.
+## rougier : because thats where the problem lies. Once the untangling works.
+## rougier : an update may not work, if the link has been broken, not sure.
+## rougier : why all the complexity ?!
 ## rougier
 optional-configs += rougier
-rougier-status       = !! Almost. Untangle fails. See the readme - make browse-rougier
+rougier-status       = !! Almost. Untangle fails. See: 'make browse-rougier'
 rougier-repo         = https://github.com/rougier/dotemacs.git
 rougier-repo-flags   =
-rougier-install-cmd  = cd rougier; rm -f ~/.emacs.org ; \
+rougier-install-cmd  = rm -f ~/.emacs.org ;      \
 			ln -s $(PWD)/rougier ~/.emacs.org ;  \
-			$(emacs-nw-profile) rougier                    \
-				--eval '(with-temp-buffer              \
-	  				  (find-file "dotemacs.org")   \
-      					  (org-babel-execute-buffer))' \
+			$(org-emacs-nw)                      \
+			--eval '(with-temp-buffer            \
+	  			(find-file "dotemacs.org")   \
+				$(org-untangle)	    	     \
+				$(kill-emacs))'              \
 			$(emacs-nw-profile) rougier $(kill-emacs)
 
 rougier-update-pull  = $(git-pull)
@@ -330,7 +353,7 @@ for-writers-status       = Works.
 for-writers-message      =
 for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
 for-writers-repo-flags   =
-for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(kill-emacs)
+for-writers-install-cmd  = $(no-install)
 for-writers-update-pull  = $(git-pull)
 for-writers-update-cmd   = $(spacemacs-update-cmd)
 ## for-writers

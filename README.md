@@ -13,47 +13,20 @@ Most configurations do this.
 
 ### Why
 
-I wanted to maintain a stable and dev installation of my emacs.
-
-The best way to learn how other people use emacs is to try their configuration.
-I wanted to explore Doom and Spacemacs and this turned out to be a real pain.
-Chemacs changes that. 
-
-But then each has its own install and update instructions. That I really dont
-want to remember. 
-
-My configuration was easy. I just moved my __.emacs__ to my emacs configuraton's
-init.el. After that it just worked. Doom was different and similarly easy.
-Spacemacs was harder, but was handled easily.
-
-I got easy ones at first Prelude, Live, Emacs from Scratch, Uncle Daves, Centaur, Purcell.
-These are all basically an __.emacs.d__ with an __init.el__.
-
-Then there are the __Org__ based configurations which are different yet
-again. Each one seems to have some convoluted install process as well.
-
-Finally, there are the Emacs for writers and Emacs Hotel California for writers,
-which are not actually emacs configurations in the classic sense. The first 
-is a spacemacs.d configuration directory, and the latter is a doom.d configuraton
-directory.  In those cases, we only need to be sure that spacemacs and doom are
-installed and that we make a chemacs entry for Spacemacs or doom pointing back to
-these installs. It is actually nice. But a pattern I had not yet encountered.
-And havent accomodated yet either.
-
 My motivations were simple initially. 
   - I wanted 
-    - dev,stable and test installs for me.
+    - dev, stable and test installs for me.
     - To Explore:
       - Doom and Spacemacs.
+      - Other Emacs configurations.
       - [Emacs for writing.](https://github.com/thinkhuman/writingwithemacs/)
-      - Org configurations that people use to find process improvements and ideas.
+      
 
 I can't resist making a system especially when it falls in your lap.
 I had a good variety of initial inputs, in actually using it common 
 tasks were integrated over and over and it became this.
 
-It keeps getting easier to manage any emacs configuration
-regardless of their methods.
+It keeps getting easier to manage any emacs configuration regardless of their methods.
 
 ### Why Make
 
@@ -62,7 +35,8 @@ to install my Emacs configuration and friends.
 
 Actually it grew like a well fed tumor when I started using Chemacs.
 
-Its a Unixy command line solution.
+Its a Unixy command line solution. The Makefile is full of make tricks,
+sed and shell bits and pieces. It is a fun way to make an API to shell.
 
 Have a need, fill a need, scratch an itch, sure would be nice if..., have some fun.
 
@@ -76,8 +50,8 @@ Make is so compose-able it is easy to end up with elegant solutions for unexpect
 things with just dependencies.
 Its simplicity is nice, its quirks and challenges are just that.
 
-I had no intention of it getting to this place. Writing it in elisp is
-fun too. :-).
+I had no intention of it getting to this place. It is a nice POC. Writing it
+in elisp will be a pleasure.
 
 ### What
 
@@ -477,30 +451,68 @@ Run in window mode or terminal mode.
 
 ### Configurations that are org files
 
-These are a bit trickier, and this one in particular because it wants to install itself
-somewhere else.  Some configurations only come as an org file that needs to be 
-untangled into an _init.el_. 
+Configurations that are _Org_ files require tangling to get what is
+hopefully an _init.el_. Mostly that seems to not be the case. These 
+configurations, so far, seem to do indirect things to get installed.
+Making links to _init.el_ or even fooling them into putting what they
+generate in their own space. This seems to more normal than an _Org_ 
+configuration that just follows self contained and common practices.
 
-I hope its an _init.el_. Frequently it is not and there is a convoluted install
-process. :
+There is a default-org-profile which can be set to indicate which emacs
+should be used to the tangling. It is set to __stable__.
+__$(org-emacs-nw)__ runs that emacs with `-nw` to do the untangling of the
+configuration's org file. Which varies greatly in location and name.
 
-    - So for the install we cd into the config and link _~/.emacs.org_ back
+We can use what we have to create an inline elisp script here in the
+configuration. If its common enough and works, maybe that gets 
+refactored for repeatability.
+
+This is the simplest _Org_ configuration that might work.
+Basically this needs to be tangled by a different install with org +...
+We go untangle it to hopefully make an init.el. Then we run emacs again
+with the new profile so it can load its self up.
+
+```make
+    ## panadestein
+    optional-configs += panadestein
+    panadestein-status       = Cant untangle itself to get an init.el
+    panadestein-repo         = https://github.com/Panadestein/emacsd.git
+    panadestein-repo-flags   =
+    panadestein-install-cmd  = $(org-emacs-nw) \
+                               --eval '(with-temp-buffer                \
+	  				                   (find-file "content/index.org")  \
+					                   $(org-untangle)                  \
+					                   $(kill-emacs))'                  \
+			                   $(emacs-nw-profile) panadestein $(kill-emacs)
+
+    panadestein-update-pull  = $(git-pull)
+    panadestein-update-cmd   = $(generic-update-cmd)
+    ## panadestein
+```
+
+
+This one is the same with a twist. It wants to tangle into a
+directory; _~/.emacs.org/_.  To fool it into doing the right 
+thing it is necessary to link _~/.emacs.org_ back to the install
+directory.
 
 Install steps:
-    - cd into the config
+    - cd into the config - install does this for us.
+    - rm _~/.emacs.org_. 
     - link _~/.emacs.org_ back to there. 
     - Run emacs to load the org file and untangle it. 
     - exit emacs
+    - rm _~/.emacs.org_. 
     - Run emacs again with the profile to initialize the packages.
 
 
 ```make
     ## rougier
     optional-configs += rougier
-    rougier-status       = !! Almost. Untangle fails. See the readme - make browse-rougier
+    rougier-status       = !! Almost. Untangle fails. See: 'make browse-rougier'
     rougier-repo         = https://github.com/rougier/dotemacs.git
     rougier-repo-flags   =
-    rougier-install-cmd  = cd rougier; rm -f ~/.emacs.org ; \
+    rougier-install-cmd  = rm -f ~/.emacs.org ; \
 	    		ln -s $(PWD)/rougier ~/.emacs.org ;        \
 		    	$(emacs-nw-profile) rougier                \
 			    	--eval '(with-temp-buffer              \
@@ -515,7 +527,7 @@ rougier-update-cmd   = $(generic-update-cmd)
 ## rougier
 ```
 
-### Doom.d and spacemacs.d configuations.
+### Doom.d and spacemacs.d configurations.
 
 These configurations are not full Emacs configurations in the traditional sense.
 These are actually configurations for Doom and Spacemacs which normally go
@@ -528,8 +540,11 @@ base emacs.
 
 These configurations introduced a new variable, __-arch__ this tells Emacsn 
 that this configuration uses doom or spacemacs and it sets up the Chemacs
-profiles accordingly. Pointing at the proper emacs install and informing it
+profiles accordingly. It Points at the proper emacs install and informs it
 that it should load its configuration from here.
+
+It seems to work. It loads the proper _init.el_.  It doesn't need an install,
+just a place to live and a Chemacs profile entry.
 
 ``` make
 ## for-writers
@@ -539,9 +554,9 @@ for-writers-status       = Almost works, testing -arch var.
 for-writers-message      =
 for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
 for-writers-repo-flags   =
-for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(kill-emacs)
+for-writers-install-cmd  = $(no-install)
 for-writers-update-pull  = $(git-pull)
-for-writers-update-cmd   = $(generic-update-cmd)
+for-writers-update-cmd   = $(spacemacs-update-cmd)
 ## for-writers
 ```
 
