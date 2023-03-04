@@ -23,7 +23,7 @@
 
 # This Makefile prints lots of more readable stuff,
 # no need to see every echo unless debugging.
-.SILENT:
+# .SILENT:
 
 # Where to get ourselves from.
 emacsn-repo := https://github.com/ericalinag/Emacsn
@@ -177,17 +177,41 @@ $(configs):
 	$(call insert-boot,$@,$@)
 	$(call insert-server-boot,$@,$@)
 
-	printf "Cloning $($@-repo) into $(emacs-home)/$@\n"
-	git clone $($@-repo-flags) $($@-repo) $(emacs-home)/$@
+	printf "Cloning !!!! $($@-repo) into $(emacs-home)/$@\n"
+#	git clone $($@-repo-flags) $($@-repo) $(emacs-home)/$@
+	$(call git-clone,$@,$@)
 
+# conditional, if -arch has a value.
+	printf "\\\\Cloning Arch $($($(@)-arch)-repo) into $(emacs-home)/$@/$($@-arch)\n"
+	$(call clone-arch,$@,$($@-arch))
+# git clone $($@-repo-flags) $($($@-arch)-repo) $(emacs-home)/$($@-arch)/$@
+
+	printf "Running install for: $($@-arch)\n"
 	printf "\-------------------------------------------\n"
+	# conditional, if -arch has a value.
+	#$(call install-arch,$@,$($@-arch))
+	cd $@/$($@-arch); $($($@-arch)-install-cmd)
+
 	printf "Running install for: $@\n"
 	printf "\-------------------------------------------\n"
-
+	printf "$($@-message)\n"
+	printf "\-------------------------------------------\n"
 	cd $@; $($@-install-cmd)
 
 	printf "Install finished for: $@\n"
 	printf "\---------------------------------------------\n"
+
+# git-clone,<name>,<name>/path
+git-clone = $(shell git clone $($(1)-repo-flags) $($(1)-repo) $(2))
+
+
+# clone-arch,<name>,<name>-arch
+# keeps us from being knee deep in $.
+clone-arch = $(shell if [[ -n "$(2)" ]]; then \
+		        git clone $($(2)-repo-flags) $($(2)-repo) $(1)/$(strip $(2)); \
+		     fi)
+
+#printf "Cloning Arch $($(2)-repo) into $(emacs-home)/$(1)/$(2))\n"; \
 
  # Emacs home is a path. Sed doesnt like it when its contents
  # have delimiters in them, use :.
@@ -197,26 +221,28 @@ $(configs):
 # installation profile name.
 # Server name will be the Install name. - see server-entry-template.txt
 make-server-entry = $(shell sed 's/\-NAME\-/$(1)-server/g' server-entry-template.txt | \
-			sed 's/\-INSTALLNAME\-/$(call target-install,$(1))/g'   | \
+			sed 's:\-INSTALLNAME\-:$(call target-install,$(1)):g'   | \
 			sed 's/\-SERVERNAME\-/$(1)/g'   | \
 			sed 's:\-ATTRS\-:$(call make-dir-entry,$(1)):g'   | \
 			sed 's:\-PWD\-:$(emacs-home):g')
 
 # Function to generate a chemacs-profile entry from a name and an
 # installation profile name. Usually they are the same.
-make-boot-entry = $(shell sed 's/\-NAME\-/$(1)/g' boot-entry-template.txt | \
-			sed 's/\-INSTALLNAME\-/$(call target-install,$(1))/g'   | \
+make-boot-entry = $(shell sed 's:\-NAME\-:$(1):g' boot-entry-template.txt | \
+			sed 's:\-INSTALLNAME\-:$(call target-install,$(1)):g'   | \
 			sed 's:\-ATTRS\-:$(call make-dir-entry,$(1)):g'   | \
 			sed 's:\-PWD\-:$(emacs-home):g')
 
 # uppercase something.
 uc  = $(shell echo $(1) | tr a-z A-Z)
 
+# If we have an arch value then our target is our private install of that.
+# other wise its just us. sed -take note we have a slash.
 target-install = $(shell if [[ -n "$($(1)-arch)" ]]; then \
-				echo $($(1)-arch); \
-				else               \
-				echo $(1);         \
-				fi)
+			     echo $(1)/$($(1)-arch); \
+			 else                        \
+			     echo $(1);              \
+			 fi)
 
 # Take an install target name.
 # Take an install target name.
@@ -294,10 +320,19 @@ $(insert-configs):
 # cd to the installation's direcory,
 # maybe do a git pull,
 # then maybe some emacs command to run an update of packages.
+# I do apologize for the syntax a bit. but in some ways its cool.
+# that stuff at the end really unravels.
+update-config =	$(shell cd $(1); ($(1)-pull); $($(1)-cmd))
+update-arch =	$(shell cd $(1)/$(2); ($(2)-pull); $($(2)-cmd))
+
 $(update-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-update$$//g' ))
 	printf "Running update for profile: $(profile-name)\n"
-	cd $(profile-name); ($@-pull); $($@-cmd)
+	$(call update-config,$(profile-name))
+	# the equivalent for the arch install if it has one.
+	if [[ -n "$($(profile-name)-arch)" ]; then   \
+	  $(call update-arch,$(profile-name),$($(profile-name)-arch) \
+	fi
 
 $(remove-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-remove$$//g' ))
@@ -319,7 +354,7 @@ test-var-set:
 
 # restore the nth saved .emacs-profiles.el.
 restore-profiles-% :
-	$(eval nth-backup=$(dot-backups)/$(shell $(backups) | sed '$*q;d'))
+	$(eval nth-backup=$(shell $(backups) | sed '$*q;d'))
 	printf "Restoring $(nth-backup)\n"
 	cp $(nth-backup) .emacs-profiles.el
 	$(call link-profiles)
@@ -335,7 +370,7 @@ backup-profiles:
 
 list-backups:
 	printf "current backups are:"
-	$(dot-backups)
+	$(backups)
 
 # show-backup-# - given a number, shows nth the backup file.
 show-backup-% :

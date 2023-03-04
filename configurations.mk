@@ -17,11 +17,16 @@ git-lab   := https://gitlab.com
 
 # Construct an emacs install command.
 # Leave emacs alive or it kill it when its done.
-# $(emacs-nw-profile) <profile-name> $(kill-emacs)
+# $(emacs-nw-profile) <profile-name> $(eval-kill-emacs)
 emacs-profile = emacs --with-profile
 emacs-nw-profile = emacs -nw --with-profile
-kill-emacs = --eval '(save-buffers-kill-terminal t)'
-org-tangle-buffer = (org-babel-execute-buffer)
+# ask first.
+kill-emacs = (save-buffers-kill-terminal nil)
+kill-emacs! = (save-buffers-kill-terminal t)
+eval-kill-emacs = --eval '$(kill-emacs!)'
+doomsync = bin/doom sync
+org-tangle = (org-babel-execute-buffer)
+
 # A generic update script to run package update.
 # for use with configurations which dont provide a
 # an update other than list-packages U.
@@ -64,7 +69,7 @@ no-op      := true
 # optional-configs += gnu
 # gnu-repo         = your-repo-url
 # gnu-repo-flags   =
-# gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
+# gnu-install-cmd  = $(emacs-nw-profile) gnu $(eval-kill-emacs)
 # gnu-update-pull  = $(git-pull)
 # gnu-update-cmd   = $(generic-update-cmd)
 # ------------------------------------------------------------------
@@ -150,6 +155,7 @@ ericas-repo-flags  =
 ericas-update-pull = $(git-pull)
 ericas-install-cmd = emacs --script install.el
 ericas-update-cmd  = emacs --script update.el
+ericas-message     = See Readme: make browse-ericas
 
 # Spacemacs
 # We can construct a lisp function to do its update.
@@ -159,13 +165,14 @@ spacemacs-status      = Works
 spacemacs-repo        = $(git-hub)/syl20bnr/spacemacs.git
 spacemacs-repo-flags  =
 spacemacs-update-pull = $(git-hub)
-spacemacs-install-cmd = $(emacs-nw-profile) spacemacs $(kill-emacs)
+spacemacs-install-cmd = $(emacs-nw-profile) spacemacs $(eval-kill-emacs)
 spacemacs-update-el   = '((lambda ()\
 			(configuration-layer/update-packages)\
 			(save-buffers-kill-terminal t)))'
 
 spacemacs-update-cmd  = emacs -nw --with-profile spacemacs \
 			  --eval $(space-update-el)
+spacemacs-message     = See Readme: make browse-spacemacs
 
 # Doom
 # doom has hybrid shell/elisp scripts to run.
@@ -175,8 +182,9 @@ doom-status       = Works
 doom-repo         = $(git-hub)/hlissner/doom-emacs.git
 doom-repo-flags   =
 doom-update-pull  = $(no-pull)
-doom-install-cmd  = $(emacs-home)/doom/bin/doom install
-doom-update-cmd   = $(emacs-home)/doom/bin/doom upgrade
+doom-install-cmd  = bin/doom install
+doom-update-cmd   = bin/doom upgrade
+doom-message      = See Readme: make browse-doom
 
 # Prelude
 optional-configs    += prelude
@@ -184,8 +192,9 @@ prelude-status      = Works
 prelude-repo        = $(git-hub)/bbatsov/prelude.git
 prelude-repo-flags  =
 prelude-update-pull = $(git-pull)
-prelude-install-cmd = $(emacs-nw-profile) prelude $(kill-emacs)
+prelude-install-cmd = $(emacs-nw-profile) prelude $(eval-kill-emacs)
 prelude-update-cmd  = $(generic-update-cmd)
+prelude-message     = See Readme: make browse-prelude
 
 # Emacs-Live
 optional-configs  += live
@@ -193,8 +202,9 @@ live-status       = Works
 live-repo         = $(git-hub)/overtone/emacs-live.git
 live-repo-flags   =
 live-update-pull  = $(git-pull)
-live-install-cmd  = $(emacs-nw-profile) live $(kill-emacs)
+live-install-cmd  = $(emacs-nw-profile) live $(eval-kill-emacs)
 live-update-cmd   = $(generic-update-cmd)
+live-message      = See Readme: make browse-live
 
 # Emacs from Hell
 # Im assuming its the same as Emacs from Scratch.
@@ -203,8 +213,9 @@ from-hell-status      = Works
 from-hell-repo        = $(git-hub)/daviwil/emacs-from-hell.git
 from-hell-repo-flags  =
 from-hell-update-pull = $(git-pull)
-from-hell-install-cmd = $(emacs-nw-profile) from-hell $(kill-emacs)
+from-hell-install-cmd = $(emacs-nw-profile) from-hell $(eval-kill-emacs)
 from-hell-update-cmd  = $(no-update)
+from-hell-message      = See Readme: make browse-from-hell
 
 # Emacs from Scratch
 # emacs from scratch has auto updating so we dont need to do that.
@@ -214,8 +225,9 @@ from-scratch-status      = Works
 from-scratch-repo        = $(git-hub)/daviwil/emacs-from-scratch.git
 from-scratch-repo-flags  =
 from-scratch-update-pull = $(git-pull)
-from-scratch-install-cmd = $(emacs-nw-profile) from-scratch $(kill-emacs)
+from-scratch-install-cmd = $(emacs-nw-profile) from-scratch $(eval-kill-emacs)
 from-scratch-update-cmd  = $(no-update)
+from-scratch-message      = See Readme: make browse-from-scratch
 
 # Uncle Daves Emacs
 # I think this might also be the same as Emacs from Scratch.
@@ -225,17 +237,19 @@ uncle-daves-status      = Works
 uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
 uncle-daves-repo-flags  =
 uncle-daves-update-pull = $(git-pull)
-uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(kill-emacs)
+uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(eval-kill-emacs)
 uncle-daves-update-cmd  = $(generic-update-cmd)
+uncle-daves-message      = See Readme: make browse-uncle-daves
 
 ## purcell
 optional-configs += purcell
 purcell-status       = Works
 purcell-repo         = https://github.com/purcell/emacs.d.git
 purcell-repo-flags   =
-purcell-install-cmd  = $(emacs-nw-profile) purcell $(kill-emacs)
+purcell-install-cmd  = $(emacs-nw-profile) purcell $(eval-kill-emacs)
 purcell-update-pull  = $(git-pull)
 purcell-update-cmd   = $(generic-update-cmd)
+purcell-message      = See Readme: make browse-purcell
 ## purcell
 
 ## centaur
@@ -243,9 +257,10 @@ optional-configs += centaur
 centaur-status       = Works
 centaur-repo         = https://github.com/seagle0128/.emacs.d.git
 centaur-repo-flags   =
-centaur-install-cmd  = $(emacs-nw-profile) centaur $(kill-emacs)
+centaur-install-cmd  = $(emacs-nw-profile) centaur $(eval-kill-emacs)
 centaur-update-pull  = $(git-pull)
 centaur-update-cmd   = $(generic-update-cmd)
+centaur-message      = See Readme: make browse-centaur
 ## centaur
 
 ## Sacha keeps an el but, seems best to tangle it anyway. So,
@@ -259,12 +274,16 @@ sachac-repo-flags   =
 sachac-install-cmd  = $(org-emacs-nw) \
 			--eval '(with-temp-buffer         \
 	  			(find-file "Sacha.org")   \
-				$(org-untangle))	  \
-				$(kill-emacs)'            \
+				$(org-tangle))	  \
+				$(eval-kill-emacs)'            \
 			ln -s Sacha.el init.el;           \
-			$(emacs-nw-profile) sachac $(kill-emacs)
+			$(emacs-nw-profile) sachac $(eval-kill-emacs)
 sachac-update-pull  = $(git-pull)
 sachac-update-cmd   = $(generic-update-cmd)
+sachac-message      = See Readme: 'make browse-sachac' \
+See also: 'make show-sachac' \
+There are missing local dependencies and other things which will \
+cause the install to fail along the way. It is a bit of hacking.
 ## sachac
 
 ## lolsmacs
@@ -274,9 +293,10 @@ lolsmacs-repo         = https://github.com/grettke/lolsmacs.git
 lolsmacs-repo-flags   =
 lolsmacs-install-cmd  = ln -s lolsmacs.el init.el; \
 			echo \(lolsmacs-init\) >> init.el; \
-			$(emacs-nw-profile) lolsmacs $(kill-emacs)
+			$(emacs-nw-profile) lolsmacs $(eval-kill-emacs)
 lolsmacs-update-pull  = $(git-pull)
 lolsmacs-update-cmd   = $(generic-update-cmd)
+lolsmax-message       = See Readme: make browse-lolsmax
 ## lolsmacs
 
 ## scimax
@@ -284,30 +304,36 @@ optional-configs += scimax
 scimax-status       = Works
 scimax-repo         = https://github.com/jkitchin/scimax.git
 scimax-repo-flags   =
-scimax-install-cmd  = $(emacs-nw-profile) scimax $(kill-emacs)
+scimax-install-cmd  = $(emacs-nw-profile) scimax $(eval-kill-emacs)
 scimax-update-pull  = $(git-pull)
 scimax-update-cmd   = $(generic-update-cmd)
+scimax-message      = See Readme: make browse-scimax
 ## scimax
+
+## org based configurations:
+## added $(default-org-profile) and $(org-emacs-nw)
+## so we can use a known good emacs with org
+## completely configured so that untangling all the various things work.
 
 ## panadestein
 ## Basically this needs to be tangled by a different install with org +...
 ## we go untangle it to hopefully make an init.el. Then we run emacs again
 ## with the new profile so it can load its self up.
-## added $(default-org-profile) so we can use a known good emacs with org
-## completely configured so that untangling all the various things work.
 optional-configs += panadestein
-panadestein-status       = Cant untangle itself to get an init.el
+panadestein-status       = Cannot tangle this to an el. No babel-execute for org!
 panadestein-repo         = https://github.com/Panadestein/emacsd.git
 panadestein-repo-flags   =
 panadestein-install-cmd  = $(org-emacs-nw) \
 				--eval '(with-temp-buffer                  \
 	  				  (find-file "content/index.org")  \
-					  $(org-untangle)                  \
+					  $(org-tangle)                  \
 					  $(kill-emacs))'                  \
-			   $(emacs-nw-profile) panadestein $(kill-emacs)
+			   $(emacs-nw-profile) panadestein $(eval-kill-emacs)
 
 panadestein-update-pull  = $(git-pull)
 panadestein-update-cmd   = $(generic-update-cmd)
+panadestein-message      = This requires untangling which will fail on this first \
+install step. Babel cannot tangle org. I have that installed. This does not install. \
 ## panadestein
 
 ## rougier : this wont work right off. needs untangling. And we have to fool it into
@@ -318,23 +344,30 @@ panadestein-update-cmd   = $(generic-update-cmd)
 ## rougier : and again to initialize it. I left the kill off of the first invocation
 ## rougier : because thats where the problem lies. Once the untangling works.
 ## rougier : an update may not work, if the link has been broken, not sure.
-## rougier : why all the complexity ?!
 ## rougier
 optional-configs += rougier
-rougier-status       = !! Almost. Untangle fails. See: 'make browse-rougier'
+rougier-status       = !! Almost. Org tangle fails. See: 'make browse-rougier'
 rougier-repo         = https://github.com/rougier/dotemacs.git
 rougier-repo-flags   =
 rougier-install-cmd  = rm -f ~/.emacs.org ;      \
 			ln -s $(PWD)/rougier ~/.emacs.org ;  \
 			$(org-emacs-nw)                      \
 			--eval '(with-temp-buffer            \
-	  			(find-file "dotemacs.org")   \
-				$(org-untangle)	    	     \
-				$(kill-emacs))'              \
-			$(emacs-nw-profile) rougier $(kill-emacs)
+	  			  (find-file "dotemacs.org")   \
+				  $(org-tangle)	    	     \
+				  $(kill-emacs!));'              \
+			$(emacs-nw-profile) rougier $(eval-kill-emacs)
 
 rougier-update-pull  = $(git-pull)
 rougier-update-cmd   = $(generic-update-cmd)
+rougier-message  = See the readme:  'make browse-rougier' \
+The problems are documented. \
+This gets us as far as it can. The tangle has problems.\
+This is an org config,\
+so we run emacs once to tangle it using 'stable'. Then run it again so\
+it will hopefully load all its packages. It may fail on either step,\
+so intervention may be required. There are documented problems.\
+		Go see the readme with 'make browse-rougier'.
 ## rougier
 
 # make print-optional-configs
@@ -350,23 +383,41 @@ rougier-update-cmd   = $(generic-update-cmd)
 optional-configs += for-writers
 for-writers-arch	 = spacemacs
 for-writers-status       = Works.
-for-writers-message      =
+for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
 for-writers-repo-flags   =
-for-writers-install-cmd  = $(no-install)
+for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(eval-kill-emacs)
+# for-writers-install-cmd  = $(no-install)
 for-writers-update-pull  = $(git-pull)
 for-writers-update-cmd   = $(spacemacs-update-cmd)
 ## for-writers
 
+doom-load = --eval '(progn (doom/reload)(doom/reload))'
 ## hotel-california-for-writers
-## this is a .doom.d repo
+## this is a .doom.d repo it has its own doom in the doom folder.
 optional-configs += hotel-california-for-writers
 hotel-california-for-writers-arch         = doom
-hotel-california-for-writers-status       = Doom configuration.
-hotel-california-for-writers-message      =
+hotel-california-for-writers-status       = Works - May take some initial help.
 hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
 hotel-california-for-writers-repo-flags   =
-hotel-california-for-writers-install-cmd  = $(emacs-nw-profile) doomd-for-writers $(kill-emacs)
+hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
+						$(emacs-nw-profile) \
+						  hotel-california-for-writers \
+						  $(doom-load)
 hotel-california-for-writers-update-pull  = $(git-pull)
-hotel-california-for-writers-update-cmd   = $(doom-update-cmd)
+hotel-california-for-writers-update-cmd   = doom/bin/doom update
+
+hotel-california-for-writers-message   = \
+This seems to work reasonably. There are frequently problems with loading \
+everything the first time. This install will likely need some aide. \
+For some reason, it requires this install cmd runs doom/reload twice. \
+It starts loading packages and syncing up with this config the second \
+time. When the Compilation buffer appears. \
+To watch the progress in emacs 'SPC b i' for ibuffer, then choose the compilation buffer \
+If/when it fails, restart the load with M-x doom/reload \
+Fonts: \
+You will need overpass and carlito fonts, or to change them in config.el and \
+then do another 'doom/reload'. If you set your environment $DOOMDIR, to here, you can \
+run the usual doom shell commands and get proper results. \
+Theres no Evil here, so you may want to load that. \
 ## hotel-california-for-writers
