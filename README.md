@@ -319,11 +319,13 @@ and it's profile name is gnu and it looks like this.
 ```make
 ## gnu
 optional-configs += gnu
+gnu-arch         = 
 gnu-repo         = your-repo-url
 gnu-repo-flags   =
 gnu-install-cmd  = $(emacs-nw-profile) gnu $(kill-emacs)
 gnu-update-pull  = $(git-pull)
 gnu-update-cmd   = $(generic-update-cmd)
+gnu-message     = See Readme: make browse-gnu
 ## gnu
 ```
 
@@ -331,6 +333,8 @@ This profile definition is the most common so far. I am
 not sure it is a 100% fit always, but it seems pretty good
 and at least harmless. 
 
+  - There is no -arch. That applies only to configurations which rely on
+  other configurations. ie. it is a doom.d or .spacemacs
   - The install does a git clone your-repo-url
     - Runs emacs -nw with the __gnu__ profile 
       - while giving it the function call for it to kill its self.
@@ -350,11 +354,13 @@ You can see them like this. `make show-<profile>` ie.
 
 ```make
     optional-configs    += prelude
+    prelude-arch        = 
     prelude-repo        = $(git-hub)bbatsov/prelude.git
     prelude-repo-flags  =
     prelude-install-cmd = $(emacs-nw-profile) prelude $(kill-emacs)
     prelude-update-pull = $(git-pull)
     prelude-update-cmd  = $(generic-update-cmd)
+    prelude-message     = See Readme: make browse-prelude
 ```
 
   - It first adds itself to the list of optional-configs.
@@ -397,6 +403,7 @@ lights when your done. ok ?
     ericas-install-cmd = emacs --script install.el
     ericas-update-pull = $(git-pull)
     ericas-update-cmd  = emacs --script update.el
+    ericas-message     = See Readme: make browse-ericas
 ```
 
 Like most emacs configurations Spacemacs just installs everything when it 
@@ -406,16 +413,17 @@ and save and kill terminal at the end, __$(kill-emacs)__.
 
 ```make
     optional-configs  += space
-    space-repo        = $(git-hub)/syl20bnr/spacemacs.git
-    space-repo-flags  =
-    space-install-cmd = $(emacs-nw-profile) space $(kill-emacs)
-    space-update-pull = $(git-pull)
-    space-update-el   = '((lambda ()\
+    spacemacs-repo        = $(git-hub)/syl20bnr/spacemacs.git
+    spacemacs-repo-flags  =
+    spacemacs-install-cmd = $(emacs-nw-profile) space $(kill-emacs)
+    spacemacs-update-pull = $(git-pull)
+    spacemacs-update-el   = '((lambda ()\
                             (configuration-layer/update-packages)\
 			                (save-buffers-kill-terminal t)))'
 
-    space-update-cmd  = $(emacs-nw-profile) space \
+    spacemacs-update-cmd  = $(emacs-nw-profile) space \
                             --eval $(space-update-el)
+    spacemacs-message     = See Readme: make browse-spacemacs
 ```
 
 
@@ -429,6 +437,7 @@ It doesn't want us to pull for it. Use __$(no-pull)__ to indicate that.
     doom-install-cmd  = $(emacs-home)/doom/bin/doom install
     doom-update-pull  = $(no-pull)
     doom-update-cmd   = $(emacs-home)/doom/bin/doom update
+    doom-message     = See Readme: make browse-doom
 ```
 
 ### Configurations with no install function
@@ -468,25 +477,33 @@ configuration. If its common enough and works, maybe that gets
 refactored for repeatability.
 
 This is the simplest _Org_ configuration that might work.
-Basically this needs to be tangled by a different install with org +...
 We go untangle it to hopefully make an init.el. Then we run emacs again
 with the new profile so it can load its self up.
+
+All of the org based configurations so far have issues. This process
+seems to be working to varying degrees. It does work if the underlying tangling and loading of packages work.
+
+Each of the org based configs
+either fails in the tangle step or in the load step on install. 
 
 ```make
     ## panadestein
     optional-configs += panadestein
-    panadestein-status       = Cant untangle itself to get an init.el
+    panadestein-status       = Cannot tangle this to an el. No babel-execute for org!
     panadestein-repo         = https://github.com/Panadestein/emacsd.git
     panadestein-repo-flags   =
-    panadestein-install-cmd  = $(org-emacs-nw) \
-                               --eval '(with-temp-buffer                \
-	  				                   (find-file "content/index.org")  \
-					                   $(org-untangle)                  \
-					                   $(kill-emacs))'                  \
-			                   $(emacs-nw-profile) panadestein $(kill-emacs)
+    panadestein-install-cmd  = \
+                $(org-emacs-nw) \
+				--eval '(with-temp-buffer                  \
+	  				  (find-file "content/index.org")  \
+					  $(org-tangle)                  \
+					  $(kill-emacs))'                  \
+			   $(emacs-nw-profile) panadestein $(eval-kill-emacs)
 
     panadestein-update-pull  = $(git-pull)
     panadestein-update-cmd   = $(generic-update-cmd)
+    panadestein-message      = This requires untangling which will fail on this first \
+    install step. Babel cannot tangle org. I have that installed. This does not install. \
     ## panadestein
 ```
 
@@ -539,12 +556,11 @@ that is what it is, and tell it which installation it should use for its
 base emacs.
 
 These configurations introduced a new variable, __-arch__ this tells Emacsn 
-that this configuration uses doom or spacemacs and it sets up the Chemacs
-profiles accordingly. It Points at the proper emacs install and informs it
-that it should load its configuration from here.
+that this configuration uses doom or spacemacs or whatever and it sets up 
+the Chemacs profiles accordingly. It also creates an install of the necessary
+the arch configuration for its own. 
 
-It seems to work. It loads the proper _init.el_.  It doesn't need an install,
-just a place to live and a Chemacs profile entry.
+This one seems to work, but its hard to tell. It looks like stock Spacemacs.
 
 ``` make
 ## for-writers
@@ -557,11 +573,68 @@ for-writers-repo-flags   =
 for-writers-install-cmd  = $(no-install)
 for-writers-update-pull  = $(git-pull)
 for-writers-update-cmd   = $(spacemacs-update-cmd)
+for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 ## for-writers
 ```
 
 
+A configuration entry for a doom.d configuration is shown here.
+This works reasonably well. The (doom/reload) is run twice, the first run
+seems to set things up. The second installs and compiles everything.
+Missing package Errors happen on the second doom/reload, but 
+restarting doom/reload restarts the process and often works.
+
+Problems mostly seem to come down to doom sync and doom/reload
+and that the packages load in the background over time. So sometimes
+they just are not there yet.
+
+An install process is to install this, and doom inside it, 
+run the doom install, then this install which is:
+
+  - Install this
+    - Install doom in here.
+    - run doom install
+  - Run doom sync using, 
+  - Run emacs and do doom/reload twice then exit.
+      The exit is currently omitted to allow manual intervention.
+      
+  Update is to
+  - git pull here
+  - doom/bin/doom update
+
+
+``` make
+doom-load = --eval '(progn (doom/reload)(doom/reload))'
+## hotel-california-for-writers
+## this is a .doom.d repo it has its own doom in the doom folder.
+optional-configs += hotel-california-for-writers
+hotel-california-for-writers-arch         = doom
+hotel-california-for-writers-status       = Works - May take some initial help.
+hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
+hotel-california-for-writers-repo-flags   =
+hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
+						$(emacs-nw-profile) \
+						  hotel-california-for-writers \
+						  $(doom-load)
+hotel-california-for-writers-update-pull  = $(git-pull)
+hotel-california-for-writers-update-cmd   = doom/bin/doom update
+
+hotel-california-for-writers-message   = \
+This seems to work reasonably. There are frequently problems with loading \
+everything the first time. This install will likely need some aide. \
+For some reason, it requires this install cmd runs doom/reload twice. \
+It starts loading packages and syncing up with this config the second \
+time. That is When the Compilation buffer appears. \
+To watch the progress in emacs 'SPC b i' for ibuffer, then choose the compilation buffer \
+If/when it fails, restart the load with M-x doom/reload \
+Fonts: \
+You will need overpass and carlito fonts, or to change them in config.el and \
+then do another 'doom/reload'. If you set your environment $DOOMDIR, to here, you can \
+run the usual doom shell commands and get proper results. \
+Theres no Evil here, so you may want to load that. \
+## hotel-california-for-writers
 ### The generic update rule
+```
 
 For configurations with no update function. (Most of them)
 

@@ -383,13 +383,13 @@ so intervention may be required. There are documented problems.\
 optional-configs += for-writers
 for-writers-arch	 = spacemacs
 for-writers-status       = Works.
-for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
 for-writers-repo-flags   =
 for-writers-install-cmd  = $(emacs-nw-profile) for-writers $(eval-kill-emacs)
 # for-writers-install-cmd  = $(no-install)
 for-writers-update-pull  = $(git-pull)
 for-writers-update-cmd   = $(spacemacs-update-cmd)
+for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 ## for-writers
 
 doom-load = --eval '(progn (doom/reload)(doom/reload))'
@@ -412,7 +412,7 @@ This seems to work reasonably. There are frequently problems with loading \
 everything the first time. This install will likely need some aide. \
 For some reason, it requires this install cmd runs doom/reload twice. \
 It starts loading packages and syncing up with this config the second \
-time. When the Compilation buffer appears. \
+time. That is When the Compilation buffer appears. \
 To watch the progress in emacs 'SPC b i' for ibuffer, then choose the compilation buffer \
 If/when it fails, restart the load with M-x doom/reload \
 Fonts: \
