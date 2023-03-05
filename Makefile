@@ -23,7 +23,7 @@
 
 # This Makefile prints lots of more readable stuff,
 # no need to see every echo unless debugging.
-# .SILENT:
+.SILENT:
 
 # Where to get ourselves from.
 emacsn-repo := https://github.com/ericalinag/Emacsn
@@ -48,7 +48,7 @@ dot-backups := $(PWD)/dot-backups
 # %F.%s = yyyy-mm-dd.epoch-seconds.
 # Used for an extension everytime we backup.
 seconds-now := $(shell date +%F.%s)
-
+git clone https://github.com/caiohcs/my-emacs
 # The last backup is the current one. We want the second one.
 # uses -t, not sort on extension.
 find-last-backup := ls -ta $(dot-backups)/.emacs-profiles.el* | head -2 | tail -1

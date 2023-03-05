@@ -461,27 +461,30 @@ Run in window mode or terminal mode.
 ### Configurations that are org files
 
 Configurations that are _Org_ files require tangling to get what is
-hopefully an _init.el_. Mostly that seems to not be the case. These 
-configurations, so far, seem to do indirect things to get installed.
+hopefully an _init.el_. These configurations, so far, seem to do 
+indirect things to get installed.
 Making links to _init.el_ or even fooling them into putting what they
 generate in their own space. This seems to more normal than an _Org_ 
 configuration that just follows self contained and common practices.
+The __caiohcs__ configuration is a nice Org configuration. The only 
+on so far that has worked out of the box without custom code.
 
 There is a default-org-profile which can be set to indicate which emacs
-should be used to the tangling. It is set to __stable__.
+should be used to the tangling. It is set to __stable__ by default.
 __$(org-emacs-nw)__ runs that emacs with `-nw` to do the untangling of the
-configuration's org file. Which varies greatly in location and name.
+configuration's org file. Which varies in location and name.
 
 We can use what we have to create an inline elisp script here in the
-configuration. If its common enough and works, maybe that gets 
-refactored for repeatability.
+configuration. 
 
-This is the simplest _Org_ configuration that might work.
-We go untangle it to hopefully make an init.el. Then we run emacs again
-with the new profile so it can load its self up.
+This is the simplest _Org_ configuration that could work given a working 
+configuration. We go untangle it to hopefully make an init.el. Then we run 
+emacs again with the new profile so it can load its self up.
 
-All of the org based configurations so far have issues. This process
-seems to be working to varying degrees. It does work if the underlying tangling and loading of packages work.
+All but one of the org based configurations so far have issues. This process
+works to step 1 with some and step 2 with others. __Caiohcs__ works perfectly,
+but doesn't need any of this as it auto untangles on save, the init.el is always
+
 
 Each of the org based configs
 either fails in the tangle step or in the load step on install. 
@@ -639,11 +642,12 @@ Theres no Evil here, so you may want to load that. \
 ### The generic update rule
 ```
 
+### The generic update rule.
+
 For configurations with no update function. (Most of them)
 
 So far, only Doom, Ericas and Spacemacs provide an update mechanism.
-The rest can use this generic update rule.(with-temp-buffer
-  (insert "Hello!"))
+The rest can use this generic update rule.
 
 There is a `generic-update.el` that can be used to do updates 
 on configurations without special functionality for that.
@@ -662,7 +666,7 @@ Their install command is usually this, add -nw if you want in terminal.
     emacs --with-profile <profile-name>
 ```
 
-Uncle Daves Emacs, Prelude, from hell, and from scratch 
+Caiohcs, Uncle Daves Emacs, Prelude, from hell, and from scratch 
 can use the generic update rule. From scratch and hell
 both update automatically and do not use packages, 
 So the update packages doesn't do/hurt anything.
