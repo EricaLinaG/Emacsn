@@ -547,7 +547,7 @@ rougier-update-cmd   = $(generic-update-cmd)
 ### Doom.d and spacemacs.d configurations.
 
 These configurations are not full Emacs configurations in the traditional sense.
-These are actually configurations for Doom and Spacemacs which normally go
+These are actually configurations for Doom or Spacemacs which normally go
 in _~/.doom.d_ and _~/.spacemacs_. Chemacs handles these with an extra entry
 in the profile telling it where this directory is.
 
@@ -579,10 +579,13 @@ for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 
 
 A configuration entry for a doom.d configuration is shown here.
-This works reasonably well. The (doom/reload) is run twice, the first run
-seems to set things up. The second installs and compiles everything.
-Missing package Errors happen on the second doom/reload, but 
-restarting doom/reload restarts the process and often works.
+This works reasonably well. This configuration has a nice dashboard
+which clearly shows what it is.
+
+For these types of configuration the (doom/reload) is run twice, 
+the first run seems to set things up. The second installs and compiles
+everything. Missing package Errors happen on the second doom/reload,
+but restarting doom/reload restarts the process and often works.
 
 Problems mostly seem to come down to doom sync and doom/reload
 and that the packages load in the background over time. So sometimes
@@ -591,12 +594,12 @@ they just are not there yet.
 An install process is to install this, and doom inside it, 
 run the doom install, then this install which is:
 
-  - Install this
+  - Install this configuraton - git clone
     - Install doom in here.
-    - run doom install
-  - Run doom sync using, 
+    - run doom install for it.
+  - Run doom sync with Doomdir to here.
   - Run emacs and do doom/reload twice then exit.
-      The exit is currently omitted to allow manual intervention.
+      The exit, _$(kill-emacs)_, is currently omitted to allow manual intervention.
       
   Update is to
   - git pull here
