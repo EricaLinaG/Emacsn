@@ -331,7 +331,7 @@ $(update-configs):
 	$(call update-config,$(profile-name))
 	# the equivalent for the arch install if it has one.
 	if [[ -n "$($(profile-name)-arch)" ]; then   \
-	  $(call update-arch,$(profile-name),$($(profile-name)-arch) \
+	  $(call update-arch,$(profile-name),$($(profile-name)-arch)) \
 	fi
 
 $(remove-configs):
