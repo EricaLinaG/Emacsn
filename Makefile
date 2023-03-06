@@ -378,7 +378,7 @@ show-backup-% :
 	printf "$(nth-backup)\n"
 	cat $(nth-backup)
 
-show-last-backum: show-backup-2
+show-last-backup: show-backup-2
 
 
 # function to remove and link to ~/.emacs-profiles.el
