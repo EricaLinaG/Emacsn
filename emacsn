@@ -16,6 +16,7 @@ edit_elisp='main-window'
 browser_eval_prefix=' eaf-open-url "'
 browser_eval_suffix='"'
 profile=''
+debug=''
 
 help(){
     print 'emacsn - helper for running emacs'
@@ -34,6 +35,8 @@ help(){
     print 'For email, mu4e must be installed. My main-window and eaf-open-url '
     print 'functions can be found here. '
     print 'http://github.com/EricGebhart/emacs-setup/elisp/config/functions.el'
+    print ' '
+    print ' -D              --debug-init'
     print ' '
     print ' Chemacs profile'
     print ' -p profile      Use another emacs config. (stable, dev, doom, space)'
@@ -139,7 +142,7 @@ help(){
 
 # $opt will hold the current option
 local opt
-while getopts cetdhwm:f:T:b:s:S:p: opt; do
+while getopts cetdDhwm:f:T:b:s:S:p: opt; do
     # loop continues till options finished
     # see which pattern $opt matches...
     case $opt in
@@ -148,6 +151,9 @@ while getopts cetdhwm:f:T:b:s:S:p: opt; do
             if [ -z "$daemon" ]; then
                 daemon="--daemon"
             fi
+            ;;
+        (D)
+            debug="--debug-init"
             ;;
         (p)
             profile="--with-profile "$OPTARG
@@ -208,7 +214,7 @@ if [[ ${emacsclient} == "yes" ]]; then
     daemon=$socket
 fi
 
-mycommand=$runemacs' '${daemon}' '${profile}' '${terminal}' '${title}' '${*}' '$runfunc' '${background}
+mycommand=$runemacs' '${daemon}' '${debug}' '${profile}' '${terminal}' '${title}' '${*}' '$runfunc' '${background}
 
 print "Emacs With Command:" $mycommand
 
