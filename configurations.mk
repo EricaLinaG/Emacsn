@@ -421,16 +421,6 @@ then do another 'doom/reload'. If you set your environment $DOOMDIR, to here, yo
 run the usual doom shell commands and get proper results. \
 Theres no Evil here, so you may want to load that. \
 ## hotel-california-for-writers
-## caiohcs
-optional-configs += caiohcs
-caiohcs-status       = Not Tested
-caiohcs-repo         = git
-caiohcs-repo-flags   =
-caiohcs-install-cmd  = $(emacs-nw-profile) caiohcs $(eval-kill-emacs)
-caiohcs-update-pull  = $(git-pull)
-caiohcs-update-cmd   = $(generic-update-cmd)
-caiohcs-message      = See Readme: make browse-caiohcs
-## caiohcs
 
 ## caiohcs
 optional-configs += caiohcs
@@ -440,5 +430,5 @@ caiohcs-repo-flags   =
 caiohcs-install-cmd  = $(emacs-nw-profile) caiohcs $(eval-kill-emacs)
 caiohcs-update-pull  = $(git-pull)
 caiohcs-update-cmd   = $(generic-update-cmd)
-caiohcs-message      = Nice Org config. Use Emacs or See Readme: make browse-caiohcs
+caiohcs-message      = Nice Org-based config. Use Emacs or See Readme: make browse-caiohcs
 ## caiohcs

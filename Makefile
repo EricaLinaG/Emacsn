@@ -48,7 +48,7 @@ dot-backups := $(PWD)/dot-backups
 # %F.%s = yyyy-mm-dd.epoch-seconds.
 # Used for an extension everytime we backup.
 seconds-now := $(shell date +%F.%s)
-git clone https://github.com/caiohcs/my-emacs
+
 # The last backup is the current one. We want the second one.
 # uses -t, not sort on extension.
 find-last-backup := ls -ta $(dot-backups)/.emacs-profiles.el* | head -2 | tail -1
@@ -322,8 +322,8 @@ $(insert-configs):
 # then maybe some emacs command to run an update of packages.
 # I do apologize for the syntax a bit. but in some ways its cool.
 # that stuff at the end really unravels.
-update-config =	$(shell cd $(1); ($(1)-pull); $($(1)-cmd))
-update-arch =	$(shell cd $(1)/$(2); ($(2)-pull); $($(2)-cmd))
+update-config =	$(shell cd $(1); $($(1)-update-pull); $($(1)-update-cmd))
+update-arch =	$(shell cd $(1)/$(2); $($(2)-update-pull); $($(2)-update-cmd))
 
 $(update-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-update$$//g' ))
