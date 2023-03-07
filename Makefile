@@ -199,7 +199,7 @@ $(configs):
 	printf "\---------------------------------------------\n"
 
 # git-clone,<name>,<name>/path
-git-clone = $(shell $($(1)-repo-flags) $($(1)-repo) $(2))
+git-clone = $(shell git clone $($(1)-repo-flags) $($(1)-repo) $(2))
 
 
 # clone-arch,<name>,<name>-arch
@@ -208,9 +208,9 @@ clone-arch = $(shell if [[ -n "$(2)" ]]; then \
 		        git clone $($(2)-repo-flags) $($(2)-repo) $(1)/$(strip $(2)); \
 		     fi)
 
+# I have no idea why I have to echo this to make it work.
 install-arch = $(shell if [[ "$(2)" ]]; then  \
-			  cd $(1)/$(2); \
-			  echo $($(2)-install-cmd); \
+			  echo "cd $(1)/$(2) ; $($(2)-install-cmd)"; \
 		        fi)
 
 #printf "Cloning Arch $($(2)-repo) into $(emacs-home)/$(1)/$(2))\n"; \

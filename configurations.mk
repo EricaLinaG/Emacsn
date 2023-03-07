@@ -392,7 +392,7 @@ for-writers-update-cmd   = $(spacemacs-update-cmd)
 for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 ## for-writers
 
-doom-load = --eval '(progn (doom/reload)(doom/reload))'
+doom-load = --eval '(progn (doom/reload)(doom/reload)(save-buffers-kill-terminal nil))'
 ## hotel-california-for-writers
 ## this is a .doom.d repo it has its own doom in the doom folder.
 optional-configs += hotel-california-for-writers
@@ -419,8 +419,27 @@ Fonts: \
 You will need overpass and carlito fonts, or to change them in config.el and \
 then do another 'doom/reload'. If you set your environment $DOOMDIR, to here, you can \
 run the usual doom shell commands and get proper results. \
-Theres no Evil here, so you may want to load that. \
+Theres no Evil here, so you may want to load that.
 ## hotel-california-for-writers
+
+## ericas-evil-doom-for-writers
+## this is a .doom.d repo it has its own doom in the doom folder.
+optional-configs += ericas-evil-doom-for-writers
+ericas-evil-doom-for-writers-arch         = doom
+ericas-evil-doom-for-writers-status       = Works - May take some initial help.
+ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
+ericas-evil-doom-for-writers-repo-flags   =
+ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
+						$(emacs-nw-profile) \
+						  ericas-evil-dom-for-writers \
+						  $(doom-load)
+ericas-evil-doom-for-writers-update-pull  = $(git-pull)
+ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
+
+ericas-evil-doom-for-writers-message   = \
+This is hotel-california-for-writers with evil, \
+some programming languages, git, flycheck, etc. Still adding stuff.
+## ericas-evil-doom-for-writers
 
 ## caiohcs
 optional-configs += caiohcs
