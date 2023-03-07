@@ -182,15 +182,12 @@ $(configs):
 	$(call git-clone,$@,$@)
 
 # conditional, if -arch has a value.
-	printf "\\\\Cloning Arch $($($(@)-arch)-repo) into $(emacs-home)/$@/$($@-arch)\n"
 	$(call clone-arch,$@,$($@-arch))
-# git clone $($@-repo-flags) $($($@-arch)-repo) $(emacs-home)/$($@-arch)/$@
 
-	printf "Running install for: $($@-arch)\n"
-	printf "\-------------------------------------------\n"
-	# conditional, if -arch has a value.
-	#$(call install-arch,$@,$($@-arch))
-	cd $@/$($@-arch); $($($@-arch)-install-cmd)
+# printf "Running install for: $($@-arch)\n"
+# printf "\-------------------------------------------\n"
+# conditional, if -arch has a value.
+	$(call install-arch,$@,$($@-arch))
 
 	printf "Running install for: $@\n"
 	printf "\-------------------------------------------\n"
@@ -202,7 +199,7 @@ $(configs):
 	printf "\---------------------------------------------\n"
 
 # git-clone,<name>,<name>/path
-git-clone = $(shell git clone $($(1)-repo-flags) $($(1)-repo) $(2))
+git-clone = $(shell $($(1)-repo-flags) $($(1)-repo) $(2))
 
 
 # clone-arch,<name>,<name>-arch
@@ -210,6 +207,11 @@ git-clone = $(shell git clone $($(1)-repo-flags) $($(1)-repo) $(2))
 clone-arch = $(shell if [[ -n "$(2)" ]]; then \
 		        git clone $($(2)-repo-flags) $($(2)-repo) $(1)/$(strip $(2)); \
 		     fi)
+
+install-arch = $(shell if [[ "$(2)" ]]; then  \
+			  cd $(1)/$(2); \
+			  echo $($(2)-install-cmd); \
+		        fi)
 
 #printf "Cloning Arch $($(2)-repo) into $(emacs-home)/$(1)/$(2))\n"; \
 
@@ -322,17 +324,23 @@ $(insert-configs):
 # then maybe some emacs command to run an update of packages.
 # I do apologize for the syntax a bit. but in some ways its cool.
 # that stuff at the end really unravels.
-update-config =	$(shell cd $(1); $($(1)-update-pull); $($(1)-update-cmd))
-update-arch =	$(shell cd $(1)/$(2); $($(2)-update-pull); $($(2)-update-cmd))
+update-config =	$(shell cd $(1); echo $($(1)-update-pull); $($(1)-update-cmd))
+# update-arch =	$(shell cd $(1)/$(2); $($(2)-update-pull); $($(2)-update-cmd))
+# update-config =	echo "$(shell cd $(1); $($(1)-update-pull); $($(1)-update-cmd))"
+
+# So this is loaded, whether its true or not. so its got to be valid shell.
+# even when $2 is empty. echo, works. and it does what we want.
+update-arch = $(shell if [[ "$(2)" ]]; then  \
+			  cd $(1)/$(2); \
+			  echo $($(2)-update-pull); \
+			  echo $($(2)-update-cmd); \
+		       fi)
 
 $(update-configs):
+	printf "update config $@\n"
 	$(eval profile-name=$(shell echo $@ | sed 's/\-update$$//g' ))
-	printf "Running update for profile: $(profile-name)\n"
 	$(call update-config,$(profile-name))
-	# the equivalent for the arch install if it has one.
-	if [[ -n "$($(profile-name)-arch)" ]; then   \
-	  $(call update-arch,$(profile-name),$($(profile-name)-arch)) \
-	fi
+	$(call update-arch,$(profile-name),$($(profile-name)-arch))
 
 $(remove-configs):
 	$(eval profile-name=$(shell echo $@ | sed 's/\-remove$$//g' ))
