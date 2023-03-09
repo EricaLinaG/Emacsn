@@ -4,8 +4,7 @@
 ;;; Give a script to run to update all the packages as needed.
 ;;; This will only work if run from the directory it is in.
 
-;;; The purpose is to be able to do an update from the command line.
-;;; This will 'git pull origin main' to update the code base and then
+;;; This will 'git pull origin' to update the code base and then
 ;;; try to update the installed packages.
 ;;;
 ;;; We change the user-emacs-directory to here so that Emacs will install
@@ -26,7 +25,7 @@
 ;;; our packages get installed.
 
 ;; (shell-command "git pull origin master")
-(shell-command "git pull origin HEAD")
+(shell-command "git pull origin")
 
 ;; Trick emacs to be here, instead of .emacs.d
 ;; Requires being here or using emacs --chdir <here> to work.

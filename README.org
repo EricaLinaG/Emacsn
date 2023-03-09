@@ -1,0 +1,720 @@
+* Emacsn
+:PROPERTIES:
+:CUSTOM_ID: emacsn
+:END:
+** A system for managing multiple Emacs configurations.
+:PROPERTIES:
+:CUSTOM_ID: a-system-for-managing-multiple-emacs-configurations.
+:END:
+This is just some *Makefile*, a script and some elisp to create an easy
+system of installing and managing multiple emacs installations from
+github. This system uses
+[[https://github.com/plexus/chemacs2][Chemacs2]] for its Emacs boot
+loader. I recommend at least reading through it's *Readme* even though
+Emacsn takes care of everything, you'll want to know eventually.
+
+Chemacs likes Emacs configurations which install in /.emacs.d/ and use
+an /init.el/. Most configurations do this.
+
+*** Why
+:PROPERTIES:
+:CUSTOM_ID: why
+:END:
+My motivations were simple initially. - I wanted - dev, stable and test
+installs for me. - To Explore: - Doom and Spacemacs. - Other Emacs
+configurations. -
+[[https://github.com/thinkhuman/writingwithemacs/][Emacs for writing.]]
+
+I can't resist making a system especially when it falls in your lap. I
+had a good variety of initial inputs, in actually using it common tasks
+were integrated over and over and it became this.
+
+It keeps getting easier to manage any emacs configuration regardless of
+their methods.
+
+*** Why Make
+:PROPERTIES:
+:CUSTOM_ID: why-make
+:END:
+This just grew organically over time out of the /Makefile/ I used to
+install my Emacs configuration and friends.
+
+Actually it grew like a well fed tumor when I started using Chemacs.
+
+Its a Unixy command line solution. The Makefile is full of make tricks,
+sed and shell bits and pieces. It is a fun way to make an API to shell.
+
+Have a need, fill a need, scratch an itch, sure would be nice if...,
+have some fun.
+
+That's how atrocities in *Make* are born.
+
+The
+[[https://github.com/EricaLinaG/Emacsn/blob/main/Makefile][Makefile]] is
+full of all sorts of weird little make tricks and over 30 calls to sed.
+
+It has been fun and gone quite quickly. Make is so compose-able it is
+easy to end up with elegant solutions for unexpected things with just
+dependencies. Its simplicity is nice, its quirks and challenges are just
+that.
+
+I had no intention of it getting to this place. It is a nice POC.
+Writing it in elisp will be a pleasure.
+
+*** What
+:PROPERTIES:
+:CUSTOM_ID: what
+:END:
+All I thought I wanted was: - Keep a dev and a stable version of my
+configuration. - Easy to test a fresh install from git. - Easy to update
+an install from git and refresh packages. - Easy to try some Emacs
+distro from github.
+
+It just sort of bloomed after that. You know something is right when
+features you need just start falling out of the code.
+
+- It has a list of installable Emacs configurations.
+- Single command to create a new configuration from a repository url and
+  install it.  Always works to some degree of installation without customization.
+- It has a default configuration which gets /dev, stable/ and /test/
+  profiles and installs. This gives me what I wanted.
+- The default profile/installs can be reassigned to any known
+  configuration. This gives you the same things.
+- There is always vanilla gnu and gnu-server boot profiles.
+- On install it runs what it can to update the new install's packages.
+- It makes your Chemacs profiles for you.
+- Each installation automatically gets two boot profiles, /name/  and /name/-server.
+- It makes snapshot backups of your profiles any time they change.
+- It adds and removes entries when it installs or removes a configuration.
+- Your custom Chemacs profiles can be persisted for subsequent installs.
+- All the data/code is template driven and easy to change.
+- A configuration can point at a repository branch if desired.
+- Its possible to have more than one working Emacsn.
+- It has status
+- It has help
+
+*** emacsn - the script
+:PROPERTIES:
+:CUSTOM_ID: emacsn---the-script
+:END:
+This is a shell script I have had for many years which just serves to
+give a little bit of ease to the emacs command line interface.
+
+*** The Default Configuration
+:PROPERTIES:
+:CUSTOM_ID: the-default-configuration
+:END:
+The default configuration is mine;
+[[https://github.com/ericalinag/ericas-emacs][Ericas-Emacs]]. If your
+configuration is set up with an init.el and goes in ~/.emacs.d you are
+golden and can use yours as the default with
+=make install-new-default...=
+
+=make help=
+
+Might also be of aide.
+
+*** 3 profiles for the default configuration
+:PROPERTIES:
+:CUSTOM_ID: profiles-for-the-default-configuration
+:END:
+The default configuration gets 3 installs, *stable*, *dev* and *test*.
+test is empty, and therefore vanilla gnu to start with.
+
+The default emacs that will run is assigned to *stable.*
+- When working on emacs make changes and test in dev.
+- Push it,
+- =make test-install=
+
+will make a fresh test install from git in the test profile and
+then run it with /--debug-init/.
+
+This is to make sure what is pushed installs and runs
+cleanly before updating the stable installation with
+=make stable-update=.
+
+
+** Backups
+:PROPERTIES:
+:CUSTOM_ID: backups
+:END:
+*Chemacs2* uses a file /~/.emacs-profiles.el/ to find out what it can
+boot emacs into. Each Emacsn keeps its own /.emacs-profiles.el/ and
+creates a link to /~/.emacs-profiles.el/.
+
+Each time Emacsn it changes the /.emacs-profiles.el/ file it makes a
+timestamped copy of /.emacs-profiles.el/ in /dot-backups//
+
+You may choose to git ignore the /dot-backups// folder, or keep it
+backed up to git. Your choice.
+
+In a similar way, on install, /~/.emacs/, /~/.emacs.d/ and
+~/.emacs-profiles.el, if it is a file, will be timestamped and copied to
+that Emacsn's /dot-backups// folder.
+
+
+** Super Quick Guide
+:PROPERTIES:
+:CUSTOM_ID: super-quick-guide
+:END:
+It really is mostly a Makefile.
+
+*** git clone ... /Emacsn.git; cd Emacsn;
+:PROPERTIES:
+:CUSTOM_ID: git-clone-emacsn.git-cd-emacsn
+:END:
+#+begin_example
+- `git clone https://gitub.com/EricaLinaG/Emacsn.git`
+- `cd Emacsn`
+
+- `make help`
+- `make status`      - The current Emacsn status.
+
+- `make browse-doom` - Open the configuration repository url in $BROWSER.
+- `make show-doom`
+#+end_example
+
+If your emacs setup works in .emacs.d with an init.el you are probably
+good to go with setting your default to that.
+
+If you want to make your emacs the default now do these two things.
+This installs Chemacs and gets us a minimal setup with vanilla gnu emacs.
+Then we create a configuration for it, set it to the default, and then
+reinstall all the default profiles with this one.
+
+- =make install-base status=
+- =make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo=
+
+You can also assign any of the installable configs as default, use /reinstall-defaults/ if replacing the current installed defaults..
+
+#+begin_example
+`make assign-default name=doom`
+`make reinstall-defaults`
+#+end_example
+
+otherwise do =make install=.
+
+**** Try it out
+:PROPERTIES:
+:CUSTOM_ID: try-it-out
+:END:
+- =emacs=
+- =emacs --with-profile dev=
+
+**** Add a new repo for now or later.
+:PROPERTIES:
+:CUSTOM_ID: add-a-new-repo-for-now-or-later.
+:END:
+You can add yours or any emacs repo as an install profile at any time.
+Then install it later.  Depending on the configuration it may need some
+love to make it work seamlessly.  Each has their quirks and ease.
+
+- =make new-config name=my-profile-name repo=The-url-to-my-emacs-repo=
+- =make my-profile-name= - to install it.
+
+You can add a profile and install it all at once with this.
+
+- =make install-new name=my-profile-name repo=The-url-to-my-emacs-repo=
+
+*** Get the Status and see some things.
+:PROPERTIES:
+:CUSTOM_ID: get-the-status-and-see-some-things.
+:END:
+- =make status=
+- =make show-profiles=
+- =make show-doom=
+- =make browse-doom=
+- =make help=
+- =M-x describe-variable chemacs-profiles=
+- =cat .emacs-profiles.el=
+- =cat ./emacs-profiles-template.el=
+- =make print-optional-configs=
+
+After that you may wish to do: - =make space doom from-hell= -
+=emacsn -p doom= - Do not do: =emacs --with-profile from-hell= How bad
+could it be?
+
+Do try: - =make test-install= - =make stable-update= -
+=make from-hell-remove=
+
+- Have fun.
+
+
+** A Quick Guide.
+:PROPERTIES:
+:CUSTOM_ID: a-quick-guide.
+:END:
+In the *Makefile* /emacs-home/ is set to wherever you clone *Emacsn* to.
+This is where all of the emacs configurations will be.
+
+I usually =cd= then clone it so my *emacs-home* will be /~/Emacsn/
+
+Get this repo from here or from your fork and =cd= into it.
+
+#+begin_src shell
+    cd
+    git clone https://github.com/EricaLinaG/Emacsn.git
+    cd Emacsn
+#+end_src
+
+*** Installing the base and default profiles.
+:PROPERTIES:
+:CUSTOM_ID: installing-the-base-and-default-profiles.
+:END:
+There are a few paths to take here. Install the basic stuff which will
+give you Ericas-Emacs as the default emacs, or if your emacs install has
+an init.el and normally lives in .emacs.d you can set it to the default
+now. Or Use one of the other available configurations as default.
+
+**** Choice 1: Take whatever is there
+:PROPERTIES:
+:CUSTOM_ID: choice-1-take-whatever-is-there
+:END:
+Install the base as well as the default profiles. It can all be changed
+later with =install-new-default=.
+
+#+begin_example
+`make install status`
+#+end_example
+
+**** Choice 2: Make your emacs the default.
+:PROPERTIES:
+:CUSTOM_ID: choice-2-make-your-emacs-the-default.
+:END:
+- =make install-base status=
+- =make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo=
+  - This can be broken into steps if you wish.
+    - =make new-config name=my-profile-name repo=The-url-to-my-emacs-repo=
+      - Optionally edit the new profile entry in /configurations.mk/.
+    - =make assign-default name=my-profile-name=
+    - =make reinstall-defaults=
+
+**** Choice 3: Change to another config for the default.
+:PROPERTIES:
+:CUSTOM_ID: choice-3-change-to-another-config-for-the-default.
+:END:
+#+begin_example
+  - `make assign-default name=from-scratch`
+  - `make install-defaults`
+  or if you already have some default installs.
+  - `make reinstall-defaults`
+#+end_example
+
+*** Get the status of Emacsn.
+:PROPERTIES:
+:CUSTOM_ID: get-the-status-of-emacsn.
+:END:
+#+begin_example
+`make status`
+`make show-optional`
+`make show-profiles`
+`make help`
+
+`make status` is a nice report of things in Emacsn.
+#+end_example
+
+Install optional Emacs configurations. Maybe install Doom-emacs,
+Spacemacs and Emacs-from-scratch
+
+#+begin_example
+`make doom space from-scratch`
+#+end_example
+
+At this point you are ready to go. Running Emacs will give you your
+default *stable* configuration. You can also specify them specifically
+
+#+begin_example
+emacs --with-profile dev
+#+end_example
+
+Or
+
+#+begin_example
+emacsn -p dev
+#+end_example
+
+
+** Emacsn Configurations
+These are simple records of Make variables. Its a little primitive,
+but it does work nicely. Each configuration has a set of variables
+with its name as a prefix.
+
+There is a[[file://.base-configurations.org][ literate program for the base configurations.]]
+Any additional configurations will appear in /configurations.mk/.
+
+You can list them with =make status=  or see them with =make show-...=
+
+** Removing installations
+:PROPERTIES:
+:CUSTOM_ID: removing-installations
+:END:
+- Step 7: Optional, remove stuff. This does also remove them from the ~/.emacs-profiles.el
+  if it knows how.
+
+#+begin_src sh
+    make from-hell-remove
+
+    make rm-optional
+
+    make rm-defaults
+
+    make rm-installs
+#+end_src
+
+But you can just do an =rm -rf ...= if you want. But you will have to
+edit your /.emacs-profiles.el/
+
+Rinse - Repeat, Have fun.
+
+** Multiple Emacsn
+:PROPERTIES:
+:CUSTOM_ID: multiple-emacsn
+:END:
+I'm not sure this is useful, but it was part of the evolution and I
+needed it to test all of this. So here it is.
+
+The command =make new-emacsn path=...= will create a fresh Emacsn at
+path which can then be used to install and manage an entirely different set
+of Emacsn.
+
+#+begin_example
+- `make new-emacsn path=../new-place`
+- `cd ../new-place`
+- `make init`
+#+end_example
+
+For multiple Emacsn to work together it is not necessary to do another
+install. It is only necessary for the Emacsn to re-link to your
+~/.emacs-profiles.el in order to work.
+
+The =init= command creates an Emacsn with
+nothing but  vanilla *gnu* and *test* profile.
+It then links to /~/.emacs-profiles.el/ to become the active Emacsn that Chemacs sees.
+
+Each Emacsn keeps its Chemacs profiles locally and links
+/~/.emacs-profiles.el/ to the one located here. This makes it super easy
+to switch to a different Emacsn. When you are ready =make re-link=
+will re-link the current Emacsn to ~/.emacs-profiles.el.
+
+Take back ~/.emacs-profiles.el.
+#+begin_example
+`make re-link`
+#+end_example
+
+
+** Chemacs
+:PROPERTIES:
+:CUSTOM_ID: chemacs
+:END:
+This system uses [[https://github.com/plexus/chemacs2][Chemacs2]] as an
+/Emacs boot loader/ to allow multiple emacs configurations to exist at
+once. Most of the examples from the Chemacs doc are incorporated here.
+Chemacs2 is installed directly into /~/.emacs.d/, if there is already
+one it will be moved out of the way first.
+
+**** Profiles and Configs.
+:PROPERTIES:
+:CUSTOM_ID: profiles-and-configs.
+:END:
+Chemacs calls it's boot entries '/profiles/'. I call the record which
+defines a profile a '/config/'. There is a direct relationship between
+the two. Installing a configuration will result in a /profile/ entry of
+the same name. So profile-name can also be the name of a configuration,
+but not necessarily.
+
+There are always at least two profiles for each installed configuration.
+One as the name of the configuration the other as
+configuration-name_-server_
+
+*** Persistent profile definitions
+:PROPERTIES:
+:CUSTOM_ID: persistent-profile-definitions
+:END:
+When a profile is installed it will automatically add in any pre-defined
+server profiles or alternative invocations which apply.
+
+/Emacsn/ uncomments lines beginning with =;;<profile>= from
+.emacs-profiles.el._ This allows more complex profiles to be persistent
+across installs by adding them to the /emacs-profiles-template.el/. With
+the proper comment prefix the profile will install its self. Emacsn does
+also create a server profile entry for each installation.
+
+Persist your code by putting them back into
+[[https://github.com/EricaLinaG/Emacsn/blob/main/emacs-profiles-template.el][emacs-profiles-template.el]].
+This file is the basis for the next fresh install of Emacsn.
+
+Modify /.emacs-profiles.el/ to add new ones or change their names.
+
+You can of course just check your /.emacs-profiles.el/ in with
+everything else. That does get tricky if you have more than one Emacsn.
+
+*** Emacs Boot entries and installations.
+:PROPERTIES:
+:CUSTOM_ID: emacs-boot-entries-and-installations.
+:END:
+For each installation profile installed there are two chemacs entries
+made, one as the name given, and another with a /-server/ prefix, which
+is a server.
+
+**** How to see what is there.
+:PROPERTIES:
+:CUSTOM_ID: how-to-see-what-is-there.
+:END:
+- =make status=
+- =make show-profiles=
+
+Their definitions can be seen with show- - =make show-<config-name>=
+
+Visit the repository with browse - =make browse-<config-name>=
+
+**** Adding new boot profile entries
+:PROPERTIES:
+:CUSTOM_ID: adding-new-boot-profile-entries
+:END:
+It is very easy to add new entries which point at other installations,
+although I'm not sure why you would.
+
+#+begin_example
+- make insert-profile name=foo profile=stable
+- make insert-server-profile name=foo-server profile=stable
+#+end_example
+
+**** Emacs boot choices
+:PROPERTIES:
+:CUSTOM_ID: emacs-boot-choices
+:END:
+See the commands above for your current reality.
+
+Each installation automatically has 2 profiles. One to run straight
+emacs the other to run it as a server. Its server socket name will be
+the same name as the configuration.
+
+/Note: additional profile entries fall under the installed profile they
+reference./
+
+- Default Install Profile
+  - *stable*
+  - *default*
+    - Servers
+      - *stable-server*
+      - *exwm*
+      - *mail*
+      - *common*
+  - *dev*
+    - *dev-server*
+      [[https://github.com/ericalinag/ericas-emacs][ericas-emacs]]
+  - *test*
+    - *test-server*
+- Gnu profile is an empty install.
+  - *gnu*
+    - *gnu-server*
+- Optional Profiles
+  - *doom* is [[https://github.com/doomemacs][doom-emacs]],
+    - *doomdir* is *doom* with a profile directory.
+    - *doomdir-server*
+  - *space* is [[https://github.com/syl20bnr/spacemacs][spacemacs]].
+    - *spacemacs* is *space* with a profile directory.
+  - *prelude* is [[https://github.com/bbatsov/prelude][prelude emacs]].
+  - *ericas* is
+    [[https://github.com/ericalinag/ericas-emacs][ericas-emacs]].
+  - *live* is [[https://github.com/overtone/emacs-live][emacs-live]].
+  - *from-scratch* is
+    [[https://github.com/daviwil/emacs-from-scratch][emacs-from-scratch]].
+  - *from-hell* is
+    [[https://github.com/daviwil/emacs-from-hell][emacs-from-hell]].
+  - *uncle-daves* is
+    [[https://github.com/daedreth/UncleDavesEmacs.git][Uncle Daves
+    Emacs]].
+  - *And theres more...*
+
+Run emacs with profiles like this:
+
+#+begin_example
+`emacs --with-profile <profile name>`
+#+end_example
+
+or =emacsn -p <profile name>=
+
+
+** Running Emacs
+:PROPERTIES:
+:CUSTOM_ID: running-emacs
+:END:
+Running =emacs= will use *default* which is also *stable* but can be
+redirected to the *dev* profile, for instance, with
+
+#+begin_example
+emacs --with-profile dev
+#+end_example
+
+or with emacsn
+
+#+begin_example
+emacsn -p dev
+#+end_example
+
+*** Running emacs client to a server
+:PROPERTIES:
+:CUSTOM_ID: running-emacs-client-to-a-server
+:END:
+If you've got a named server running you can connect to it like this.
+There are so many choices in how to do this. They all work just fine.
+Chemacs and emacsn really simplify running Emacs servers and connecting
+with them.
+
+Create a new frame, connect to the socket and use vanilla emacs as
+fallback
+
+#+begin_example
+emacsclient -c -s exwm -a emacs
+emacsclient -c -s mail -a emacs
+emacsclient -c -s doom -a emacs
+#+end_example
+
+or, with emacsn, which will fail if there is no server. - my preference.
+This will just use the default profile. Add -p to specify an other.
+
+#+begin_example
+emacsn -cws exwm
+emacsn -cws mail
+emacsn -cws doom
+#+end_example
+
+Use an existing emacsclient frame by omitting the =w=:
+
+#+begin_example
+emacsn -cs mail
+#+end_example
+
+*** Running named daemons
+:PROPERTIES:
+:CUSTOM_ID: running-named-daemons
+:END:
+Some Chemacs profiles are servers, we dont have to do anything to make
+them start except invoke them.
+
+#+begin_example
+emacs --with-profile exwm
+emacs --with-profile gnu-server
+emacs --with-profile doom-server
+#+end_example
+
+or
+
+#+begin_example
+emacsn -p exwm
+emacsn -p gnu-server
+emacsn -p doom-server
+#+end_example
+
+**** Named daemons with emacsn
+:PROPERTIES:
+:CUSTOM_ID: named-daemons-with-emacsn
+:END:
+Using the default emacs as a server can be done like this.
+
+#+begin_example
+emacsn -s exwm
+emacsn -s mail
+#+end_example
+
+Connect emacsclint in a new frame/window with:
+
+#+begin_example
+emacsn -cws mail
+#+end_example
+
+*** Running no name daemons
+:PROPERTIES:
+:CUSTOM_ID: running-no-name-daemons
+:END:
+A vanilla, no-name, daemon - the old fashioned way, not the Chemacs way.
+
+#+begin_example
+emacs --daemon &
+#+end_example
+
+or emacsn -d
+
+Doom emacs daemon with the regular doom profile.
+
+#+begin_example
+emacs --with-profile doom --daemon &
+#+end_example
+
+or emacsn -dp doom
+
+
+** The emacsn script
+:PROPERTIES:
+:CUSTOM_ID: the-emacsn-script
+:END:
+There have already been a number of examples of emacsn usage so you are
+probably getting the idea. Its a very old script, and works well. I run
+emacs a few different ways. I use named daemons for some things. its
+nice to have so clients can be used for mu4e and Exwm.
+
+Chemacs handles some of the same things, but they seem to work well
+together.
+
+To facilitate the emacs commandline I have a wrapper for emacs in my
+~/bin directory. =emacsn=. It is a simple CLI that does all of those
+things.
+
+=emacsn -h= will give extensive help with examples.
+
+*** emacs daemons, clients, exwm, mu4e
+:PROPERTIES:
+:CUSTOM_ID: emacs-daemons-clients-exwm-mu4e
+:END:
+Emacsn has nice controls for creating and using named and unamed daemons
+with Emacs and Emacsclient. It also makes it easy to run elisp functions
+which is leveraged by other options like -e to create an emacs
+invocation for mu4e which runs as emacsclient and connects to a named
+daemon.
+
+It knows how to run any elisp function on startup, it runs =mu4e= or my
+=main-window= function to set up emacs in a standard configuration for a
+project. It can also choose different Chemacs profiles. Creating
+multiple daemons and using them by name is easy. It's easy to add
+others.
+
+Both of these commands result in the same thing, they both use the
+*stable* profile. They set the title, run mu4e, and set the server name
+to mail. but one uses the mail server profile from Chemacs, the other
+uses cli options to create a named mail server.
+
+Running a named emacs daemon for mail with Chemacs looks like this. This
+will run the mail server entry in *~/.emacs-profiles*.
+
+#+begin_example
+emacsn -ep mail
+#+end_example
+
+Using the default Chemacs profile it is like this.
+
+#+begin_example
+emacsn -es mail
+#+end_example
+
+Creating a new frame to connect to the server using the usual
+emacsclient looks like this:
+
+#+begin_example
+emacsn -ecws mail
+#+end_example
+
+The *emacsn* script has extensive help and a lot of options.
+
+
+** Summary
+:PROPERTIES:
+:CUSTOM_ID: summary-1
+:END:
+I hope that this is a useful project for folks. It has changed the way I
+manage my emacs installs, and it has given me an easy way to explore
+other Emacs configurations which is an amazingly good way to find new
+features and ways of doing things.
+
+I am open to PRs, so if you have something you'd like to add or suggest,
+please do.

@@ -1,0 +1,676 @@
+#+auto_tangle: t
+
+* Emacs configurations
+:PROPERTIES:
+:CUSTOM_ID: emacs-configurations
+:END:
+
+These are a few git repositories that I have tried installing and using with
+this system. Some of the more well known Emacsn are here.
+These are just data for the makefile so that it knows what to do.
+
+These configurations all go into [[https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk][/base-configurations.mk/]].
+Additional configurations can be found in [[https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk][/configurations.mk/]] which is
+untouched by Org and where they are appear when added. I thought
+of adding them to the end here and then tangling anytime this changes.
+That is extra complexity for no real gain. These are loaded by the main /Makefile/
+
+There is a target rule to help with making new configurations. It does
+assume basic generic functionality, but that is usually enough.
+Any configurations added in this way will go into configurations.mk
+This is the way to start with a new configuration. Add it first. Then
+discern its type. If it is an /.emacs.d/ configuration it will likely just work.
+
+#+begin_example
+  `make new-config name=my-profile-name repo=The-url-to-my-emacs-repo`
+  `make status`
+#+end_example
+
+After doing a =make status= you might be curious what all those profiles are. You
+can see them like this.
+
+=make show-<profile>=
+
+ie. =make show-doom=
+
+
+** Major types of configurations
+These are the common types of configurations so far.
+I dont think the failures of the org configurations is a reflection on
+this tool.  Perhaps it is just shining light.
+
+- An emacs.d with init.  - The generic one above.
+- Vanilla Doom               - Special install and update commands.
+- Vanilla Spacemacs      - Special update commands.
+- An Org configuration, - Needs tangling, sometimes fooling, sometimes works.
+- A /-arch/ install,              - A Doom or Spacemacs configuration.
+  Easy, but needs its own install of it's parent architecture.
+
+** The Configuration Template
+:PROPERTIES:
+:CUSTOM_ID: the-template
+:END:
+This template used by =make new-config= is /config-template.txt,/ it's
+profile name is gnu and it looks like this. This is the template to
+use for an /.emacs.d/ configuration, and its a place to start for the rest.
+
+#+begin_src makefile :tangle config-template.txt
+## gnu
+optional-configs += gnu
+gnu-arch               =
+gnu-status            = Not Tested at all
+gnu-repo               = your-repo-url
+gnu-repo-flags      =
+gnu-install-cmd    = $(emacs-nw-profile) gnu $(eval-kill-emacs)
+gnu-update-pull    = $(git-pull)
+gnu-update-cmd   = $(generic-update-cmd)
+gnu-message        = See Readme: make browse-gnu
+## gnu
+#+end_src
+
+This profile definition is the most common so far.
+It will work to some basic stage and is harmless even if it fails, running
+emacs again with the new profile is sometimes a process.
+This profile causes the following behaviors.
+
+- There is no /-arch/. That applies only to configurations which rely on
+  other configurations. ie. it is a doom.d or .spacemacs
+
+The install is just running emacs in terminal and then killing it. That can
+be enough to get a configuration to load its self. Sometimes the kill
+might need to be removed if there are problems, or  the update runs in
+the background.
+
+**** The install
+- git clone your-repo-url
+- Change directory to the configuration;
+- Runs emacs -nw; while giving it the function call for it to kill its self.
+
+**** The update
+- Change directory to the configuration;
+  - /$(git-pull)/ ie. =git pull origin=
+  - =generic-update= then runs an elisp script to update packages.
+
+** The generic update elisp function
+
+This uses packages and essentially asks packages to select its packages,
+and then update them. This may or may not do anything depending upon
+how a configuration is managing its packages. If a configuration provides
+an update function that should be used instead.
+
+#+begin_src emacs-lisp :tangle ./generic-update.el
+;;; generic-update --- Update selected packages.
+
+;;; Commentary:
+;;; Give a script to run to update all the packages as needed.
+;;; This will only work if run from the directory it is in.
+
+;;; This will 'git pull origin' to update the code base and then
+;;; try to update the installed packages.
+;;;
+;;; We change the user-emacs-directory to here so that Emacs will install
+;;; its packages here.
+
+;;; This is for emacs configurations which rely solely on list-packages for
+;;; package installation and updates.
+
+;;; Presumably those systems will install new packages automatically if
+;;; the code base changes and introduces any.
+
+;;; Code:
+
+;;; Because when we get here, emacs is still pointing at ~/.emacs.d and we
+;;; need it to point here. I'm not yet sure why it doesn't point here.
+;;; chemacs must not set it when we use --script which means we can
+;;; just run this with vanilla emacs and fool it to point here so
+;;; our packages get installed.
+
+;; (shell-command "git pull origin master")
+(shell-command "git pull origin")
+
+;; Trick emacs to be here, instead of .emacs.d
+;; Requires being here or using emacs --chdir <here> to work.
+;; This allows us to run vanilla emacs to update our emacs.
+;; just make sure its running here directly or with --chdir on
+;; on the emacs command line.
+(setq user-emacs-directory default-directory)
+(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+(princ "# updated:")
+(princ package-user-dir)
+
+(require 'package)
+
+(when (not package-archive-contents)
+  (package-refresh-contents))
+
+(list-packages t)
+(package-install-selected-packages)
+
+(provide 'generic-update)
+;;; generic-update.el ends here
+#+end_src
+
+
+** Basic Configurations
+:PROPERTIES:
+:CUSTOM_ID: more-configurations
+:END:
+These first ones are all /.emacs.d/ configuruations which use the default template as is.
+
+These install their packages the first time they run, and they mostly use packages or
+use-package to manage their updates.
+The install command amounts to running terminal emacs on the profile that
+was just cloned. These are /.emacs.d/ and they are all the same as the template.
+
+=make status=
+=make show-prelude=
+
+**** Prelude
+#+begin_src makefile :tangle ./base-configurations.mk
+## Prelude
+optional-configs    += prelude
+prelude-arch        =
+prelude-status      = Works
+prelude-repo        = $(git-hub)/bbatsov/prelude.git
+prelude-repo-flags  =
+prelude-update-pull = $(git-pull)
+prelude-install-cmd = $(emacs-nw-profile) prelude $(eval-kill-emacs)
+prelude-update-cmd  = $(generic-update-cmd)
+prelude-message     = See Readme: make browse-prelude
+## Prelude
+#+end_src
+
+**** Emacs Live
+#+begin_src makefile :tangle ./base-configurations.mk
+# Emacs-Live
+optional-configs  += live
+live-status       = Works
+live-repo         = $(git-hub)/overtone/emacs-live.git
+live-repo-flags   =
+live-update-pull  = $(git-pull)
+live-install-cmd  = $(emacs-nw-profile) live $(eval-kill-emacs)
+live-update-cmd   = $(generic-update-cmd)
+live-message      = See Readme: make browse-live
+#+end_src
+
+**** Emacs from Hell
+Its not really recommended to try to use this one.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Emacs from Hell
+# Im assuming its the same as Emacs from Scratch.
+optional-configs      += from-hell
+from-hell-status      = Works
+from-hell-repo        = $(git-hub)/daviwil/emacs-from-hell.git
+from-hell-repo-flags  =
+from-hell-update-pull = $(git-pull)
+from-hell-install-cmd = $(emacs-nw-profile) from-hell $(eval-kill-emacs)
+from-hell-update-cmd  = $(no-update)
+from-hell-message      = See Readme: make browse-from-hell
+#+end_src
+
+**** Emacs from Scratch
+This is a nice configuration to start from.  It is nicely structured and
+reasonably full featured.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Emacs from Scratch
+# emacs from scratch has auto updating so we dont need to do that.
+# we'll just pull the code and let it take care of its self.
+optional-configs         += from-scratch
+from-scratch-status      = Works
+from-scratch-repo        = $(git-hub)/daviwil/emacs-from-scratch.git
+from-scratch-repo-flags  =
+from-scratch-update-pull = $(git-pull)
+from-scratch-install-cmd = $(emacs-nw-profile) from-scratch $(eval-kill-emacs)
+from-scratch-update-cmd  = $(no-update)
+from-scratch-message      = See Readme: make browse-from-scratch
+#+end_src
+
+**** Uncle Daves Emacs
+This might be an org configuration, but this works.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Uncle Daves Emacs
+# I think this might also be the same as Emacs from Scratch.
+# I havent looked to see if it has auto update on.
+optional-configs        += uncle-daves
+uncle-daves-status      = Works
+uncle-daves-repo        = $(git-hub)/daedreth/UncleDavesEmacs.git
+uncle-daves-repo-flags  =
+uncle-daves-update-pull = $(git-pull)
+uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(eval-kill-emacs)
+uncle-daves-update-cmd  = $(generic-update-cmd)
+uncle-daves-message      = See Readme: make browse-uncle-daves
+#+end_src
+
+**** Purcell Emacs
+#+begin_src makefile :tangle ./base-configurations.mk
+## purcell
+optional-configs += purcell
+purcell-status       = Works
+purcell-repo         = https://github.com/purcell/emacs.d.git
+purcell-repo-flags   =
+purcell-install-cmd  = $(emacs-nw-profile) purcell $(eval-kill-emacs)
+purcell-update-pull  = $(git-pull)
+purcell-update-cmd   = $(generic-update-cmd)
+purcell-message      = See Readme: make browse-purcell
+## purcell
+#+end_src
+
+**** Centaur Emacs
+#+begin_src makefile :tangle ./base-configurations.mk
+## centaur
+optional-configs += centaur
+centaur-status       = Works
+centaur-repo         = https://github.com/seagle0128/.emacs.d.git
+centaur-repo-flags   =
+centaur-install-cmd  = $(emacs-nw-profile) centaur $(eval-kill-emacs)
+centaur-update-pull  = $(git-pull)
+centaur-update-cmd   = $(generic-update-cmd)
+centaur-message      = See Readme: make browse-centaur
+## centaur
+#+end_src
+
+**** Lolsmacs
+#+begin_src makefile :tangle ./base-configurations.mk
+## lolsmacs
+optional-configs += lolsmacs
+lolsmacs-status       = Works
+lolsmacs-repo         = https://github.com/grettke/lolsmacs.git
+lolsmacs-repo-flags   =
+lolsmacs-install-cmd  = ln -s lolsmacs.el init.el; \
+			echo \(lolsmacs-init\) >> init.el; \
+			$(emacs-nw-profile) lolsmacs $(eval-kill-emacs)
+lolsmacs-update-pull  = $(git-pull)
+lolsmacs-update-cmd   = $(generic-update-cmd)
+lolsmax-message       = See Readme: make browse-lolsmax
+## lolsmacs
+#+end_src
+
+**** Scimax
+#+begin_src makefile :tangle ./base-configurations.mk
+## scimax
+optional-configs += scimax
+scimax-status       = Works
+scimax-repo         = https://github.com/jkitchin/scimax.git
+scimax-repo-flags   =
+scimax-install-cmd  = $(emacs-nw-profile) scimax $(eval-kill-emacs)
+scimax-update-pull  = $(git-pull)
+scimax-update-cmd   = $(generic-update-cmd)
+scimax-message      = See Readme: make browse-scimax
+## scimax
+#+end_src
+
+**** Caiohs
+This is actually an org based configuration which has auto tangle on.  Because
+of that there's nothing special about it. It is just like the rest of these.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+## caiohcs
+optional-configs += caiohcs
+caiohcs-status       = Works. Nice Org config. Nice features.
+caiohcs-repo         = https://github.com/caiohcs/my-emacs
+caiohcs-repo-flags   =
+caiohcs-install-cmd  = $(emacs-nw-profile) caiohcs $(eval-kill-emacs)
+caiohcs-update-pull  = $(git-pull)
+caiohcs-update-cmd   = $(generic-update-cmd)
+caiohcs-message      = Nice Org-based config. Use Emacs or See Readme: make browse-caiohcs
+## caiohcs
+#+end_src
+
+Emacsn modifies *.emacs-profiles.el* as you add new profile installs.
+Your profiles in ~/.emacs-profiles is a link to the one here.
+
+** Profiles which have install/update functionalities.
+:PROPERTIES:
+:CUSTOM_ID: profiles-which-have-an-install-andor-update-functionalities.
+:END:
+Doom and Ericas are the only configurations which provide an install
+function. It does make things all a little bit nicer. They can interact
+as needed and exit when done. We do our best for the rest. Somehow it
+does feel right to just say hey! you over there, install all your stuff
+there, turn out the lights when your done. ok ?
+
+**** Ericas Emacs
+
+This isn't quite as nice as doom's shell scripts but it works.
+The generic configuration works too.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Ericas-Emacs
+optional-configs   = ericas
+ericas-status      = Works
+ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
+ericas-repo-flags  =
+ericas-update-pull = $(git-pull)
+ericas-install-cmd = emacs --script install.el
+ericas-update-cmd  = emacs --script update.el
+ericas-message     = See Readme: make browse-ericas
+#+end_src
+
+**** Doom Emacs
+Doom has hybrid shell/elisp scripts to run for install and update. It
+doesn't want us to pull for it. Use *$(no-pull)* to indicate that.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Doom
+# doom has hybrid shell/elisp scripts to run.
+# doom doesn't need or want a pull, it takes care of that.
+optional-configs  += doom
+doom-status       = Works
+doom-repo         = $(git-hub)/hlissner/doom-emacs.git
+doom-repo-flags   =
+doom-update-pull  = $(no-pull)
+doom-install-cmd  = bin/doom install
+doom-update-cmd   = bin/doom upgrade
+doom-message      = See Readme: make browse-doom
+#+end_src
+
+**** Spacemacs Emacs
+
+Like most emacs configurations Spacemacs just installs everything when
+it runs the first time. But it does have an internal lisp function we
+can use to do an update. In both cases we run in terminal mode, trust it
+all went well and save and kill terminal at the end, *$(kill-emacs)*.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Spacemacs
+# We can construct a lisp function to do its update.
+# probably its install too. I havent gone looking.
+optional-configs  += spacemacs
+spacemacs-status      = Works
+spacemacs-repo        = $(git-hub)/syl20bnr/spacemacs.git
+spacemacs-repo-flags  =
+spacemacs-update-pull = $(git-hub)
+spacemacs-install-cmd = $(emacs-nw-profile) spacemacs $(eval-kill-emacs)
+spacemacs-update-el   = '((lambda ()\
+			(configuration-layer/update-packages)\
+			(save-buffers-kill-terminal t)))'
+
+spacemacs-update-cmd  = emacs -nw --with-profile spacemacs \
+			  --eval $(space-update-el)
+spacemacs-message     = See Readme: make browse-spacemacs
+#+end_src
+
+** Configurations that are org files
+:PROPERTIES:
+:CUSTOM_ID: configurations-that-are-org-files
+:END:
+Configurations that are /Org/ files sometimes require tangling to get what is
+hopefully an /init.el/. These configurations, so far, seem to do
+indirect things to get installed. Making links to /init.el/ or even
+fooling them into putting what they generate into their own space instead of elsewhere.
+
+There is a default-org-profile which can be set to indicate which emacs
+should be used to do the tangling. It is set to *stable* by default.
+*$(org-emacs-nw)* runs that emacs with =-nw= to do the untangling of the
+configuration's org file. Which varies in location and name.
+
+This is the simplest /Org/ configuration that could work given a working
+configuration. We go untangle it to hopefully make an init.el. Then we
+run emacs again with the new profile so it can load its self up.
+
+All of these org based configurations have issues. This
+process works to step 1 with some and step 2 with others.
+None untangle and finish their first execution and load.
+
+When the install fails you will want to do this to work your way
+through the issues.
+
+emacs --with-profile /name/ --debug-init
+or
+emacsn -dp /name/
+
+
+**** Sacha Chua's Emacs
+
+Sacha keeps a /Sacha.el/ but, seems best to tangle it anyway. So,
+we do. Then we run again with the /new init.el/ that we have
+to fake out with a link to /sacha.el/.  All well and good. It fails
+with dependencies which are clearly local to somewhere else.
+I haven't dug all the way to success yet.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Spacemacs
+## sachac
+optional-configs += sachac
+sachac-status       = Tested. Fails to load. Various problems. Requires hacking.
+sachac-repo         = https://github.com/sachac/.emacs.d.git
+sachac-repo-flags   =
+sachac-install-cmd  = $(org-emacs-nw) \
+			--eval '(with-temp-buffer         \
+	  			(find-file "Sacha.org")   \
+				$(org-tangle))	  \
+				$(eval-kill-emacs)'            \
+			ln -s Sacha.el init.el;           \
+			$(emacs-nw-profile) sachac $(eval-kill-emacs)
+sachac-update-pull  = $(git-pull)
+sachac-update-cmd   = $(generic-update-cmd)
+sachac-message      = See Readme: 'make browse-sachac' \
+See also: 'make show-sachac' \
+There are missing local dependencies and other things which will \
+cause the install to fail along the way. It is a bit of hacking.
+## sachac
+#+end_src
+
+**** Panadestein Emacs
+
+This one fails at tangling, it needs something I don't have but I dont know what.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+## panadestein
+## Basically this needs to be tangled by a different install with org +...
+## we go untangle it to hopefully make an init.el. Then we run emacs again
+## with the new profile so it can load its self up.
+optional-configs += panadestein
+panadestein-status       = Cannot tangle this to an el. No babel-execute for org!
+panadestein-repo         = https://github.com/Panadestein/emacsd.git
+panadestein-repo-flags   =
+panadestein-install-cmd  = $(org-emacs-nw) \
+				--eval '(with-temp-buffer                  \
+	  				  (find-file "content/index.org")  \
+					  $(org-tangle)                  \
+					  $(kill-emacs))'                  \
+			   $(emacs-nw-profile) panadestein $(eval-kill-emacs)
+
+panadestein-update-pull  = $(git-pull)
+panadestein-update-cmd   = $(generic-update-cmd)
+panadestein-message      = This requires untangling which will fail on this first \
+install step. Babel cannot tangle org. I have that installed. This does not install. \
+## panadestein
+#+end_src
+
+
+**** Rougier Emacs
+
+This one has a different twist. It wants to tangle into a directory;
+~/.emacs.org/. To fool it into doing the right thing it is necessary
+to link ~/.emacs.org/ back to the install directory here.
+
+Install steps in the configuration:
+- cd into the config - install does this for us.
+- rm /~//.emacs.org/.
+- link /~//.emacs.org/ back to here.
+- Run emacs to load the org file and untangle it.
+- exit emacs
+- rm /~//.emacs.org/.
+- Run emacs again with the profile to initialize the packages.
+
+The tangle here fails for different reasons which can be fixed.
+[[See the Readme] [https://github.com/rougier/dotemacs.git]]
+
+#+begin_src makefile :tangle ./base-configurations.mk
+optional-configs += rougier
+rougier-status       = !! Almost. Org tangle fails. See: 'make browse-rougier'
+rougier-repo         = https://github.com/rougier/dotemacs.git
+rougier-repo-flags   =
+rougier-install-cmd  = rm -f ~/.emacs.org ;      \
+			ln -s $(PWD)/rougier ~/.emacs.org ;  \
+			$(org-emacs-nw)                      \
+			--eval '(with-temp-buffer            \
+	  			  (find-file "dotemacs.org")   \
+				  $(org-tangle)	    	     \
+				  $(kill-emacs!));'              \
+			$(emacs-nw-profile) rougier $(eval-kill-emacs)
+
+rougier-update-pull  = $(git-pull)
+rougier-update-cmd   = $(generic-update-cmd)
+rougier-message  = See the readme:  'make browse-rougier' \
+    The problems are documented. This gets us as far as it can.
+## rougier
+#+end_src
+
+
+** Doom.d and spacemacs.d configurations.
+:PROPERTIES:
+:CUSTOM_ID: doom.d-and-spacemacs.d-configurations.
+:END:
+These configurations are not full Emacs configurations in the
+traditional sense. These are actually configurations for Doom or
+Spacemacs which normally go in /~//.doom.d/ and /~//.spacemacs/. Chemacs
+handles these with an extra entry in the profile telling it where this
+directory is.
+
+These configurations introduced a new variable, *-arch,* this tells
+Emacsn that this configuration uses doom or spacemacs or whatever and it
+sets up the Chemacs profiles accordingly. It also creates an install of
+the necessary the arch configuration for its own.
+
+
+**** Emacs for writers
+
+Emacs for writers is a /.spacemacs/ type repo. We just need to tell it
+which installation it should use for its base emacs.
+
+This one seems to work, but its hard to tell. It looks like stock
+Spacemacs.
+
+#+begin_src makefile  :tangle ./base-configurations.mk
+## for-writers
+optional-configs += for-writers
+for-writers-arch         = spacemacs
+for-writers-status       = Almost works, testing -arch var.
+for-writers-message      =
+for-writers-repo         = https://github.com/frankjonen/emacs-for-writers.git
+for-writers-repo-flags   =
+for-writers-install-cmd  = $(no-install)
+for-writers-update-pull  = $(git-pull)
+for-writers-update-cmd   = $(spacemacs-update-cmd)
+for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
+## for-writers
+#+end_src
+
+**** Hotel California for Creative Writers
+
+A configuration entry for a doom.d configuration is shown here. This
+works reasonably well. This configuration has a nice dashboard which
+clearly shows what it is.
+
+For these types of configuration the (doom/reload) is run twice, the
+first run seems to set things up. The second installs and compiles
+everything. Missing package Errors happen on the second doom/reload, but
+restarting doom/reload restarts the process and often works.
+There is probably something about doom that I dont understand that would
+explain this or give an easier way.
+
+Problems mostly seem to come down to doom sync and doom/reload and that
+the packages load in the background over time. So sometimes they just
+are not there yet.
+
+An install process is to install this, and doom inside it, run the doom
+install, then this install which is:
+
+- Install this configuraton - git clone
+  - Install doom in the new configation a doom.
+  - run doom install for it.
+- Run doom sync with Doomdir to here.
+- Run emacs and do doom/reload twice then exit.
+
+- Update is to
+  - git pull the configuration
+  - doom/bin/doom update
+
+Note: At a minimum, you will need Overpass and Carlito fonts, or to change them in config.el.
+There is also a few other things to install the [[https://github.com/jacmoe/.doom.d.git][readme tells all]].
+
+#+begin_src makefile :tangle ./base-configurations.mk
+  doom-load = --eval '(progn (doom/reload)(doom/reload))'
+  ## hotel-california-for-writers
+  ## this is a .doom.d repo it has its own doom in the doom folder.
+  optional-configs += hotel-california-for-writers
+  hotel-california-for-writers-arch         = doom
+  hotel-california-for-writers-status       = Works - May take some initial help.
+  hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
+  hotel-california-for-writers-repo-flags   =
+  hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
+                          $(emacs-nw-profile) \
+                            hotel-california-for-writers \
+                            $(doom-load)
+  hotel-california-for-writers-update-pull  = $(git-pull)
+  hotel-california-for-writers-update-cmd   = doom/bin/doom update
+
+  hotel-california-for-writers-message   = \
+  This seems to work reasonably.  I've installed it a lot of times. \
+  There are other things to install. See make browse-hotel-california-for-writers \
+  At a minimum Fonts: \
+  You will need Overpass and Carlito fonts, or to change them in config.el and \
+  then do another 'doom/reload'.
+#+end_src
+
+**** Erica's Evil Doom for Writers
+
+I created this from Hotel California for writers by adding Evil, and various other packages that
+I feel are necessary after 25 plus years of programming in emacs.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+  ## ericas-evil-doom-for-writers
+  ## this is a .doom.d repo it has its own doom in the doom folder.
+  optional-configs += ericas-evil-doom-for-writers
+  ericas-evil-doom-for-writers-arch         = doom
+  ericas-evil-doom-for-writers-status       = Works - May take some initial help.
+  ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
+  ericas-evil-doom-for-writers-repo-flags   =
+  ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
+                                                  $(emacs-nw-profile) \
+                                                    ericas-evil-dom-for-writers \
+                                                    $(doom-load)
+  ericas-evil-doom-for-writers-update-pull  = $(git-pull)
+  ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
+
+  ericas-evil-doom-for-writers-message   = \
+  This is hotel-california-for-writers with evil, and then some.\
+  See make browse ericas-evil-doom-for-writers
+  ## ericas-evil-doom-for-writers
+#+end_src
+
+
+** Summary
+:PROPERTIES:
+:CUSTOM_ID: summary
+:END:
+To add a new profile to [[https://github.com/EricaLinaG/Emacsn/blob/main/configurations.mk][/configurations.mk/]] is easy,
+
+=make new-config name=some-name repo=some-repo=.
+
+To add it *and* install it do this;
+
+=make install-new name=some-name repo=some-repo=.
+
+A profile's install command is frequently just to run emacs with that
+profile.
+
+The update changes directories to the installation, maybe does a
+=git pull=, and maybe runs emacs to update its packages. The
+generic-update-cmd works for most configurations, it simply gets emacs
+packages to install-selected.
+
+The /-repo-flags/ allow for creating profiles based on different
+branches in the same repo.
+
+Configurations can be seen with
+
+=make status=
+and
+make show-/name/
