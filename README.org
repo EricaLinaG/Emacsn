@@ -339,7 +339,7 @@ These are simple records of Make variables. Its a little primitive,
 but it does work nicely. Each configuration has a set of variables
 with its name as a prefix.
 
-There is a[[file://.base-configurations.org][ literate program for the base configurations.]]
+There is a [[https://github.com/EricaLinaG/Emacsn/blob/main/base-configurations.org][literate program for the base configurations.]]
 Any additional configurations will appear in /configurations.mk/.
 
 You can list them with =make status=  or see them with =make show-...=
