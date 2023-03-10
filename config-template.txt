@@ -1,11 +1,11 @@
 ## gnu
 optional-configs += gnu
-gnu-arch               =
-gnu-status            = Not Tested at all
-gnu-repo               = your-repo-url
-gnu-repo-flags      =
-gnu-install-cmd    = $(emacs-nw-profile) gnu $(eval-kill-emacs)
-gnu-update-pull    = $(git-pull)
-gnu-update-cmd   = $(generic-update-cmd)
-gnu-message        = See Readme: make browse-gnu
+gnu-arch        =
+gnu-status      = Not Tested at all
+gnu-repo        = your-repo-url
+gnu-repo-flags  =
+gnu-install-cmd = $(emacs-nw-profile) gnu $(eval-kill-emacs)
+gnu-update-pull = $(git-pull)
+gnu-update-cmd  = $(generic-update-cmd)
+gnu-message     = See Readme: make browse-gnu
 ## gnu
