@@ -118,7 +118,8 @@ ericas-status      = Works
 ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
 ericas-repo-flags  =
 ericas-update-pull = $(git-pull)
-ericas-install-cmd = emacs --script install.el --with-debug
+ericas-install-cmd = emacs --script install.el;\
+emacs --script install.el;
 ericas-update-cmd  = emacs --script update.el
 ericas-message     = See Readme: make browse-ericas
 

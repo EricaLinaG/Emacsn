@@ -337,17 +337,21 @@ there, turn out the lights when your done. ok ?
 
 This isn't quite as nice as doom's shell scripts but it works.
 The generic configuration works too.
+The install has started failing on a package, restarting it finishes it somehow.
+Its the elp package. I have no idea why it fails the first time and loads the
+second.
 
 #+begin_src makefile :tangle ./base-configurations.mk
-# Ericas-Emacs
-optional-configs   = ericas
-ericas-status      = Works
-ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
-ericas-repo-flags  =
-ericas-update-pull = $(git-pull)
-ericas-install-cmd = emacs --script install.el --with-debug
-ericas-update-cmd  = emacs --script update.el
-ericas-message     = See Readme: make browse-ericas
+  # Ericas-Emacs
+  optional-configs   = ericas
+  ericas-status      = Works
+  ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
+  ericas-repo-flags  =
+  ericas-update-pull = $(git-pull)
+  ericas-install-cmd = emacs --script install.el;\
+  emacs --script install.el;
+  ericas-update-cmd  = emacs --script update.el
+  ericas-message     = See Readme: make browse-ericas
 #+end_src
 
 **** Doom Emacs
