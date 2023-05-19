@@ -43,6 +43,16 @@ from-scratch-install-cmd = $(emacs-nw-profile) from-scratch $(eval-kill-emacs)
 from-scratch-update-cmd  = $(no-update)
 from-scratch-message      = See Readme: make browse-from-scratch
 
+# Crafted Emacs
+optional-configs    += crafted
+crafted-status      = Works
+crafted-repo        = $(git-hub)/SystemCrafters/crafted-emacs
+crafted-repo-flags  =
+crafted-update-pull = $(git-pull)
+crafted-install-cmd = $(emacs-nw-profile) crafted $(eval-kill-emacs)
+crafted-update-cmd  = $(no-update)
+crafted-message     = See Readme: make browse-crafted
+
 # Uncle Daves Emacs
 # I think this might also be the same as Emacs from Scratch.
 # I havent looked to see if it has auto update on.
@@ -112,16 +122,16 @@ caiohcs-update-cmd   = $(generic-update-cmd)
 caiohcs-message      = Nice Org-based config. Use Emacs or See Readme: make browse-caiohcs
 ## caiohcs
 
-# Ericas-Emacs
-optional-configs   = ericas
-ericas-status      = Works
-ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
-ericas-repo-flags  =
-ericas-update-pull = $(git-pull)
-ericas-install-cmd = emacs --script install.el;\
-emacs --script install.el;
-ericas-update-cmd  = emacs --script update.el
-ericas-message     = See Readme: make browse-ericas
+  # Ericas-Emacs
+  optional-configs   = ericas
+  ericas-status      = Works
+  ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
+  ericas-repo-flags  =
+  ericas-update-pull = $(git-pull)
+  ericas-install-cmd = emacs --script install.el;\
+  emacs --script install.el;
+  ericas-update-cmd  = emacs --script update.el
+  ericas-message     = See Readme: make browse-ericas
 
 # Doom
 # doom has hybrid shell/elisp scripts to run.
@@ -226,43 +236,43 @@ for-writers-update-cmd   = $(spacemacs-update-cmd)
 for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 ## for-writers
 
-doom-load = --eval '(progn (doom/reload)(doom/reload))'
-## hotel-california-for-writers
-## this is a .doom.d repo it has its own doom in the doom folder.
-optional-configs += hotel-california-for-writers
-hotel-california-for-writers-arch         = doom
-hotel-california-for-writers-status       = Works - May take some initial help.
-hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
-hotel-california-for-writers-repo-flags   =
-hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
-                        $(emacs-nw-profile) \
-                          hotel-california-for-writers \
-                          $(doom-load)
-hotel-california-for-writers-update-pull  = $(git-pull)
-hotel-california-for-writers-update-cmd   = doom/bin/doom update
+  doom-load = --eval '(progn (doom/reload)(doom/reload))'
+  ## hotel-california-for-writers
+  ## this is a .doom.d repo it has its own doom in the doom folder.
+  optional-configs += hotel-california-for-writers
+  hotel-california-for-writers-arch         = doom
+  hotel-california-for-writers-status       = Works - May take some initial help.
+  hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
+  hotel-california-for-writers-repo-flags   =
+  hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
+                          $(emacs-nw-profile) \
+                            hotel-california-for-writers \
+                            $(doom-load)
+  hotel-california-for-writers-update-pull  = $(git-pull)
+  hotel-california-for-writers-update-cmd   = doom/bin/doom update
 
-hotel-california-for-writers-message   = \
-This seems to work reasonably.  I've installed it a lot of times. \
-There are other things to install. See make browse-hotel-california-for-writers \
-At a minimum Fonts: \
-You will need Overpass and Carlito fonts, or to change them in config.el and \
-then do another 'doom/reload'.
+  hotel-california-for-writers-message   = \
+  This seems to work reasonably.  I've installed it a lot of times. \
+  There are other things to install. See make browse-hotel-california-for-writers \
+  At a minimum Fonts: \
+  You will need Overpass and Carlito fonts, or to change them in config.el and \
+  then do another 'doom/reload'.
 
-## ericas-evil-doom-for-writers
-## this is a .doom.d repo it has its own doom in the doom folder.
-optional-configs += ericas-evil-doom-for-writers
-ericas-evil-doom-for-writers-arch         = doom
-ericas-evil-doom-for-writers-status       = Works - May take some initial help.
-ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
-ericas-evil-doom-for-writers-repo-flags   =
-ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
-                                                $(emacs-nw-profile) \
-                                                  ericas-evil-dom-for-writers \
-                                                  $(doom-load)
-ericas-evil-doom-for-writers-update-pull  = $(git-pull)
-ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
+  ## ericas-evil-doom-for-writers
+  ## this is a .doom.d repo it has its own doom in the doom folder.
+  optional-configs += ericas-evil-doom-for-writers
+  ericas-evil-doom-for-writers-arch         = doom
+  ericas-evil-doom-for-writers-status       = Works - May take some initial help.
+  ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
+  ericas-evil-doom-for-writers-repo-flags   =
+  ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
+                                                  $(emacs-nw-profile) \
+                                                    ericas-evil-dom-for-writers \
+                                                    $(doom-load)
+  ericas-evil-doom-for-writers-update-pull  = $(git-pull)
+  ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
 
-ericas-evil-doom-for-writers-message   = \
-This is hotel-california-for-writers with evil, and then some.\
-See make browse ericas-evil-doom-for-writers
-## ericas-evil-doom-for-writers
+  ericas-evil-doom-for-writers-message   = \
+  This is hotel-california-for-writers with evil, and then some.\
+  See make browse ericas-evil-doom-for-writers
+  ## ericas-evil-doom-for-writers

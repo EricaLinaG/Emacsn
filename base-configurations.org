@@ -228,6 +228,22 @@ from-scratch-update-cmd  = $(no-update)
 from-scratch-message      = See Readme: make browse-from-scratch
 #+end_src
 
+**** Crafted Emacs
+This is a nice configuration to start from.  It is nicely structured and full featured.
+
+#+begin_src makefile :tangle ./base-configurations.mk
+# Crafted Emacs
+optional-configs    += crafted
+crafted-status      = Works
+crafted-repo        = $(git-hub)/SystemCrafters/crafted-emacs
+crafted-repo-flags  =
+crafted-update-pull = $(git-pull)
+crafted-install-cmd = $(emacs-nw-profile) crafted $(eval-kill-emacs)
+crafted-update-cmd  = $(no-update)
+crafted-message     = See Readme: make browse-crafted
+#+end_src
+
+
 **** Uncle Daves Emacs
 This might be an org configuration, but this works.
 
