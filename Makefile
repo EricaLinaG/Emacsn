@@ -369,7 +369,7 @@ restore-profiles-% :
 
 # function to make a timestamped copy of .emacs-profiles.el
 backup-profile = \
-	cp .emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
+	cp -L .emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
 
 backup-profiles:
 	printf "\nBacking up .emacs-profiles.el to \
@@ -536,6 +536,11 @@ list-configs:
 	printf "========================================\n"
 	grep '.*-status' base-configurations.mk | sed 's/-status.*=/    \t/'
 	grep '.*-status' configurations.mk | sed 's/-status.*=/    \t/'
+	printf "========================================\n"
+	printf "See an install configuration with show-<configuration-name>\n"
+	printf "\n	make show-crafted \n"
+	printf "\nVisit the repo url.\n"
+	printf "\n      make browse-crafted \n"
 
 show-optional:
 	printf "\nAll Optional installations:\n"
@@ -551,9 +556,9 @@ show-available:
 
 	printf "========================================\n"
 	printf "See an install configuration with show-<configuration-name>\n"
-	printf "\n	make show-doom \n"
+	printf "\n	make show-crafted \n"
 	printf "\nVisit the repo url.\n"
-	printf "\n      make browse-doom \n"
+	printf "\n      make browse-crafted \n"
 
 status-header:
 	printf "Emacsn: Current Status\n"
@@ -565,7 +570,7 @@ status-end:
 	printf "\nUse 'make help' to get help.\n"
 	printf "========================================\n"
 
-status: status-header show-default show-installs show-available list-configs status-end
+status: status-header show-default show-installs list-configs status-end
 
 help:
 	cat help.txt

@@ -66,7 +66,7 @@ Writing it in elisp will be a pleasure.
 :CUSTOM_ID: what
 :END:
 All I thought I wanted was: - Keep a dev and a stable version of my
-configuration. - Easy to test a fresh install from git. - Easy to update
+configuration. - Easy to test a fresh emacs config install from git. - Easy to update
 an install from git and refresh packages. - Easy to try some Emacs
 distro from github.
 
@@ -174,13 +174,30 @@ It really is mostly a Makefile.
 - `make show-doom`
 #+end_example
 
+Just install it all with Erica's emacs.
+
+- `make install`
+
+To get just the base. Chemacs, vanilla gnu emacs, etc.
+
+- `make install-base`
+
+To install the defaults, stable and dev, create an empty/vanilla test.  This can take a bit of time
+doing the initial loading of all the packages of the stable and dev emacs.
+
+- `make install-defaults`
+
+
+*** Set a different default configuration.
+
 If your emacs setup works in .emacs.d with an init.el you are probably
-good to go with setting your default to that.
+good to go with setting your default to that using the default configuration template.
+Otherwise the configuration may need some custom settings which may stop it from working out of the box.
 
 If you want to make your emacs the default now do these two things.
 This installs Chemacs and gets us a minimal setup with vanilla gnu emacs.
-Then we create a configuration for it, set it to the default, and then
-reinstall all the default profiles with this one.
+Then we create a configuration for your emacs repo and set it to the default.
+Then reinstall all the default profiles with this one.
 
 - =make install-base status=
 - =make install-new-default name=my-profile-name repo=The-url-to-my-emacs-repo=
