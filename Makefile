@@ -433,7 +433,8 @@ mv.emacs-profiles.el:
 ifneq ($(has-profiles), 0)
 	printf " Has a chemacs profile thats not a link. Saving it away"
 	printf "\n\nMoving ~/.emacs-profiles.el to $(dot-backups)/.emacs-profiles.el.$(seconds-now)\n"
-	mv ~/.emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
+	cp -L ~/.emacs-profiles.el $(dot-backups)/.emacs-profiles.el.$(seconds-now)
+	rm -f ~/.emacs-profiles.el
 endif
 
 # These move .emacs and .emacs.d to .bak.<epoch seconds>
