@@ -19,6 +19,7 @@ live-update-pull  = $(git-pull)
 live-install-cmd  = $(emacs-nw-profile) live $(eval-kill-emacs)
 live-update-cmd   = $(generic-update-cmd)
 live-message      = See Readme: make browse-live
+# Emacs-Live
 
 # Emacs from Hell
 # Im assuming its the same as Emacs from Scratch.
@@ -30,6 +31,7 @@ from-hell-update-pull = $(git-pull)
 from-hell-install-cmd = $(emacs-nw-profile) from-hell $(eval-kill-emacs)
 from-hell-update-cmd  = $(no-update)
 from-hell-message      = See Readme: make browse-from-hell
+# Emacs from Hell
 
 # Emacs from Scratch
 # emacs from scratch has auto updating so we dont need to do that.
@@ -42,6 +44,7 @@ from-scratch-update-pull = $(git-pull)
 from-scratch-install-cmd = $(emacs-nw-profile) from-scratch $(eval-kill-emacs)
 from-scratch-update-cmd  = $(no-update)
 from-scratch-message      = See Readme: make browse-from-scratch
+# Emacs from Scratch
 
 # Crafted Emacs
 optional-configs    += crafted
@@ -52,6 +55,7 @@ crafted-update-pull = $(git-pull)
 crafted-install-cmd = $(emacs-nw-profile) crafted $(eval-kill-emacs)
 crafted-update-cmd  = $(no-update)
 crafted-message     = See Readme: make browse-crafted
+# Crafted Emacs
 
 # Uncle Daves Emacs
 # I think this might also be the same as Emacs from Scratch.
@@ -64,6 +68,7 @@ uncle-daves-update-pull = $(git-pull)
 uncle-daves-install-cmd = $(emacs-nw-profile) uncle-daves $(eval-kill-emacs)
 uncle-daves-update-cmd  = $(generic-update-cmd)
 uncle-daves-message      = See Readme: make browse-uncle-daves
+# Uncle Daves Emacs
 
 ## purcell
 optional-configs += purcell
@@ -122,16 +127,43 @@ caiohcs-update-cmd   = $(generic-update-cmd)
 caiohcs-message      = Nice Org-based config. Use Emacs or See Readme: make browse-caiohcs
 ## caiohcs
 
-  # Ericas-Emacs
-  optional-configs   = ericas
-  ericas-status      = Works
-  ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
-  ericas-repo-flags  =
-  ericas-update-pull = $(git-pull)
-  ericas-install-cmd = emacs --script install.el;\
-  emacs --script install.el;
-  ericas-update-cmd  = emacs --script update.el
-  ericas-message     = See Readme: make browse-ericas
+## writing-studio
+optional-configs += writing-studio
+writing-studio-status       = Not tested.
+writing-studio-repo         = https://github.com/pprevos/emacs-writing-studio.git
+writing-studio-repo-flags   =
+writing-studio-install-cmd  = $(emacs-nw-profile) writing-studio $(eval-kill-emacs)
+writing-studio-update-pull  = $(git-pull)
+writing-studio-update-cmd   = $(generic-update-cmd)
+writing-studio-message      = Should work. Use Emacs or See Readme: make browse-writing-studio
+## writing-studio
+
+## writing-with-emacs
+## this is a .doom.d repo it has its own doom in the doom folder.
+optional-configs += writing-with-emacs
+writing-with-emacs-status       = untested - init.els usually work out of the box..
+writing-with-emacs-repo         = https://github.com/thinkhuman/writingwithemacs
+writing-with-emacs-repo-flags   =
+writing-with-emacs-install-cmd  = $(emacs-nw-profile) writing-with-emacs $(eval-kill-emacs)
+writing-with-emacs-update-pull  = $(git-pull)
+writing-with-emacs-update-cmd   = $(generic-update-cmd)
+
+writing-with-emacs-message   = \
+This is is a configuration by someone who doesnt code.\
+See make browse writing-with-emacs
+## writing-with-emacs
+
+# Ericas-Emacs
+optional-configs   = ericas
+ericas-status      = Works
+ericas-repo        = $(git-hub)/ericalinag/ericas-emacs.git
+ericas-repo-flags  =
+ericas-update-pull = $(git-pull)
+ericas-install-cmd = emacs --script install.el;\
+                                    emacs --script install.el;
+ericas-update-cmd  = emacs --script update.el
+ericas-message     = See Readme: make browse-ericas
+# Ericas-Emacs
 
 # Doom
 # doom has hybrid shell/elisp scripts to run.
@@ -144,6 +176,7 @@ doom-update-pull  = $(no-pull)
 doom-install-cmd  = bin/doom install
 doom-update-cmd   = bin/doom upgrade
 doom-message      = See Readme: make browse-doom
+# Doom
 
 # Spacemacs
 # We can construct a lisp function to do its update.
@@ -161,8 +194,8 @@ spacemacs-update-el   = '((lambda ()\
 spacemacs-update-cmd  = emacs -nw --with-profile spacemacs \
 			  --eval $(space-update-el)
 spacemacs-message     = See Readme: make browse-spacemacs
-
 # Spacemacs
+
 ## sachac
 optional-configs += sachac
 sachac-status       = Tested. Fails to load. Various problems. Requires hacking.
@@ -204,6 +237,7 @@ panadestein-message      = This requires untangling which will fail on this firs
 install step. Babel cannot tangle org. I have that installed. This does not install. \
 ## panadestein
 
+## rougier
 optional-configs += rougier
 rougier-status       = !! Almost. Org tangle fails. See: 'make browse-rougier'
 rougier-repo         = https://github.com/rougier/dotemacs.git
@@ -236,43 +270,44 @@ for-writers-update-cmd   = $(spacemacs-update-cmd)
 for-writers-message      = Seems like close to vanilla spacemacs. I dunno.
 ## for-writers
 
-  doom-load = --eval '(progn (doom/reload)(doom/reload))'
-  ## hotel-california-for-writers
-  ## this is a .doom.d repo it has its own doom in the doom folder.
-  optional-configs += hotel-california-for-writers
-  hotel-california-for-writers-arch         = doom
-  hotel-california-for-writers-status       = Works - May take some initial help.
-  hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
-  hotel-california-for-writers-repo-flags   =
-  hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
-                          $(emacs-nw-profile) \
-                            hotel-california-for-writers \
-                            $(doom-load)
-  hotel-california-for-writers-update-pull  = $(git-pull)
-  hotel-california-for-writers-update-cmd   = doom/bin/doom update
+doom-load = --eval '(progn (doom/reload)(doom/reload))'
+## hotel-california-for-writers
+## this is a .doom.d repo it has its own doom in the doom folder.
+optional-configs += hotel-california-for-writers
+hotel-california-for-writers-arch         = doom
+hotel-california-for-writers-status       = Works - May take some initial help.
+hotel-california-for-writers-repo         = https://github.com/jacmoe/.doom.d.git
+hotel-california-for-writers-repo-flags   =
+hotel-california-for-writers-install-cmd  = doom/$(doomsync); \
+                        $(emacs-nw-profile) \
+                          hotel-california-for-writers \
+                          $(doom-load)
+hotel-california-for-writers-update-pull  = $(git-pull)
+hotel-california-for-writers-update-cmd   = doom/bin/doom update
 
-  hotel-california-for-writers-message   = \
-  This seems to work reasonably.  I've installed it a lot of times. \
-  There are other things to install. See make browse-hotel-california-for-writers \
-  At a minimum Fonts: \
-  You will need Overpass and Carlito fonts, or to change them in config.el and \
-  then do another 'doom/reload'.
+hotel-california-for-writers-message   = \
+This seems to work reasonably.  I've installed it a lot of times. \
+There are other things to install. See make browse-hotel-california-for-writers \
+At a minimum Fonts: \
+You will need Overpass and Carlito fonts, or to change them in config.el and \
+then do another 'doom/reload'.
+## hotel-california-for-writers
 
-  ## ericas-evil-doom-for-writers
-  ## this is a .doom.d repo it has its own doom in the doom folder.
-  optional-configs += ericas-evil-doom-for-writers
-  ericas-evil-doom-for-writers-arch         = doom
-  ericas-evil-doom-for-writers-status       = Works - May take some initial help.
-  ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
-  ericas-evil-doom-for-writers-repo-flags   =
-  ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
-                                                  $(emacs-nw-profile) \
-                                                    ericas-evil-dom-for-writers \
-                                                    $(doom-load)
-  ericas-evil-doom-for-writers-update-pull  = $(git-pull)
-  ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
+## ericas-evil-doom-for-writers
+## this is a .doom.d repo it has its own doom in the doom folder.
+optional-configs += ericas-evil-doom-for-writers
+ericas-evil-doom-for-writers-arch         = doom
+ericas-evil-doom-for-writers-status       = Works - May take some initial help.
+ericas-evil-doom-for-writers-repo         = https://github.com/ericalinag/ericas-evil-doom-for-writers.git
+ericas-evil-doom-for-writers-repo-flags   =
+ericas-evil-doom-for-writers-install-cmd  = doom/$(doomsync); \
+                                                $(emacs-nw-profile) \
+                                                  ericas-evil-dom-for-writers \
+                                                  $(doom-load)
+ericas-evil-doom-for-writers-update-pull  = $(git-pull)
+ericas-evil-doom-for-writers-update-cmd   = doom/bin/doom update
 
-  ericas-evil-doom-for-writers-message   = \
-  This is hotel-california-for-writers with evil, and then some.\
-  See make browse ericas-evil-doom-for-writers
-  ## ericas-evil-doom-for-writers
+ericas-evil-doom-for-writers-message   = \
+This is hotel-california-for-writers with evil, and then some.\
+See make browse ericas-evil-doom-for-writers
+## ericas-evil-doom-for-writers

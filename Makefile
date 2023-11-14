@@ -117,7 +117,7 @@ test-sed:
 print-%  : ; @echo $* = $($*)
 
 show-%  : ; @echo $* configuration:
-	grep '^$*' configurations.mk
+	grep '^$*' base-configurations.mk
 
 browse-% :
 	$(shell $(BROWSER) $($*-repo))
